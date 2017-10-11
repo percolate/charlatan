@@ -124,10 +124,6 @@ func (g *Generator) generate() []byte {
 		title := fmt.Sprintf("// This is a mock for %s //", i.Name)
 		bar := strings.Repeat("/", len(title))
 
-		fmt.Fprintf(&buf, "%s\n", bar)
-		fmt.Fprintf(&buf, "%s\n", title)
-		fmt.Fprintf(&buf, "%s\n", bar)
-
 		for _, m := range i.Methods {
 			if err := invocationTempl.Execute(&buf, m); err != nil {
 				log.Fatal(err)
