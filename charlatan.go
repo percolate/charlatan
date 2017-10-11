@@ -90,12 +90,11 @@ func main() {
 
 	src := g.generate()
 
-	if *outputName == "" {
-		*outputName = "charlatan.go"
+	if *outputPath == "" {
+		*outputPath = "charlatan.go"
 	}
 
-	output := filepath.Join(dir, *outputName)
-	if err := ioutil.WriteFile(output, src, 0644); err != nil {
+	if err := ioutil.WriteFile(*outputPath, src, 0644); err != nil {
 		log.Fatalf("writing output: %s", err)
 	}
 }
