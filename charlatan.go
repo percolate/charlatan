@@ -25,6 +25,18 @@ func (s *stringSliceValue) Get() interface{} {
 	return []string(*s)
 }
 
+const (
+	usageFormat = `charlatan
+https://github.com/percolate/charlatan
+
+Usage:
+  charlatan [options] <interface> ...
+  charlatan -h | --help
+
+Options:
+`
+)
+
 var (
 	outputName  = flag.String("output", "", "output file name [default: charlatan.go]")
 	packageName = flag.String("package", "", "output package name [default: \"<current package>\"]")
@@ -40,15 +52,7 @@ func init() {
 }
 
 func usage() {
-	fmt.Fprintf(os.Stderr, `charlatan
-https://github.com/percolate/charlatan
-
-Usage:
-  charlatan [options] <interface>...
-  charlatan -h | --help
-
-Options:
-`)
+	fmt.Fprintf(os.Stderr, usageFormat)
 	flag.PrintDefaults()
 }
 
