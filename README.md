@@ -97,32 +97,32 @@ In tests, a `FakeContext` can be used anywhere a `Context` is required since it 
 
 ```Go
 func CheckContext(c *Context) bool {
-    return c.Value("PKey")
+	return c.Value("PKey")
 }
 
 func TestCheckContext(t *testing.T) {
-    pkey := "PKey"
-    pval := true
-    context := &contexttest.FakeContext{
-        ValueHook: func(key interface{}) (ret0 interface{}) {
-            return pval
-        },
-    }
-    p := CheckContext(context)
+	pkey := "PKey"
+	pval := true
+	context := &contexttest.FakeContext{
+		ValueHook: func(key interface{}) (ret0 interface{}) {
+			return pval
+		},
+	}
+	p := CheckContext(context)
 
-    valueCallCount := len(context.ValueCalls)
-    if valueCallCount != 1 {
-        t.Errorf("Value was called %d times", valueCallCount)
-    }
-    invocation := context.ValueCalls[0]
-    if invocation.Parameters.Key != pkey {
-        t.Errorf("Value was called with %s, expected %s", invocation.Parameters.Key, pkey)
-    }
-    if invocation.Results.Ret0 != pval {
-        t.Errorf("Value returned %s, expected %s", invocation.Results.Ret0, pval)
-    }
-    if p != pval {
-        t.Errorf("CheckContext returned %s, expected %s", p, pval)
-    }
+	valueCallCount := len(context.ValueCalls)
+	if valueCallCount != 1 {
+		t.Errorf("Value was called %d times", valueCallCount)
+	}
+	invocation := context.ValueCalls[0]
+	if invocation.Parameters.Key != pkey {
+		t.Errorf("Value was called with %s, expected %s", invocation.Parameters.Key, pkey)
+	}
+	if invocation.Results.Ret0 != pval {
+		t.Errorf("Value returned %s, expected %s", invocation.Results.Ret0, pval)
+	}
+	if p != pval {
+		t.Errorf("CheckContext returned %s, expected %s", p, pval)
+	}
 }
 ```
