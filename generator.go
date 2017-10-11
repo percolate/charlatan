@@ -10,6 +10,7 @@ import (
 	"go/token"
 	"log"
 	"os"
+	"path/filepath"
 	"strings"
 )
 
@@ -161,4 +162,16 @@ func (g *Generator) format() []byte {
 		return g.buf.Bytes()
 	}
 	return src
+}
+
+// prefixDirectory places the directory name on the beginning of each name in the list.
+func prefixDirectory(directory string, names []string) []string {
+	if directory == "." {
+		return names
+	}
+	ret := make([]string, len(names))
+	for i, name := range names {
+		ret[i] = filepath.Join(directory, name)
+	}
+	return ret
 }
