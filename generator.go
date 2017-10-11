@@ -134,17 +134,17 @@ func (g *Generator) generate() {
 
 		for _, m := range i.Methods {
 			if err := invocationTempl.Execute(&g.buf, m); err != nil {
-				panic(err)
+				log.Fatal(err)
 			}
 		}
 
 		if err := fakeTempl.Execute(&g.buf, i); err != nil {
-			panic(err)
+			log.Fatal(err)
 		}
 
 		for _, m := range i.Methods {
 			if err := methodTempl.Execute(&g.buf, m); err != nil {
-				panic(err)
+				log.Fatal(err)
 			}
 		}
 	}
