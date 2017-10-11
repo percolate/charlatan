@@ -38,10 +38,10 @@ Options:
 )
 
 var (
-	outputName  = flag.String("output", "", "output file name [default: charlatan.go]")
-	packageName = flag.String("package", "", "output package name [default: \"<current package>\"]")
-	dirName     = flag.String("dir", "", "input package directory [default: current package directory]")
-	fileNames   stringSliceValue
+	outputPath    = flag.String("output", "", "output file path [default: ./charlatan.go]")
+	outputPackage = flag.String("package", "", "output package name [default: \"<current package>\"]")
+	dirName       = flag.String("dir", "", "input package directory [default: current package directory]")
+	fileNames     stringSliceValue
 )
 
 func init() {
@@ -69,6 +69,7 @@ func main() {
 		g   Generator
 	)
 
+	g.targetPackage = *outputPackage
 	g.interfaces = flag.Args()
 
 	if *dirName != "" {
@@ -92,6 +93,10 @@ func main() {
 
 	if *outputPath == "" {
 		*outputPath = "charlatan.go"
+	}
+
+	if err := os.MkdirAll(filepath.Dir(*outputPath), 0755); err != nil {
+		log.Fatalf("writing output: %s", err)
 	}
 
 	if err := ioutil.WriteFile(*outputPath, src, 0644); err != nil {
