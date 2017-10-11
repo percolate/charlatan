@@ -26,16 +26,17 @@ func (s *stringSliceValue) Get() interface{} {
 }
 
 var (
-	interfaces  stringSliceValue
 	outputName  = flag.String("output", "", "output file name [default: charlatan.go]")
 	packageName = flag.String("package", "", "output package name [default: \"<current package>\"]")
+	dirName     = flag.String("dir", "", "input package directory [default: current package directory]")
+	fileNames   stringSliceValue
 )
 
 func init() {
-	flag.Var(&interfaces, "interface", "name of interface to fake, may be repeated")
 	log.SetFlags(0)
 	log.SetPrefix("charlatan: ")
 	flag.Usage = usage
+	flag.Var(&fileNames, "file", "name of input file, may be repeated, ignored if -dir is present")
 }
 
 func usage() {
@@ -43,7 +44,7 @@ func usage() {
 https://github.com/percolate/charlatan
 
 Usage:
-  charlatan [options] (--interface <I>)...
+  charlatan [options] <interface>...
   charlatan -h | --help
 
 Options:
@@ -53,55 +54,44 @@ Options:
 
 func main() {
 	flag.Parse()
-	if len(interfaces) == 0 {
+
+	if flag.NArg() == 0 {
 		flag.Usage()
 		os.Exit(2)
 	}
 
-	// We accept either one directory or a list of files. Which do we have?
-	args := flag.Args()
-	if len(args) == 0 {
-		// Default: process whole package in current directory.
-		args = []string{"."}
-	}
-
-	// Parse the package once.
 	var (
 		dir string
 		g   Generator
 	)
 
-	g.interfaceNames = interfaces
-	if len(args) == 1 && isDirectory(args[0]) {
-		dir = args[0]
-		g.parsePackageDir(args[0])
+	g.interfaces = flag.Args()
+
+	if *dirName != "" {
+		dir = *dirName
+		g.parsePackageDir(dir)
+	} else if len(fileNames) != 0 {
+		dir = filepath.Dir(fileNames[0])
+		for _, name := range fileNames[1:] {
+			if dir != filepath.Dir(name) {
+				log.Fatal("all input source files must be in the same package directory")
+			}
+		}
+		g.parsePackageFiles(fileNames)
 	} else {
-		dir = filepath.Dir(args[0])
-		g.parsePackageFiles(args)
+		// process the package in current directory.
+		dir = *dirName
+		g.parsePackageDir(".")
 	}
 
-	g.generate()
+	src := g.generate()
 
-	// format the output.
-	src := g.format()
-
-	// Write to file.
-	outputName := *outputName
-	if outputName == "" {
-		outputName = filepath.Join(dir, "charlatan.go")
+	if *outputName == "" {
+		*outputName = "charlatan.go"
 	}
 
-	err := ioutil.WriteFile(outputName, src, 0644)
-	if err != nil {
+	output := filepath.Join(dir, *outputName)
+	if err := ioutil.WriteFile(output, src, 0644); err != nil {
 		log.Fatalf("writing output: %s", err)
 	}
-}
-
-// isDirectory returns true if the named file is a directory.
-func isDirectory(name string) bool {
-	info, err := os.Stat(name)
-	if err != nil {
-		log.Fatal(err)
-	}
-	return info.IsDir()
 }
