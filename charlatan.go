@@ -20,7 +20,7 @@ import (
 )
 
 var (
-	interfaceFlags = flag.String("interfaces", "", "comma-separated list of type names; must be set")
+	interfaceFlags = flag.String("interfaces", "", "comma-separated list of interface names; must be set")
 	output         = flag.String("output", "", "output file name; default srcdir/charlatan.go")
 	pack           = flag.String("packagename", "", "output file package name; default to \"<enclosingpackage>test\"")
 )
@@ -28,8 +28,8 @@ var (
 // Usage is a replacement usage function for the flags package.
 func Usage() {
 	fmt.Fprintf(os.Stderr, "Usage of %s:\n", os.Args[0])
-	fmt.Fprintf(os.Stderr, "\tcharlatan [flags] -interfaces T")
-	fmt.Fprintf(os.Stderr, "\tcharlatan [flags] -interfaces T [file]")
+	fmt.Fprintf(os.Stderr, "\tcharlatan [flags] -interfaces T\n")
+	fmt.Fprintf(os.Stderr, "\tcharlatan [flags] -interfaces T [file]\n")
 	fmt.Fprintf(os.Stderr, "For more information, see:\n")
 	fmt.Fprintf(os.Stderr, "\thttps://github.com/percolate/charlatan\n")
 	fmt.Fprintf(os.Stderr, "Flags:\n")
