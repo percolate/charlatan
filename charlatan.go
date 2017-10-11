@@ -16,32 +16,52 @@ import (
 	"os"
 	"path/filepath"
 	"strings"
-	"text/template"
 )
+
+type stringSliceValue []string
+
+func (s *stringSliceValue) Set(value string) error {
+	*s = append(*s, value)
+	return nil
+}
+
+func (s *stringSliceValue) String() string {
+	return strings.Join(*s, ", ")
+}
+
+func (s *stringSliceValue) Get() interface{} {
+	return []string(*s)
+}
 
 var (
-	interfaceFlags = flag.String("interfaces", "", "comma-separated list of type names; must be set")
-	output         = flag.String("output", "", "output file name; default srcdir/charlatan.go")
-	pack           = flag.String("packagename", "", "output file package name; default to \"<enclosingpackage>test\"")
+	interfaces  stringSliceValue
+	outputName  = flag.String("output", "", "output file name [default: charlatan.go]")
+	packageName = flag.String("package", "", "output package name [default: \"<current package>\"]")
 )
 
-// Usage is a replacement usage function for the flags package.
-func Usage() {
-	fmt.Fprintf(os.Stderr, "Usage of %s:\n", os.Args[0])
-	fmt.Fprintf(os.Stderr, "\tcharlatan [flags] -interfaces T")
-	fmt.Fprintf(os.Stderr, "\tcharlatan [flags] -interfaces T [file]")
-	fmt.Fprintf(os.Stderr, "For more information, see:\n")
-	fmt.Fprintf(os.Stderr, "\thttps://github.com/percolate/charlatan\n")
-	fmt.Fprintf(os.Stderr, "Flags:\n")
+func init() {
+	flag.Var(&interfaces, "interface", "name of interface to fake, may be repeated")
+	log.SetFlags(0)
+	log.SetPrefix("charlatan: ")
+	flag.Usage = usage
+}
+
+func usage() {
+	fmt.Fprintf(os.Stderr, `charlatan
+https://github.com/percolate/charlatan
+
+Usage:
+  charlatan [options] (--interface <I>)...
+  charlatan -h | --help
+
+Options:
+`)
 	flag.PrintDefaults()
 }
 
 func main() {
-	log.SetFlags(0)
-	log.SetPrefix("charlatan: ")
-	flag.Usage = Usage
 	flag.Parse()
-	if len(*interfaceFlags) == 0 {
+	if len(interfaces) == 0 {
 		flag.Usage()
 		os.Exit(2)
 	}
@@ -59,7 +79,7 @@ func main() {
 		g   Generator
 	)
 
-	g.interfaceNames = strings.Split(*interfaceFlags, ",")
+	g.interfaceNames = interfaces
 	if len(args) == 1 && isDirectory(args[0]) {
 		dir = args[0]
 		g.parsePackageDir(args[0])
@@ -74,7 +94,7 @@ func main() {
 	src := g.format()
 
 	// Write to file.
-	outputName := *output
+	outputName := *outputName
 	if outputName == "" {
 		outputName = filepath.Join(dir, "charlatan.go")
 	}
@@ -287,7 +307,7 @@ func (g *Generator) generate() {
 		log.Fatalf("no interfaces named %s defined", g.interfaceNames)
 	}
 
-	packageName := *pack
+	packageName := *packageName
 	if packageName == "" {
 		packageName = fmt.Sprintf("%stest", g.pkg.name)
 	}
