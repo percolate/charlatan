@@ -3,6 +3,7 @@ package main
 import (
 	"text/template"
 )
+
 const (
 	invocationTemplate = `
 type {{.Name}}Invocation struct {{"{"}}{{if .Params}}
@@ -44,6 +45,6 @@ func (a *Fake{{.InterfaceName}}) {{.Name}}({{.FormatParamsDeclaration}}) ({{.For
 
 var (
 	invocationTempl = template.Must(template.New("invocation").Parse(invocationTemplate))
-	fakeTempl = template.Must(template.New("fake").Parse(fakeTemplate))
-	methodTempl = template.Must(template.New("method").Parse(methodTemplate))
+	fakeTempl       = template.Must(template.New("fake").Parse(fakeTemplate))
+	methodTempl     = template.Must(template.New("method").Parse(methodTemplate))
 )
