@@ -1,1 +1,27 @@
+# compiled file noise
+*.o
+*.a
+*.so
+build
+
+# go noise
+*.[568vq]
+[568vq].out
+*.cgo1.go
+*.cgo2.c
+_cgo_defun.c
+_cgo_gotypes.go
+_cgo_export.*
+_testmain.go
+*.exe
+*.test
+*.prof
+_obj/
+_test/
+
+# macos noise
+.DS_Store
+
+# editor noise
+*~
 .idea
