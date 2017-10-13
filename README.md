@@ -39,7 +39,7 @@ or from the command line:
 
 You can chose the output path using `-output`, which must include the
 name of the generated source file.  Any intermediate directories in the
-path that don't exist will be created.  The package used in the 
+path that don't exist will be created.  The package used in the
 generated file's `pacakge` directive can be set using `-package`.
 
 ## Example
@@ -113,7 +113,7 @@ anywhere a `Service` interface is expected.
 ```go
 func TestUsingService(t *testing.T) {
 	// expectedThings := ...
-    // expectedCriteria := ...
+	// expectedCriteria := ...
 	svc := &example.FakeService{
 		QueryHook: func(filter *QueryFilter) ([]*Thing, error) {
 			if filter.Criteria != expectedCriteria {
@@ -135,5 +135,5 @@ Create anonymous function implementations for only those interface
 methods that should be called in the code under test.  This will force
 a painc if any unexpected calls are made the mock implementation.
 
-The generated code has `godoc` formatted comments explaining the use 
+The generated code has `godoc` formatted comments explaining the use
 of the mock and its methods.
