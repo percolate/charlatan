@@ -25,17 +25,17 @@ type Fake{{.Name}} struct {
 
 `
 	methodTemplate = `
-func (a *Fake{{.InterfaceName}}) {{.Name}}({{.FormatParamsDeclaration}}) ({{.FormatResultsDeclaration}}) {
+func (f *Fake{{.InterfaceName}}) {{.Name}}({{.FormatParamsDeclaration}}) ({{.FormatResultsDeclaration}}) {
 	invocation := new({{.Name}}Invocation)
 
 {{if .Params}}{{range .Params}}	invocation.Parameters.{{.CapitalName}} = {{.Name}}
 {{end}}{{end}}
-{{if .Results}}	{{.FormatResultsCall}} = a.{{.Name}}Hook({{.FormatParamsCall}})
-{{else}}	a.{{.Name}}Hook({{.FormatParamsCall}})
+{{if .Results}}	{{.FormatResultsCall}} = f.{{.Name}}Hook({{.FormatParamsCall}})
+{{else}}	f.{{.Name}}Hook({{.FormatParamsCall}})
 {{end}}
 {{if .Results}}	{{range .Results}}invocation.Results.{{.CapitalName}} = {{.Name}}
 {{end}}{{end}}
-	a.{{.Name}}Calls = append(a.{{.Name}}Calls, invocation)
+	f.{{.Name}}Calls = append(f.{{.Name}}Calls, invocation)
 
 	return {{.FormatResultsCall}}
 }
