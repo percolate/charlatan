@@ -91,7 +91,7 @@ type FakeService struct {
 	FetchCalls []*FetchInvocation
 }
 
-func (f *FakeService) Query(filter *QueryFilter) ([]*Thing, error) {
+func (f *FakeService) Query(filter *QueryFilter) (ret0 []*Thing, ret1 error) {
 	invocation := new(QueryInvocation)
 	invocation.Parameters.Filter = filter
 
@@ -100,7 +100,7 @@ func (f *FakeService) Query(filter *QueryFilter) ([]*Thing, error) {
 	invocation.Results.Ret0 = ret0
 	invocation.Results.Ret1 = ret1
 
-	return ret0, ret1
+	return
 }
 
 // other generated code elided ...
