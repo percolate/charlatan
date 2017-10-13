@@ -21,7 +21,7 @@ jobs:
       - run:
           name: Validate Markdown
           command: |
-            mdl -t ~MD010 $(find . -path ./vendor -prune -o -type f -name '*.md' -print)
+            mdl -r ~MD010 $(find . -path ./vendor -prune -o -type f -name '*.md' -print)
 
   release:
     docker:
