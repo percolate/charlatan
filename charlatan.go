@@ -60,13 +60,13 @@ func main() {
 	flag.Parse()
 
 	if flag.NArg() == 0 {
-		log.Error("interface parameters are required")
+		log.Print("interface parameters are required")
 		flag.Usage()
 		os.Exit(2)
 	}
 
 	if *outputPath != "" && !strings.HasSuffix(*outputPath, ".go") {
-		log.Error("output path must be a Go source file name")
+		log.Print("output path must be a Go source file name")
 		flag.Usage()
 		os.Exit(2)
 	}
