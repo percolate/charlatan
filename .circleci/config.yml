@@ -12,7 +12,9 @@ jobs:
       - checkout
       - run:
           shell: /bin/bash
-          command: ! gofmt -l . 2>&1 | read
+          name: go fmt
+          command: |
+            ! gofmt -l . 2>&1 | read
       - run: go vet
       - run: make test
       - run: sbin/codecov
