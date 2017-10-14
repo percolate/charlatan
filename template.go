@@ -188,8 +188,7 @@ func (f *Fake{{.InterfaceName}}) {{.Name}}ResultsForCall({{.FormatParamsDeclarat
 	for _, call := range f.{{.Name}}Calls {
 		if {{range $i, $p := .Params}}{{if $i}} && {{end}}reflect.DeepEqual(call.Parameters.{{$p.CapitalName}}, {{$p.Name}}){{end}} {
 			{{range .Results}}{{.Name}} = call.Results.{{.CapitalName}}
-			{{end}}
-			found = true
+			{{end}}found = true
 			break
 		}
 	}
@@ -202,7 +201,7 @@ func (f *Fake{{.InterfaceName}}) {{.Name}}ResultsForCall({{.FormatParamsDeclarat
 `
 
 var (
-	charlatanTempl  = template.Must(template.New("charlatan").Parse(charlatanTemplate))
+	charlatanTempl = template.Must(template.New("charlatan").Parse(charlatanTemplate))
 )
 
 type Template struct {
