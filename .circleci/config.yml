@@ -10,7 +10,9 @@ jobs:
 
     steps:
       - checkout
-      - run: gofmt -l . 2>&1 | read; [ $? == 1 ]
+      - run:
+          shell: /bin/bash
+          command: ! gofmt -l . 2>&1 | read
       - run: go vet
       - run: make test
       - run: sbin/codecov
