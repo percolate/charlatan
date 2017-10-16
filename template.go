@@ -112,7 +112,7 @@ func (f *Fake{{.InterfaceName}}) {{.Name}}CalledOnce() bool {
 func (f *Fake{{.InterfaceName}}) Assert{{.Name}}CalledOnce(t *testing.T) {
 	t.Helper()
 	if len(f.{{.Name}}Calls) != 1 {
-		t.Error("Fake{{.InterfaceName}}.{{.Name}} called %d times, expected 1", len(f.{{.Name}}Calls))
+		t.Errorf("Fake{{.InterfaceName}}.{{.Name}} called %d times, expected 1", len(f.{{.Name}}Calls))
 	}
 }
 
