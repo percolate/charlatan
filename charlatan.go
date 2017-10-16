@@ -96,17 +96,23 @@ func main() {
 		g.parsePackageDir(".")
 	}
 
-	src := g.generate()
+	src, err := g.generate()
+	if err != nil {
+		log.Print(err)
+	}
+	if src == nil {
+		os.Exit(1)
+	}
 
 	if *outputPath == "" {
 		*outputPath = "charlatan.go"
 	}
 
 	if err := os.MkdirAll(filepath.Dir(*outputPath), 0755); err != nil {
-		log.Fatalf("writing output: %s", err)
+		log.Fatalf("error writing output: %s", err)
 	}
 
 	if err := ioutil.WriteFile(*outputPath, src, 0644); err != nil {
-		log.Fatalf("writing output: %s", err)
+		log.Fatalf("error writing output: %s", err)
 	}
 }

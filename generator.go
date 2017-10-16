@@ -1,10 +1,9 @@
 package main
 
 import (
-	"bytes"
+	"fmt"
 	"go/ast"
 	"go/build"
-	"go/format"
 	"go/parser"
 	"go/token"
 	"log"
@@ -76,7 +75,7 @@ func (g *Generator) parsePackage(directory string, names []string, text interfac
 }
 
 // generate produces the charlatan file for the named interface.
-func (g *Generator) generate() []byte {
+func (g *Generator) generate() ([]byte, error) {
 	interfacedecs := make([]*InterfaceDeclaration, 0, 100)
 	g.imports = &ImportSet{
 		imports: make([]*Import, 0),
@@ -94,7 +93,7 @@ func (g *Generator) generate() []byte {
 	}
 
 	if len(interfacedecs) == 0 {
-		log.Fatalf("no interfaces named %s defined", g.interfaces)
+		return nil, fmt.Errorf("no interfaces named %s defined", g.interfaces)
 	}
 
 	if g.targetPackage == "" {
@@ -115,21 +114,7 @@ func (g *Generator) generate() []byte {
 		Interfaces:  interfacedecs,
 	}
 
-	var buf bytes.Buffer
-	if err := tmpl.Execute(&buf); err != nil {
-		log.Fatal(err)
-	}
-
-	src, err := format.Source(buf.Bytes())
-	if err != nil {
-		// Should never happen, but can arise when developing this code.
-		// The user can compile the output to see the error.
-		log.Printf("warning: internal error: invalid Go generated: %s", err)
-		log.Printf("warning: compile the package to analyze the error")
-		return buf.Bytes()
-	}
-
-	return src
+	return tmpl.Execute()
 }
 
 // prefixDirectory places the directory name on the beginning of each name in the list.
