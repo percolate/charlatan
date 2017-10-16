@@ -1,7 +1,9 @@
 package main
 
 import (
-	"io"
+	"bytes"
+	"fmt"
+	"go/format"
 	"text/template"
 )
 
@@ -59,21 +61,21 @@ type Fake{{.Name}} struct {
 {{range .Methods}} {{.Name}}Calls []*{{.Name}}Invocation
 {{end}}}
 
-{{range .Methods}}
-func (f *Fake{{.InterfaceName}}) {{.Name}}({{.FormatParamsDeclaration}}) ({{.FormatResultsDeclaration}}) {
-	invocation := new({{.Name}}Invocation)
+{{range $m := .Methods}}
+{{with $f := gensym}}func ({{$f}} *Fake{{$m.InterfaceName}}) {{$m.Name}}({{$m.FormatParamsDeclaration}}) ({{$m.FormatResultsDeclaration}}) {
+	invocation := new({{$m.Name}}Invocation)
 
-{{if .Params}}{{range .Params}} invocation.Parameters.{{.CapitalName}} = {{.Name}}
+{{if $m.Params}}{{range $m.Params}} invocation.Parameters.{{.CapitalName}} = {{.Name}}
 {{end}}{{end}}
-{{if .Results}} {{.FormatResultsCall}} = f.{{.Name}}Hook({{.FormatParamsCall}})
-{{else}} f.{{.Name}}Hook({{.FormatParamsCall}})
+{{if $m.Results}} {{$m.FormatResultsCall}} = {{$f}}.{{$m.Name}}Hook({{$m.FormatParamsCall}})
+{{else}} {{$f}}.{{$m.Name}}Hook({{$m.FormatParamsCall}})
 {{end}}
-{{if .Results}}{{range .Results}}invocation.Results.{{.CapitalName}} = {{.Name}}
+{{if $m.Results}}{{range $m.Results}}invocation.Results.{{.CapitalName}} = {{.Name}}
 {{end}}{{end}}
-	f.{{.Name}}Calls = append(f.{{.Name}}Calls, invocation)
+	{{$f}}.{{$m.Name}}Calls = append({{$f}}.{{$m.Name}}Calls, invocation)
 
 	return
-}
+}{{end}}
 
 // {{.Name}}Called returns true if Fake{{.InterfaceName}}.{{.Name}} was called
 func (f *Fake{{.InterfaceName}}) {{.Name}}Called() bool {
@@ -128,80 +130,82 @@ func (f *Fake{{.InterfaceName}}) Assert{{.Name}}CalledN(t *testing.T, n int) {
 }
 
 {{if .Params}}// {{.Name}}CalledWith returns true if Fake{{.InterfaceName}}.{{.Name}} was called with the given values
-func (f *Fake{{.InterfaceName}}) {{.Name}}CalledWith({{.FormatParamsDeclaration}}) bool {
+{{with $f := gensym}}func ({{$f}} *Fake{{$m.InterfaceName}}) {{$m.Name}}CalledWith({{$m.FormatParamsDeclaration}}) bool {
 	var found bool
-	for _, call := range f.{{.Name}}Calls {
-		if {{range $i, $p := .Params}}{{if $i}} && {{end}}reflect.DeepEqual(call.Parameters.{{$p.CapitalName}}, {{$p.Name}}){{end}} {
+	for _, call := range {{$f}}.{{$m.Name}}Calls {
+		if {{range $i, $p := $m.Params}}{{if $i}} && {{end}}reflect.DeepEqual(call.Parameters.{{$p.CapitalName}}, {{$p.Name}}){{end}} {
 			found = true
 			break
 		}
 	}
 
 	return found
-}
+}{{end}}
 
 // Assert{{.Name}}CalledWith calls t.Error if Fake{{.InterfaceName}}.{{.Name}} was not called with the given values
-func (f *Fake{{.InterfaceName}}) Assert{{.Name}}CalledWith(t *testing.T, {{.FormatParamsDeclaration}}) {
+{{with $f := gensym}}func ({{$f}} *Fake{{$m.InterfaceName}}) Assert{{$m.Name}}CalledWith(t *testing.T, {{$m.FormatParamsDeclaration}}) {
 	t.Helper()
 	var found bool
-	for _, call := range f.{{.Name}}Calls {
-		if {{range $i, $p := .Params}}{{if $i}} && {{end}}reflect.DeepEqual(call.Parameters.{{$p.CapitalName}}, {{$p.Name}}){{end}} {
+	for _, call := range {{$f}}.{{$m.Name}}Calls {
+		if {{range $i, $p := $m.Params}}{{if $i}} && {{end}}reflect.DeepEqual(call.Parameters.{{$p.CapitalName}}, {{$p.Name}}){{end}} {
 			found = true
 			break
 		}
 	}
 
 	if !found {
-		t.Error("Fake{{.InterfaceName}}.{{.Name}} not called with expected parameters")
+		t.Error("Fake{{$m.InterfaceName}}.{{$m.Name}} not called with expected parameters")
 	}
-}
+}{{end}}
 
 // {{.Name}}CalledOnceWith returns true if Fake{{.InterfaceName}}.{{.Name}} was called exactly once with the given values
-func (f *Fake{{.InterfaceName}}) {{.Name}}CalledOnceWith({{.FormatParamsDeclaration}}) bool {
+{{with $f := gensym}}func ({{$f}} *Fake{{$m.InterfaceName}}) {{$m.Name}}CalledOnceWith({{$m.FormatParamsDeclaration}}) bool {
 	var count int
-	for _, call := range f.{{.Name}}Calls {
-		if {{range $i, $p := .Params}}{{if $i}} && {{end}}reflect.DeepEqual(call.Parameters.{{$p.CapitalName}}, {{$p.Name}}){{end}} {
+	for _, call := range {{$f}}.{{$m.Name}}Calls {
+		if {{range $i, $p := $m.Params}}{{if $i}} && {{end}}reflect.DeepEqual(call.Parameters.{{$p.CapitalName}}, {{$p.Name}}){{end}} {
 			count++
 		}
 	}
 
 	return count == 1
-}
+}{{end}}
 
 // Assert{{.Name}}CalledOnceWith calls t.Error if Fake{{.InterfaceName}}.{{.Name}} was not called exactly once with the given values
-func (f *Fake{{.InterfaceName}}) Assert{{.Name}}OnceCalledWith(t *testing.T, {{.FormatParamsDeclaration}}) {
+{{with $f := gensym}}func ({{$f}} *Fake{{$m.InterfaceName}}) Assert{{$m.Name}}OnceCalledWith(t *testing.T, {{$m.FormatParamsDeclaration}}) {
 	t.Helper()
 	var count int
-	for _, call := range f.{{.Name}}Calls {
-		if {{range $i, $p := .Params}}{{if $i}} && {{end}}reflect.DeepEqual(call.Parameters.{{$p.CapitalName}}, {{$p.Name}}){{end}} {
+	for _, call := range {{$f}}.{{$m.Name}}Calls {
+		if {{range $i, $p := $m.Params}}{{if $i}} && {{end}}reflect.DeepEqual(call.Parameters.{{$p.CapitalName}}, {{$p.Name}}){{end}} {
 			count++
 		}
 	}
 
 	if count != 1 {
-		t.Errorf("Fake{{.InterfaceName}}.{{.Name}} called %d times with expected parameters, expected one", count)
+		t.Errorf("Fake{{$m.InterfaceName}}.{{$m.Name}} called %d times with expected parameters, expected one", count)
 	}
-}
+}{{end}}
 
 // {{.Name}}ResultsForCall returns the result values for the first call to Fake{{.InterfaceName}}.{{.Name}} with the given values
-func (f *Fake{{.InterfaceName}}) {{.Name}}ResultsForCall({{.FormatParamsDeclaration}}) ({{.FormatResultsDeclaration}}, found bool) {
-	for _, call := range f.{{.Name}}Calls {
-		if {{range $i, $p := .Params}}{{if $i}} && {{end}}reflect.DeepEqual(call.Parameters.{{$p.CapitalName}}, {{$p.Name}}){{end}} {
-			{{range .Results}}{{.Name}} = call.Results.{{.CapitalName}}
+{{with $f := gensym}}func ({{$f}} *Fake{{$m.InterfaceName}}) {{$m.Name}}ResultsForCall({{$m.FormatParamsDeclaration}}) ({{$m.FormatResultsDeclaration}}, found bool) {
+	for _, call := range {{$f}}.{{$m.Name}}Calls {
+		if {{range $i, $p := $m.Params}}{{if $i}} && {{end}}reflect.DeepEqual(call.Parameters.{{$p.CapitalName}}, {{$p.Name}}){{end}} {
+			{{range $m.Results}}{{.Name}} = call.Results.{{.CapitalName}}
 			{{end}}found = true
 			break
 		}
 	}
 
 	return
-}
+}{{end}}
 {{end}}
 {{end}}
 {{end}}
 `
 
 var (
-	charlatanTempl = template.Must(template.New("charlatan").Parse(charlatanTemplate))
+	symGen         = SymbolGenerator{Prefix: "_f"}
+	funky          = template.FuncMap{"gensym": func() string { return symGen.Next() }}
+	charlatanTempl = template.Must(template.New("charlatan").Funcs(funky).Parse(charlatanTemplate))
 )
 
 type Template struct {
@@ -211,6 +215,18 @@ type Template struct {
 	Interfaces  []*InterfaceDeclaration
 }
 
-func (t *Template) Execute(w io.Writer) error {
-	return charlatanTempl.Execute(w, t)
+func (t *Template) Execute() ([]byte, error) {
+	var buf bytes.Buffer
+	if err := charlatanTempl.Execute(&buf, t); err != nil {
+		return nil, err
+	}
+
+	src, err := format.Source(buf.Bytes())
+	if err != nil {
+		// Should not happen except when developing this code.
+		// The user can compile the output to see the error.
+		return buf.Bytes(), fmt.Errorf("warning: internal error: invalid code generated: %s", err)
+	}
+
+	return src, nil
 }
