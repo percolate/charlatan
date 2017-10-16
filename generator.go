@@ -6,57 +6,56 @@ import (
 	"go/build"
 	"go/parser"
 	"go/token"
-	"log"
 	"os"
 	"path/filepath"
 	"strings"
 )
 
-// Generator holds the state of the analysis. Primarily used to buffer
-// the output for format.Source.
+// Generator holds the state of the analysis
 type Generator struct {
-	pkg           *Package // Package we are scanning.
-	targetPackage string
-	interfaces    []string
-	imports       *ImportSet
+	// PackageOverride can be set to control the package for the output file.  The default is the same package as the input interfaces.
+	PackageOverride string
+	pkg             *Package
+	imports         *ImportSet
 }
 
-// parsePackageDir parses the package residing in the directory.
-func (g *Generator) parsePackageDir(directory string) {
+// LoadPackageDir parses the package residing in the given directory.
+func LoadPackageDir(directory string) (*Generator, error) {
 	pkg, err := build.Default.ImportDir(directory, 0)
 	if err != nil {
-		log.Fatalf("cannot process directory %s: %s", directory, err)
+		return nil, fmt.Errorf("cannot process directory %s: %s", directory, err)
 	}
-	var names []string
-
+	names := make([]string, 0, len(pkg.GoFiles)+len(pkg.CgoFiles))
 	names = append(names, pkg.GoFiles...)
 	names = append(names, pkg.CgoFiles...)
-	names = append(names, pkg.SFiles...)
-	names = prefixDirectory(directory, names)
+	if directory != "." {
+		for i, name := range names {
+			names[i] = filepath.Join(directory, name)
+		}
+	}
 
-	g.parsePackage(directory, names, nil)
+	return parsePackage(directory, names)
 }
 
-// parsePackageFiles parses the package occupying the named files.
-func (g *Generator) parsePackageFiles(names []string) {
-	g.parsePackage(".", names, nil)
+// LoadPackageFiles parses the package using only the given files.
+func LoadPackageFiles(names []string) (*Generator, error) {
+	return parsePackage(".", names)
 }
 
 // parsePackage analyzes the single package constructed from the named files.
-// If text is non-nil, it is a string to be used instead of the content of the file,
-// to be used for testing. parsePackage exits if there is an error.
-func (g *Generator) parsePackage(directory string, names []string, text interface{}) {
+func parsePackage(directory string, names []string) (*Generator, error) {
 	var files []*File
 	var astFiles []*ast.File
+	g := new(Generator)
 	g.pkg = new(Package)
 	fs := token.NewFileSet()
 	for _, name := range names {
 		if !strings.HasSuffix(name, ".go") {
 			continue
 		}
-		parsedFile, err := parser.ParseFile(fs, name, text, 0)
+		parsedFile, err := parser.ParseFile(fs, name, nil, 0)
 		if err != nil {
-			log.Fatalf("parsing package: %s: %s", name, err)
+			return nil, fmt.Errorf("parsing package: %s: %s", name, err)
 		}
 		astFiles = append(astFiles, parsedFile)
 		files = append(files, &File{
@@ -65,17 +64,19 @@ func (g *Generator) parsePackage(directory string, names []string, text interfac
 		})
 	}
 	if len(astFiles) == 0 {
-		log.Fatalf("%s: no buildable Go files", directory)
+		return nil, fmt.Errorf("%s: no buildable Go files", directory)
 	}
 	g.pkg.name = astFiles[0].Name.Name
 	g.pkg.files = files
 	g.pkg.dir = directory
 	// Type check the package.
 	g.pkg.check(fs, astFiles)
+
+	return g, nil
 }
 
 // generate produces the charlatan file for the named interface.
-func (g *Generator) generate() ([]byte, error) {
+func (g *Generator) Generate(interfaces []string) ([]byte, error) {
 	interfacedecs := make([]*InterfaceDeclaration, 0, 100)
 	g.imports = &ImportSet{
 		imports: make([]*Import, 0),
@@ -85,7 +86,7 @@ func (g *Generator) generate() ([]byte, error) {
 
 		if file.file != nil {
 			file.imports = g.imports
-			file.interfaceNames = g.interfaces
+			file.interfaceNames = interfaces
 			ast.Inspect(file.file, file.genDecl)
 
 			interfacedecs = append(interfacedecs, file.interfaces...)
@@ -93,11 +94,12 @@ func (g *Generator) generate() ([]byte, error) {
 	}
 
 	if len(interfacedecs) == 0 {
-		return nil, fmt.Errorf("no interfaces named %s defined", g.interfaces)
+		return nil, fmt.Errorf("no interfaces named %s defined", interfaces)
 	}
 
-	if g.targetPackage == "" {
-		g.targetPackage = g.pkg.name
+	packageName := g.pkg.name
+	if g.PackageOverride != "" {
+		packageName = g.PackageOverride
 	}
 
 	requiredPackages := g.imports.GetRequired()
@@ -109,22 +111,10 @@ func (g *Generator) generate() ([]byte, error) {
 	argv := []string{"charlatan"}
 	tmpl := Template{
 		CommandLine: strings.Join(append(argv, os.Args[1:]...), " "),
-		PackageName: g.targetPackage,
+		PackageName: packageName,
 		Imports:     imports,
 		Interfaces:  interfacedecs,
 	}
 
 	return tmpl.Execute()
-}
-
-// prefixDirectory places the directory name on the beginning of each name in the list.
-func prefixDirectory(directory string, names []string) []string {
-	if directory == "." {
-		return names
-	}
-	ret := make([]string, len(names))
-	for i, name := range names {
-		ret[i] = filepath.Join(directory, name)
-	}
-	return ret
 }

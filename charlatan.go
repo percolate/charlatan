@@ -62,41 +62,46 @@ func main() {
 	if flag.NArg() == 0 {
 		log.Print("interface parameters are required")
 		flag.Usage()
-		os.Exit(2)
+		os.Exit(1)
 	}
 
 	if *outputPath != "" && !strings.HasSuffix(*outputPath, ".go") {
 		log.Print("output path must be a Go source file name")
 		flag.Usage()
-		os.Exit(2)
+		os.Exit(1)
 	}
 
 	var (
-		dir string
-		g   Generator
+		g   *Generator
+		err error
 	)
 
-	g.targetPackage = *outputPackage
-	g.interfaces = flag.Args()
-
 	if *dirName != "" {
-		dir = *dirName
-		g.parsePackageDir(dir)
+		g, err = LoadPackageDir(*dirName)
+		if err != nil {
+			log.Fatal(err)
+		}
 	} else if len(fileNames) != 0 {
-		dir = filepath.Dir(fileNames[0])
 		for _, name := range fileNames[1:] {
-			if dir != filepath.Dir(name) {
+			if *dirName != filepath.Dir(name) {
 				log.Fatal("all input source files must be in the same package directory")
 			}
 		}
-		g.parsePackageFiles(fileNames)
+		g, err = LoadPackageFiles(fileNames)
+		if err != nil {
+			log.Fatal(err)
+		}
 	} else {
 		// process the package in current directory.
-		dir = *dirName
-		g.parsePackageDir(".")
+		g, err = LoadPackageDir(".")
+		if err != nil {
+			log.Fatal(err)
+		}
 	}
 
-	src, err := g.generate()
+	g.PackageOverride = *outputPackage
+
+	src, err := g.Generate(flag.Args())
 	if err != nil {
 		log.Print(err)
 	}
