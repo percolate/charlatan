@@ -13,13 +13,13 @@ import (
 
 // Generator holds the state of the analysis
 type Generator struct {
-	// PackageOverride can be set to control the package for the output file.  The default is the same package as the input interfaces.
+	// PackageOverride can be set to control the package for the output file.  The default is the same package as the input interface(s).
 	PackageOverride string
 	pkg             *Package
 	imports         *ImportSet
 }
 
-// LoadPackageDir parses the package residing in the given directory.
+// LoadPackageDir parses a package in the given directory.
 func LoadPackageDir(directory string) (*Generator, error) {
 	pkg, err := build.Default.ImportDir(directory, 0)
 	if err != nil {
@@ -37,13 +37,12 @@ func LoadPackageDir(directory string) (*Generator, error) {
 	return parsePackage(directory, names)
 }
 
-// LoadPackageFiles parses the package using only the given files.
+// LoadPackageFiles parses a package using only the given files.
 func LoadPackageFiles(names []string) (*Generator, error) {
 	return parsePackage(".", names)
 }
 
-// parsePackage analyzes the single package constructed from the named files.
-func parsePackage(directory string, names []string) (*Generator, error) {
+func parsePackage(directory string, filenames []string) (*Generator, error) {
 	var files []*File
 	var astFiles []*ast.File
 	g := new(Generator)
