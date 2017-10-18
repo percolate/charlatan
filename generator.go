@@ -6,6 +6,7 @@ import (
 	"go/build"
 	"go/parser"
 	"go/token"
+	"go/types"
 	"os"
 	"path/filepath"
 	"strings"
@@ -15,8 +16,9 @@ import (
 type Generator struct {
 	// PackageOverride can be set to control the package for the output file.  The default is the same package as the input interface(s).
 	PackageOverride string
-	pkg             *Package
+	packageName     string
 	imports         *ImportSet
+	interfaces      map[string]*Interface
 }
 
 // LoadPackageDir parses a package in the given directory.
@@ -28,6 +30,7 @@ func LoadPackageDir(directory string) (*Generator, error) {
 	names := make([]string, 0, len(pkg.GoFiles)+len(pkg.CgoFiles))
 	names = append(names, pkg.GoFiles...)
 	names = append(names, pkg.CgoFiles...)
+
 	if directory != "." {
 		for i, name := range names {
 			names[i] = filepath.Join(directory, name)
@@ -43,60 +46,90 @@ func LoadPackageFiles(names []string) (*Generator, error) {
 }
 
 func parsePackage(directory string, filenames []string) (*Generator, error) {
-	var files []*File
-	var astFiles []*ast.File
-	g := new(Generator)
-	g.pkg = new(Package)
-	fs := token.NewFileSet()
-	for _, name := range names {
-		if !strings.HasSuffix(name, ".go") {
+	generator := &Generator{
+		imports:    new(ImportSet),
+		interfaces: make(map[string]*Interface),
+	}
+	files := make([]*ast.File, 0, len(filenames))
+	fileset := token.NewFileSet()
+	for _, filename := range filenames {
+		if !strings.HasSuffix(filename, ".go") {
 			continue
 		}
-		parsedFile, err := parser.ParseFile(fs, name, nil, 0)
+		file, err := parser.ParseFile(fileset, filename, nil, 0)
 		if err != nil {
-			return nil, fmt.Errorf("parsing package: %s: %s", name, err)
+			return nil, fmt.Errorf("syntax error: %s", err)
 		}
-		astFiles = append(astFiles, parsedFile)
-		files = append(files, &File{
-			file: parsedFile,
-			pkg:  g.pkg,
-		})
+		generator.extractImports(file)
+		generator.extractInterfaces(file)
+		files = append(files, file)
 	}
-	if len(astFiles) == 0 {
-		return nil, fmt.Errorf("error: no buildable Go files in %s", directory)
+	if len(files) == 0 {
+		return nil, fmt.Errorf("error: no Go files found in %s", directory)
 	}
-	g.pkg.name = astFiles[0].Name.Name
-	g.pkg.files = files
-	g.pkg.dir = directory
-	// Type check the package.
-	g.pkg.check(fs, astFiles)
+	generator.packageName = files[0].Name.Name
 
-	return g, nil
+	// Type check the package.
+	config := types.Config{Importer: defaultImporter(), Error: func(err error) { fmt.Fprintln(os.Stderr, err) }}
+	if _, err := config.Check(directory, fileset, files, nil); err != nil {
+		return nil, fmt.Errorf("type check failed")
+	}
+
+	return generator, nil
 }
 
-// generate produces the charlatan file for the named interface.
-func (g *Generator) Generate(interfaces []string) ([]byte, error) {
-	interfacedecs := make([]*InterfaceDeclaration, 0, 100)
-	g.imports = &ImportSet{
-		imports: make([]*Import, 0),
+func (g *Generator) extractImports(file *ast.File) {
+	for _, spec := range file.Imports {
+		if spec.Name != nil {
+			// Only add un-named imports for now
+			// xxx - why?
+			continue
+		}
+		parts := strings.Split(spec.Path.Value, "/")
+		g.imports.Add(&Import{
+			Name: strings.Replace(parts[len(parts)-1], "\"", "", -1),
+			Path: spec.Path.Value,
+		})
 	}
-	for _, file := range g.pkg.files {
-		// Set the state for this run of the walker.
+}
 
-		if file.file != nil {
-			file.imports = g.imports
-			file.interfaceNames = interfaces
-			ast.Inspect(file.file, file.genDecl)
+func (g *Generator) extractInterfaces(file *ast.File) {
+	for _, node := range file.Decls {
+		decl, ok := node.(*ast.GenDecl)
+		if !ok || decl.Tok != token.TYPE {
+			continue
+		}
+		spec := decl.Specs[0].(*ast.TypeSpec)
+		ifType, ok := spec.Type.(*ast.InterfaceType)
+		if !ok || len(ifType.Methods.List) == 0 || spec.Name.Name == "_" {
+			continue
+		}
 
-			interfacedecs = append(interfacedecs, file.interfaces...)
+		ifDecl := &Interface{
+			Name: spec.Name.Name,
+		}
+		g.interfaces[spec.Name.Name] = ifDecl
+
+		for _, method := range ifType.Methods.List {
+			if _, ok := method.Type.(*ast.FuncType); ok {
+				ifDecl.addMethod(method, g.imports)
+			}
 		}
 	}
+}
 
-	if len(interfacedecs) == 0 {
-		return nil, fmt.Errorf("error: no interfaces named %s defined", interfaces)
+// Generate produces the charlatan source file data for the named interfaces.
+func (g *Generator) Generate(interfaceNames []string) ([]byte, error) {
+	decls := make([]*Interface, 0, len(interfaceNames))
+	for _, name := range interfaceNames {
+		decl, ok := g.interfaces[name]
+		if !ok {
+			return nil, fmt.Errorf("error: interface %q not found", name)
+		}
+		decls = append(decls, decl)
 	}
 
-	packageName := g.pkg.name
+	packageName := g.packageName
 	if g.PackageOverride != "" {
 		packageName = g.PackageOverride
 	}
@@ -112,7 +145,7 @@ func (g *Generator) Generate(interfaces []string) ([]byte, error) {
 		CommandLine: strings.Join(append(argv, os.Args[1:]...), " "),
 		PackageName: packageName,
 		Imports:     imports,
-		Interfaces:  interfacedecs,
+		Interfaces:  decls,
 	}
 
 	return tmpl.Execute()

@@ -212,7 +212,7 @@ type Template struct {
 	CommandLine string
 	PackageName string
 	Imports     []string
-	Interfaces  []*InterfaceDeclaration
+	Interfaces  []*Interface
 }
 
 func (t *Template) Execute() ([]byte, error) {

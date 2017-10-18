@@ -1,69 +1,47 @@
 package main
 
 import (
-	"errors"
 	"fmt"
 	"go/ast"
-	"go/token"
-	"go/types"
-	"log"
 	"strings"
 )
 
-type Package struct {
-	dir      string
-	name     string
-	files    []*File
-	typesPkg *types.Package
-}
-
-// check type-checks the package. The package must be OK to proceed.
-func (pkg *Package) check(fs *token.FileSet, astFiles []*ast.File) {
-	config := types.Config{Importer: defaultImporter(), FakeImportC: true}
-	typesPkg, err := config.Check(pkg.dir, fs, astFiles, nil)
-	if err != nil {
-		log.Fatalf("checking package: %s", err)
-	}
-	pkg.typesPkg = typesPkg
-}
-
-// An Import is a struct used to track qualified types across files
-// so that we can import their packages in the charlatan file
+// Import represents a declared import
 type Import struct {
 	Name     string // the package's name
 	Path     string // import path for the package
-	Required bool   // denotes whether the import is required by charlatan
+	Required bool   // is the import required in the charlatan output?
 }
 
+// ImportSet contains all the import declarations encountered
 type ImportSet struct {
-	// possibly makes more sense to use a `map` underneath?
 	imports []*Import
 }
 
-func (r *ImportSet) Add(ri *Import) {
-	if !r.Contains(ri) {
-		r.imports = append(r.imports, ri)
+func (r *ImportSet) Add(value *Import) {
+	if r.imports == nil {
+		r.imports = []*Import{value}
+	} else if !r.Contains(value) {
+		r.imports = append(r.imports, value)
 	}
 }
 
-func (r *ImportSet) Remove(ri *Import) error {
+func (r *ImportSet) Remove(ri *Import) {
 	for index, i := range r.imports {
-		found := i.Name == ri.Name && i.Path == ri.Path
-		if found {
+		if i.Name == ri.Name && i.Path == ri.Path {
 			r.imports = append(r.imports[:index], r.imports[index+1:]...)
-			return nil
+			return
 		}
 	}
-	return errors.New("Item not present in set, cannot remove")
 }
 
 func (r *ImportSet) Contains(ri *Import) bool {
 	for _, i := range r.imports {
-		found := i.Name == ri.Name && i.Path == ri.Path
-		if found {
-			return found
+		if i.Name == ri.Name && i.Path == ri.Path {
+			return true
 		}
 	}
+
 	return false
 }
 
@@ -72,13 +50,13 @@ func (r *ImportSet) GetAll() []*Import {
 }
 
 func (r *ImportSet) GetRequired() []*Import {
-	reqimps := make([]*Import, 0)
+	result := make([]*Import, 0, len(r.imports))
 	for _, imp := range r.imports {
 		if imp.Required {
-			reqimps = append(reqimps, imp)
+			result = append(result, imp)
 		}
 	}
-	return reqimps
+	return result
 }
 
 func (r *ImportSet) RequireByName(s string) {
@@ -89,13 +67,13 @@ func (r *ImportSet) RequireByName(s string) {
 	}
 }
 
-// InterfaceDeclaration represents a declared interface.
-type InterfaceDeclaration struct {
+// Interface represents a declared interface.
+type Interface struct {
 	Name    string
 	Methods []*Method
 }
 
-func (i *InterfaceDeclaration) addMethod(m *ast.Field, imps *ImportSet) {
+func (i *Interface) addMethod(m *ast.Field, imps *ImportSet) {
 	functype, ok := m.Type.(*ast.FuncType)
 	if !ok {
 		return
@@ -308,85 +286,4 @@ func (v Value) StructDef() string {
 
 func (v Value) CapitalName() string {
 	return strings.Title(v.Name)
-}
-
-// File holds a single parsed file and associated data.
-type File struct {
-	pkg            *Package                // Package to which this file belongs.
-	file           *ast.File               // Parsed AST.
-	interfaces     []*InterfaceDeclaration // The interface declarations.
-	interfaceNames []string
-	imports        *ImportSet
-}
-
-// genDecl processes one declaration clause.
-func (f *File) genDecl(node ast.Node) bool {
-	decl, ok := node.(*ast.GenDecl)
-	if !ok || decl.Tok != token.TYPE {
-		// We only care about type declarations.
-		if ok && decl.Tok == token.IMPORT {
-			for _, s := range decl.Specs {
-				spec := s.(*ast.ImportSpec)
-
-				// Only add un-named imports for now
-				if spec.Name == nil {
-					parts := strings.Split(spec.Path.Value, "/")
-					name := strings.Replace(parts[len(parts)-1], "\"", "", -1)
-					imp := &Import{
-						Name:     name,
-						Path:     spec.Path.Value,
-						Required: false,
-					}
-					f.imports.Add(imp)
-				}
-			}
-		}
-		return true
-	}
-
-	spec := decl.Specs[0].(*ast.TypeSpec)
-	ident := spec.Name
-
-	// Look for an interface type with methods, not named `_`
-	specType, ok := spec.Type.(*ast.InterfaceType)
-	if !ok {
-		// We only care about interfaces with methods
-		return true
-	}
-	methods := specType.Methods.List
-	if len(methods) == 0 {
-		return true
-	}
-	name := ident.Name
-	if name == "_" {
-		return true
-	}
-
-	// Continue walking if the name doesn't match a name we're looking for
-	namefound := false
-	for _, i := range f.interfaceNames {
-		namefound = i == name
-		if namefound {
-			break
-		}
-	}
-	if !namefound {
-		return true
-	}
-
-	interfacedec := &InterfaceDeclaration{
-		Name: name,
-	}
-
-	// Add each method to our interfacedec
-	for _, method := range methods {
-		_, ok := method.Type.(*ast.FuncType)
-		if ok {
-			interfacedec.addMethod(method, f.imports)
-		}
-	}
-
-	f.interfaces = append(f.interfaces, interfacedec)
-
-	return false
 }
