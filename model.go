@@ -13,19 +13,14 @@ import (
 type Package struct {
 	dir      string
 	name     string
-	defs     map[*ast.Ident]types.Object
 	files    []*File
 	typesPkg *types.Package
 }
 
 // check type-checks the package. The package must be OK to proceed.
 func (pkg *Package) check(fs *token.FileSet, astFiles []*ast.File) {
-	pkg.defs = make(map[*ast.Ident]types.Object)
 	config := types.Config{Importer: defaultImporter(), FakeImportC: true}
-	info := &types.Info{
-		Defs: pkg.defs,
-	}
-	typesPkg, err := config.Check(pkg.dir, fs, astFiles, info)
+	typesPkg, err := config.Check(pkg.dir, fs, astFiles, nil)
 	if err != nil {
 		log.Fatalf("checking package: %s", err)
 	}
