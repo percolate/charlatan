@@ -63,7 +63,7 @@ func parsePackage(directory string, filenames []string) (*Generator, error) {
 		})
 	}
 	if len(astFiles) == 0 {
-		return nil, fmt.Errorf("%s: no buildable Go files", directory)
+		return nil, fmt.Errorf("error: no buildable Go files in %s", directory)
 	}
 	g.pkg.name = astFiles[0].Name.Name
 	g.pkg.files = files
@@ -93,7 +93,7 @@ func (g *Generator) Generate(interfaces []string) ([]byte, error) {
 	}
 
 	if len(interfacedecs) == 0 {
-		return nil, fmt.Errorf("no interfaces named %s defined", interfaces)
+		return nil, fmt.Errorf("error: no interfaces named %s defined", interfaces)
 	}
 
 	packageName := g.pkg.name
