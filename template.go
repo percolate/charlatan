@@ -42,7 +42,7 @@ Fake{{.Name}} is a mock implementation of {{.Name}} for testing.
 			{{$m.Name}}Hook: func({{$m.ParametersDeclaration}}) ({{$m.ResultsDeclaration}}) {
 				// ensure parameters meet expections, signal errors using t, etc
 				return
-			}
+			},
 		}
 
 		// test code goes here ...
