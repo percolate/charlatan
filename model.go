@@ -86,109 +86,98 @@ func (i *Interface) addMethod(field *ast.Field, imports *ImportSet) {
 
 	// `Params.List` can be 0-length, but `Results` can be nil
 	for i, parameter := range functionType.Params.List {
-		values := extractValues(parameter, i, "arg", imports)
-		method.Parameters = append(method.Parameters, values...)
+		identifiers := extractIdentifiers(parameter, i, "arg", imports)
+		method.Parameters = append(method.Parameters, identifiers...)
 	}
 
 	if functionType.Results != nil {
 		for i, result := range functionType.Results.List {
-			values := extractValues(result, i, "ret", imports)
-			method.Results = append(method.Results, values...)
+			identifiers := extractIdentifiers(result, i, "ret", imports)
+			method.Results = append(method.Results, identifiers...)
 		}
 	}
 
 	i.Methods = append(i.Methods, method)
 }
 
-// Maps an ast.Field reference to an array of Values
-func extractValues(f *ast.Field, i int, prefix string, imports *ImportSet) []*Value {
-	var values []*Value
-	var names []string
+func extractIdentifiers(field *ast.Field, i int, prefix string, imports *ImportSet) []*Identifier {
+	identifierType := unwrap(field.Type, imports)
 
-	elliptical := false
-	chandir := 0
-	ispointer := false
-	qualifier := ""
-	fieldType := ""
-
-	if len(f.Names) == 0 {
-		n := fmt.Sprintf("%s%d", prefix, i)
-		names = append(names, n)
-	} else {
-		for _, n := range f.Names {
-			names = append(names, n.Name)
+	if len(field.Names) == 0 {
+		return []*Identifier{
+			&Identifier{
+				Name:      fmt.Sprintf("%s%d", prefix, i),
+				valueType: identifierType,
+			},
 		}
 	}
 
-	// Check if we're dealing with an ellipse
-	topType := f.Type
-	ellipsis, ok := topType.(*ast.Ellipsis)
-	if ok {
-		elliptical = true
-		topType = ellipsis.Elt
-	}
-
-	// Check if we're dealing with a channel
-	chantype, ok := topType.(*ast.ChanType)
-	if ok {
-		chandir = int(chantype.Dir)
-		topType = chantype.Value
-	}
-
-	// Check if we're dealing with a pointer
-	starType, ok := topType.(*ast.StarExpr)
-	if ok {
-		ispointer = true
-		topType = starType.X
-	}
-
-	typeParseFailure := "charlatan: failed to parse type: %s"
-
-	// Check if the type is a qualified identifier (from a package)
-	selectorType, isqualified := topType.(*ast.SelectorExpr)
-	_, isinterface := topType.(*ast.InterfaceType)
-	_, isstruct := topType.(*ast.StructType)
-	if isinterface {
-		fieldType = "interface{}"
-	} else if isstruct {
-		fieldType = "struct{}"
-	} else if isqualified {
-		selectedName, ok := selectorType.X.(*ast.Ident)
-		if !ok {
-			fmt.Println(fmt.Errorf(typeParseFailure, f.Type))
+	identifiers := make([]*Identifier, len(field.Names))
+	for i, name := range field.Names {
+		identifiers[i] = &Identifier{
+			Name:      name.Name,
+			valueType: identifierType,
 		}
-		qualifier = selectedName.Name
-		imports.RequireByName(selectedName.Name)
-
-		fieldType = selectorType.Sel.Name
-	} else {
-		selectedName, ok := topType.(*ast.Ident)
-		if !ok {
-			fmt.Println(fmt.Errorf(typeParseFailure, f.Type))
-		}
-		fieldType = selectedName.Name
 	}
 
-	for _, name := range names {
-		v := &Value{
-			Name:       name,
-			Type:       fieldType,
-			Pointer:    ispointer,
-			Elliptical: elliptical,
-			Qualifier:  qualifier,
-			ChanDir:    chandir,
+	return identifiers
+}
+
+func unwrap(node ast.Expr, imports *ImportSet) Type {
+	switch nodeType := node.(type) {
+	case *ast.Ellipsis:
+		return &Ellipsis{
+			subType: unwrap(nodeType.Elt, imports),
 		}
-		values = append(values, v)
+	case *ast.ChanType:
+		switch nodeType.Dir {
+		case ast.SEND:
+			return &SendChannel{
+				subType: unwrap(nodeType.Value, imports),
+			}
+		case ast.RECV:
+			return &ReceiveChannel{
+				subType: unwrap(nodeType.Value, imports),
+			}
+		case ast.SEND + ast.RECV:
+			return &Channel{
+				subType: unwrap(nodeType.Value, imports),
+			}
+		}
+	case *ast.StarExpr:
+		return &Pointer{
+			subType: unwrap(nodeType.X, imports),
+		}
+	case *ast.InterfaceType:
+		return &BasicType{
+			Name: "interface{}",
+		}
+	case *ast.StructType:
+		return &BasicType{
+			Name: "struct{}",
+		}
+	case *ast.SelectorExpr:
+		selector := nodeType.X.(*ast.Ident).Name
+		imports.RequireByName(selector)
+		return &BasicType{
+			Qualifier: selector,
+			Name:      nodeType.Sel.Name,
+		}
+	case *ast.Ident:
+		return &BasicType{
+			Name: nodeType.Name,
+		}
 	}
-	return values
+
+	return nil
 }
 
 // Method represents a method in an interface's method set
 type Method struct {
 	Interface      string
 	Name           string
-	Parameters     []*Value
-	Results        []*Value
+	Parameters     []*Identifier
+	Results        []*Identifier
 	parametersDecl string
 	parametersCall string
 	resultsDecl    string
@@ -201,8 +190,8 @@ func (m *Method) ParametersDeclaration() string {
 	}
 	if m.parametersDecl == "" {
 		params := make([]string, len(m.Parameters))
-		for i, value := range m.Parameters {
-			params[i] = value.functionDeclarationFormat()
+		for i, param := range m.Parameters {
+			params[i] = param.ParameterFormat()
 		}
 		m.parametersDecl = strings.Join(params, ", ")
 	}
@@ -216,8 +205,8 @@ func (m *Method) ParametersReference() string {
 	}
 	if m.parametersCall == "" {
 		params := make([]string, len(m.Parameters))
-		for i, value := range m.Parameters {
-			params[i] = value.argumentFormat()
+		for i, param := range m.Parameters {
+			params[i] = param.ReferenceFormat()
 		}
 		m.parametersCall = strings.Join(params, ", ")
 	}
@@ -231,8 +220,8 @@ func (m *Method) ResultsDeclaration() string {
 	}
 	if m.resultsDecl == "" {
 		params := make([]string, len(m.Results))
-		for i, value := range m.Results {
-			params[i] = value.functionDeclarationFormat()
+		for i, param := range m.Results {
+			params[i] = param.ParameterFormat()
 		}
 		m.resultsDecl = strings.Join(params, ", ")
 	}
@@ -246,8 +235,8 @@ func (m *Method) ResultsReference() string {
 	}
 	if m.resultsCall == "" {
 		params := make([]string, len(m.Results))
-		for i, value := range m.Results {
-			params[i] = value.argumentFormat()
+		for i, param := range m.Results {
+			params[i] = param.ReferenceFormat()
 		}
 		m.resultsCall = strings.Join(params, ", ")
 	}
@@ -255,68 +244,153 @@ func (m *Method) ResultsReference() string {
 	return m.resultsCall
 }
 
-// Value represents a Parameter or Result of a Method
-type Value struct {
-	Name       string // name if a named parameter/result, else null string
-	Type       string
-	Qualifier  string
-	Pointer    bool
-	Elliptical bool
-	ChanDir    int
+type Identifier struct {
+	Name            string
+	valueType       Type
+	titleCase       string
+	parameterFormat string
+	referenceFormat string
+	fieldFormat     string
 }
 
-func (v Value) functionDeclarationFormat() string {
-	formatted := ""
-	switch v.ChanDir {
-	case 1:
-		formatted = "chan<- "
-	case 2:
-		formatted = "<-chan "
-	case 3:
-		formatted = "chan "
+func (i *Identifier) TitleCase() string {
+	if i.titleCase == "" {
+		i.titleCase = strings.Title(i.Name)
 	}
-	if v.Elliptical {
-		formatted = fmt.Sprintf("%s...", formatted)
-	}
-	if v.Pointer {
-		formatted = fmt.Sprintf("%s*", formatted)
-	}
-	if len(v.Qualifier) > 0 {
-		formatted = fmt.Sprintf("%s%s.", formatted, v.Qualifier)
-	}
-	return fmt.Sprintf("%s %s%s", v.Name, formatted, v.Type)
+	return i.titleCase
 }
 
-func (v Value) argumentFormat() string {
-	formatted := ""
-	if v.Elliptical {
-		formatted = "..."
+func (i *Identifier) ParameterFormat() string {
+	if i.parameterFormat == "" {
+		i.parameterFormat = fmt.Sprintf("%s %s", i.Name, i.valueType.ParameterFormat())
 	}
-	return fmt.Sprintf("%s%s", v.Name, formatted)
+
+	return i.parameterFormat
 }
 
-func (v Value) StructDef() string {
-	formatted := ""
-	switch v.ChanDir {
-	case 1:
-		formatted = "chan<- "
-	case 2:
-		formatted = "<-chan "
-	case 3:
-		formatted = "chan "
+func (i *Identifier) ReferenceFormat() string {
+	if i.referenceFormat == "" {
+		i.referenceFormat = fmt.Sprintf("%s%s", i.Name, i.valueType.ReferenceFormat())
 	}
-	if v.Elliptical {
-		formatted = fmt.Sprintf("%s[]", formatted)
-	}
-	if v.Pointer {
-		formatted = fmt.Sprintf("%s*", formatted)
-	}
-	if len(v.Qualifier) > 0 {
-		formatted = fmt.Sprintf("%s%s.", formatted, v.Qualifier)
-	}
-	return fmt.Sprintf("%s %s%s", v.CapitalName(), formatted, v.Type)
+
+	return i.referenceFormat
 }
 
-func (v Value) CapitalName() string {
-	return strings.Title(v.Name)
+func (i *Identifier) FieldFormat() string {
+	if i.fieldFormat == "" {
+		i.fieldFormat = fmt.Sprintf("%s %s", i.TitleCase(), i.valueType.FieldFormat())
+	}
+
+	return i.fieldFormat
+}
+
+type Type interface {
+	ParameterFormat() string
+	ReferenceFormat() string
+	FieldFormat() string
+}
+
+type Ellipsis struct {
+	subType Type
+}
+
+func (t *Ellipsis) ParameterFormat() string {
+	return fmt.Sprintf("%s...", t.subType.ParameterFormat())
+}
+
+func (t *Ellipsis) ReferenceFormat() string {
+	return "..."
+}
+
+func (t *Ellipsis) FieldFormat() string {
+	return fmt.Sprintf("%s[]", t.subType.FieldFormat())
+}
+
+type Channel struct {
+	subType Type
+}
+
+func (t *Channel) ParameterFormat() string {
+	return fmt.Sprintf("chan %s", t.subType.ParameterFormat())
+}
+
+func (t *Channel) ReferenceFormat() string {
+	return t.subType.ReferenceFormat()
+}
+
+func (t *Channel) FieldFormat() string {
+	return fmt.Sprintf("chan %s", t.subType.FieldFormat())
+}
+
+type ReceiveChannel struct {
+	subType Type
+}
+
+func (t *ReceiveChannel) ParameterFormat() string {
+	return fmt.Sprintf("<-chan %s", t.subType.ParameterFormat())
+}
+
+func (t *ReceiveChannel) ReferenceFormat() string {
+	return t.subType.ReferenceFormat()
+}
+
+func (t *ReceiveChannel) FieldFormat() string {
+	return fmt.Sprintf("<-chan %s", t.subType.FieldFormat())
+}
+
+type SendChannel struct {
+	subType Type
+}
+
+func (t *SendChannel) ParameterFormat() string {
+	return fmt.Sprintf("chan<- %s", t.subType.ParameterFormat())
+}
+
+func (t *SendChannel) ReferenceFormat() string {
+	return t.subType.ReferenceFormat()
+}
+
+func (t *SendChannel) FieldFormat() string {
+	return fmt.Sprintf("chan<- %s", t.subType.FieldFormat())
+}
+
+type Pointer struct {
+	subType Type
+}
+
+func (t *Pointer) ParameterFormat() string {
+	return fmt.Sprintf("*%s", t.subType.ParameterFormat())
+}
+
+func (t *Pointer) ReferenceFormat() string {
+	return t.subType.ReferenceFormat()
+}
+
+func (t *Pointer) FieldFormat() string {
+	return fmt.Sprintf("*%s", t.subType.FieldFormat())
+}
+
+type BasicType struct {
+	Name      string
+	Qualifier string
+}
+
+func (t *BasicType) ParameterFormat() string {
+	if t.Qualifier != "" {
+		return fmt.Sprintf("%s.%s", t.Qualifier, t.Name)
+	}
+
+	return t.Name
+}
+
+func (t *BasicType) ReferenceFormat() string {
+	return ""
+}
+
+func (t *BasicType) FieldFormat() string {
+	if t.Qualifier != "" {
+		return fmt.Sprintf("%s.%s", t.Qualifier, t.Name)
+	}
+
+	return t.Name
 }

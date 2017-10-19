@@ -21,11 +21,11 @@ import (
 // {{.Name}}Invocation represents a single call of Fake{{.Interface}}.{{.Name}}
 type {{.Name}}Invocation struct {
 {{if .Parameters}}	Parameters struct {
-{{range .Parameters}}	{{.StructDef}}
+{{range .Parameters}}	{{.FieldFormat}}
 {{end}}
 	}{{end}}
 {{if .Results}}	Results struct {
-{{range .Results}}	{{.StructDef}}
+{{range .Results}}	{{.FieldFormat}}
 {{end}}
 	}{{end}}
 }
@@ -65,12 +65,12 @@ type Fake{{.Name}} struct {
 {{with $f := gensym}}func ({{$f}} *Fake{{$m.Interface}}) {{$m.Name}}({{$m.ParametersDeclaration}}) ({{$m.ResultsDeclaration}}) {
 	invocation := new({{$m.Name}}Invocation)
 
-{{if $m.Parameters}}{{range $m.Parameters}} invocation.Parameters.{{.CapitalName}} = {{.Name}}
+{{if $m.Parameters}}{{range $m.Parameters}} invocation.Parameters.{{.TitleCase}} = {{.Name}}
 {{end}}{{end}}
 {{if $m.Results}} {{$m.ResultsReference}} = {{$f}}.{{$m.Name}}Hook({{$m.ParametersReference}})
 {{else}} {{$f}}.{{$m.Name}}Hook({{$m.ParametersReference}})
 {{end}}
-{{if $m.Results}}{{range $m.Results}}invocation.Results.{{.CapitalName}} = {{.Name}}
+{{if $m.Results}}{{range $m.Results}}invocation.Results.{{.TitleCase}} = {{.Name}}
 {{end}}{{end}}
 	{{$f}}.{{$m.Name}}Calls = append({{$f}}.{{$m.Name}}Calls, invocation)
 
@@ -133,7 +133,7 @@ func (f *Fake{{.Interface}}) Assert{{.Name}}CalledN(t *testing.T, n int) {
 {{with $f := gensym}}func ({{$f}} *Fake{{$m.Interface}}) {{$m.Name}}CalledWith({{$m.ParametersDeclaration}}) bool {
 	var found bool
 	for _, call := range {{$f}}.{{$m.Name}}Calls {
-		if {{range $i, $p := $m.Parameters}}{{if $i}} && {{end}}reflect.DeepEqual(call.Parameters.{{$p.CapitalName}}, {{$p.Name}}){{end}} {
+		if {{range $i, $p := $m.Parameters}}{{if $i}} && {{end}}reflect.DeepEqual(call.Parameters.{{$p.TitleCase}}, {{$p.Name}}){{end}} {
 			found = true
 			break
 		}
@@ -147,7 +147,7 @@ func (f *Fake{{.Interface}}) Assert{{.Name}}CalledN(t *testing.T, n int) {
 	t.Helper()
 	var found bool
 	for _, call := range {{$f}}.{{$m.Name}}Calls {
-		if {{range $i, $p := $m.Parameters}}{{if $i}} && {{end}}reflect.DeepEqual(call.Parameters.{{$p.CapitalName}}, {{$p.Name}}){{end}} {
+		if {{range $i, $p := $m.Parameters}}{{if $i}} && {{end}}reflect.DeepEqual(call.Parameters.{{$p.TitleCase}}, {{$p.Name}}){{end}} {
 			found = true
 			break
 		}
@@ -162,7 +162,7 @@ func (f *Fake{{.Interface}}) Assert{{.Name}}CalledN(t *testing.T, n int) {
 {{with $f := gensym}}func ({{$f}} *Fake{{$m.Interface}}) {{$m.Name}}CalledOnceWith({{$m.ParametersDeclaration}}) bool {
 	var count int
 	for _, call := range {{$f}}.{{$m.Name}}Calls {
-		if {{range $i, $p := $m.Parameters}}{{if $i}} && {{end}}reflect.DeepEqual(call.Parameters.{{$p.CapitalName}}, {{$p.Name}}){{end}} {
+		if {{range $i, $p := $m.Parameters}}{{if $i}} && {{end}}reflect.DeepEqual(call.Parameters.{{$p.TitleCase}}, {{$p.Name}}){{end}} {
 			count++
 		}
 	}
@@ -175,7 +175,7 @@ func (f *Fake{{.Interface}}) Assert{{.Name}}CalledN(t *testing.T, n int) {
 	t.Helper()
 	var count int
 	for _, call := range {{$f}}.{{$m.Name}}Calls {
-		if {{range $i, $p := $m.Parameters}}{{if $i}} && {{end}}reflect.DeepEqual(call.Parameters.{{$p.CapitalName}}, {{$p.Name}}){{end}} {
+		if {{range $i, $p := $m.Parameters}}{{if $i}} && {{end}}reflect.DeepEqual(call.Parameters.{{$p.TitleCase}}, {{$p.Name}}){{end}} {
 			count++
 		}
 	}
@@ -188,8 +188,8 @@ func (f *Fake{{.Interface}}) Assert{{.Name}}CalledN(t *testing.T, n int) {
 // {{.Name}}ResultsForCall returns the result values for the first call to Fake{{.Interface}}.{{.Name}} with the given values
 {{with $f := gensym}}func ({{$f}} *Fake{{$m.Interface}}) {{$m.Name}}ResultsForCall({{$m.ParametersDeclaration}}) ({{$m.ResultsDeclaration}}, found bool) {
 	for _, call := range {{$f}}.{{$m.Name}}Calls {
-		if {{range $i, $p := $m.Parameters}}{{if $i}} && {{end}}reflect.DeepEqual(call.Parameters.{{$p.CapitalName}}, {{$p.Name}}){{end}} {
-			{{range $m.Results}}{{.Name}} = call.Results.{{.CapitalName}}
+		if {{range $i, $p := $m.Parameters}}{{if $i}} && {{end}}reflect.DeepEqual(call.Parameters.{{$p.TitleCase}}, {{$p.Name}}){{end}} {
+			{{range $m.Results}}{{.Name}} = call.Results.{{.TitleCase}}
 			{{end}}found = true
 			break
 		}
