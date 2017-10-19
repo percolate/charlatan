@@ -121,7 +121,7 @@ func TestUsingService(t *testing.T) {
 				return nil, errors.New("unexpected criteria")
 			}
 			return expectedThings, nil
-		}
+		},
 	}
 
 	// use the `svc` instance in the code under text ...
