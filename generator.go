@@ -134,17 +134,11 @@ func (g *Generator) Generate(interfaceNames []string) ([]byte, error) {
 		packageName = g.PackageOverride
 	}
 
-	requiredPackages := g.imports.GetRequired()
-	imports := make([]string, len(requiredPackages))
-	for i, pkg := range requiredPackages {
-		imports[i] = pkg.Path
-	}
-
 	argv := []string{"charlatan"}
 	tmpl := Template{
 		CommandLine: strings.Join(append(argv, os.Args[1:]...), " "),
 		PackageName: packageName,
-		Imports:     imports,
+		Imports:     g.imports.GetRequired(),
 		Interfaces:  decls,
 	}
 

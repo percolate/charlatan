@@ -14,7 +14,7 @@ package {{.PackageName}}
 import (
 	"reflect"
 	"testing"
-{{range .Imports}} "{{.}}"
+{{range .Imports}} {{.Path}}
 {{end}}
 )
 {{range .Interfaces}}{{range .Methods}}
@@ -211,7 +211,7 @@ var (
 type Template struct {
 	CommandLine string
 	PackageName string
-	Imports     []string
+	Imports     []*Import
 	Interfaces  []*Interface
 }
 
@@ -225,7 +225,7 @@ func (t *Template) Execute() ([]byte, error) {
 	if err != nil {
 		// Should not happen except when developing this code.
 		// The user can compile the output to see the error.
-		return buf.Bytes(), fmt.Errorf("warning: internal error: invalid code generated: %s", err)
+		return buf.Bytes(), fmt.Errorf("internal error: invalid code generated: %s", err)
 	}
 
 	return src, nil
