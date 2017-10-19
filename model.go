@@ -73,29 +73,30 @@ type Interface struct {
 	Methods []*Method
 }
 
-func (i *Interface) addMethod(m *ast.Field, imps *ImportSet) {
-	functype, ok := m.Type.(*ast.FuncType)
+func (i *Interface) addMethod(field *ast.Field, imports *ImportSet) {
+	functionType, ok := field.Type.(*ast.FuncType)
 	if !ok {
 		return
 	}
 
 	method := &Method{
-		InterfaceName: i.Name,
-		Name:          m.Names[0].Name,
+		Interface: i.Name,
+		Name:      field.Names[0].Name,
 	}
 
 	// `Params.List` can be 0-length, but `Results` can be nil
-	for i, p := range functype.Params.List {
-		values := extractValues(p, i, "arg", imps)
-		method.Params = append(method.Params, values...)
+	for i, parameter := range functionType.Params.List {
+		values := extractValues(parameter, i, "arg", imports)
+		method.Parameters = append(method.Parameters, values...)
 	}
 
-	if functype.Results != nil {
-		for i, r := range functype.Results.List {
-			values := extractValues(r, i, "ret", imps)
+	if functionType.Results != nil {
+		for i, result := range functionType.Results.List {
+			values := extractValues(result, i, "ret", imports)
 			method.Results = append(method.Results, values...)
 		}
 	}
+
 	i.Methods = append(i.Methods, method)
 }
 
@@ -184,48 +185,80 @@ func extractValues(f *ast.Field, i int, prefix string, imports *ImportSet) []*Va
 
 // Method represents a method in an interface's method set
 type Method struct {
-	InterfaceName string
-	Name          string
-	Params        []*Value
-	Results       []*Value
+	Interface      string
+	Name           string
+	Parameters     []*Value
+	Results        []*Value
+	parametersDecl string
+	parametersCall string
+	resultsDecl    string
+	resultsCall    string
 }
 
-func (m Method) FormatParamsDeclaration() string {
-	var f []string
-	for _, v := range m.Params {
-		f = append(f, v.functionDeclarationFormat())
+func (m *Method) ParametersDeclaration() string {
+	if len(m.Parameters) == 0 {
+		return ""
 	}
-	return strings.Join(f, ", ")
+	if m.parametersDecl == "" {
+		params := make([]string, len(m.Parameters))
+		for i, value := range m.Parameters {
+			params[i] = value.functionDeclarationFormat()
+		}
+		m.parametersDecl = strings.Join(params, ", ")
+	}
+
+	return m.parametersDecl
 }
 
-func (m Method) FormatParamsCall() string {
-	var f []string
-	for _, v := range m.Params {
-		f = append(f, v.argumentFormat())
+func (m *Method) ParametersReference() string {
+	if len(m.Parameters) == 0 {
+		return ""
 	}
-	return strings.Join(f, ", ")
+	if m.parametersCall == "" {
+		params := make([]string, len(m.Parameters))
+		for i, value := range m.Parameters {
+			params[i] = value.argumentFormat()
+		}
+		m.parametersCall = strings.Join(params, ", ")
+	}
+
+	return m.parametersCall
 }
 
-func (m Method) FormatResultsDeclaration() string {
-	var f []string
-	for _, v := range m.Results {
-		f = append(f, v.functionDeclarationFormat())
+func (m *Method) ResultsDeclaration() string {
+	if len(m.Results) == 0 {
+		return ""
 	}
-	return strings.Join(f, ", ")
+	if m.resultsDecl == "" {
+		params := make([]string, len(m.Results))
+		for i, value := range m.Results {
+			params[i] = value.functionDeclarationFormat()
+		}
+		m.resultsDecl = strings.Join(params, ", ")
+	}
+
+	return m.resultsDecl
 }
 
-func (m Method) FormatResultsCall() string {
-	var f []string
-	for _, v := range m.Results {
-		f = append(f, v.argumentFormat())
+func (m *Method) ResultsReference() string {
+	if len(m.Results) == 0 {
+		return ""
 	}
-	return strings.Join(f, ", ")
+	if m.resultsCall == "" {
+		params := make([]string, len(m.Results))
+		for i, value := range m.Results {
+			params[i] = value.argumentFormat()
+		}
+		m.resultsCall = strings.Join(params, ", ")
+	}
+
+	return m.resultsCall
 }
 
 // Value represents a Parameter or Result of a Method
 type Value struct {
 	Name       string // name if a named parameter/result, else null string
-	Type       string //
+	Type       string
 	Qualifier  string
 	Pointer    bool
 	Elliptical bool

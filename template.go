@@ -18,10 +18,10 @@ import (
 {{end}}
 )
 {{range .Interfaces}}{{range .Methods}}
-// {{.Name}}Invocation represents a single call of Fake{{.InterfaceName}}.{{.Name}}
+// {{.Name}}Invocation represents a single call of Fake{{.Interface}}.{{.Name}}
 type {{.Name}}Invocation struct {
-{{if .Params}}	Parameters struct {
-{{range .Params}}	{{.StructDef}}
+{{if .Parameters}}	Parameters struct {
+{{range .Parameters}}	{{.StructDef}}
 {{end}}
 	}{{end}}
 {{if .Results}}	Results struct {
@@ -37,9 +37,9 @@ Fake{{.Name}} is a mock implementation of {{.Name}} for testing.
 
 	package example
 
-	func TestWith{{$m.InterfaceName}}(t *testing.T) {
-		f := &{{$.PackageName}}.Fake{{$m.InterfaceName}}{
-			{{$m.Name}}Hook: func({{$m.FormatParamsDeclaration}}) ({{$m.FormatResultsDeclaration}}) {
+	func TestWith{{$m.Interface}}(t *testing.T) {
+		f := &{{$.PackageName}}.Fake{{$m.Interface}}{
+			{{$m.Name}}Hook: func({{$m.ParametersDeclaration}}) ({{$m.ResultsDeclaration}}) {
 				// ensure parameters meet expections, signal errors using t, etc
 				return
 			}
@@ -47,7 +47,7 @@ Fake{{.Name}} is a mock implementation of {{.Name}} for testing.
 
 		// test code goes here ...
 
-		// asset state of Fake{{.Name}} ...
+		// assert state of Fake{{.Name}} ...
 		f.Assert{{$m.Name}}CalledOnce(t)
 	}
 
@@ -56,19 +56,19 @@ should be called in the code under test.  This will force a painc if any
 unexpected calls are made to Fake{{.Name}}.
 {{end}}{{end}}*/
 type Fake{{.Name}} struct {
-{{range .Methods}} {{.Name}}Hook func({{.FormatParamsDeclaration}}) ({{.FormatResultsDeclaration}})
+{{range .Methods}} {{.Name}}Hook func({{.ParametersDeclaration}}) ({{.ResultsDeclaration}})
 {{end}}
 {{range .Methods}} {{.Name}}Calls []*{{.Name}}Invocation
 {{end}}}
 
 {{range $m := .Methods}}
-{{with $f := gensym}}func ({{$f}} *Fake{{$m.InterfaceName}}) {{$m.Name}}({{$m.FormatParamsDeclaration}}) ({{$m.FormatResultsDeclaration}}) {
+{{with $f := gensym}}func ({{$f}} *Fake{{$m.Interface}}) {{$m.Name}}({{$m.ParametersDeclaration}}) ({{$m.ResultsDeclaration}}) {
 	invocation := new({{$m.Name}}Invocation)
 
-{{if $m.Params}}{{range $m.Params}} invocation.Parameters.{{.CapitalName}} = {{.Name}}
+{{if $m.Parameters}}{{range $m.Parameters}} invocation.Parameters.{{.CapitalName}} = {{.Name}}
 {{end}}{{end}}
-{{if $m.Results}} {{$m.FormatResultsCall}} = {{$f}}.{{$m.Name}}Hook({{$m.FormatParamsCall}})
-{{else}} {{$f}}.{{$m.Name}}Hook({{$m.FormatParamsCall}})
+{{if $m.Results}} {{$m.ResultsReference}} = {{$f}}.{{$m.Name}}Hook({{$m.ParametersReference}})
+{{else}} {{$f}}.{{$m.Name}}Hook({{$m.ParametersReference}})
 {{end}}
 {{if $m.Results}}{{range $m.Results}}invocation.Results.{{.CapitalName}} = {{.Name}}
 {{end}}{{end}}
@@ -77,63 +77,63 @@ type Fake{{.Name}} struct {
 	return
 }{{end}}
 
-// {{.Name}}Called returns true if Fake{{.InterfaceName}}.{{.Name}} was called
-func (f *Fake{{.InterfaceName}}) {{.Name}}Called() bool {
+// {{.Name}}Called returns true if Fake{{.Interface}}.{{.Name}} was called
+func (f *Fake{{.Interface}}) {{.Name}}Called() bool {
 	return len(f.{{.Name}}Calls) != 0
 }
 
-// Assert{{.Name}}Called calls t.Error if Fake{{.InterfaceName}}.{{.Name}} was not called
-func (f *Fake{{.InterfaceName}}) Assert{{.Name}}Called(t *testing.T) {
+// Assert{{.Name}}Called calls t.Error if Fake{{.Interface}}.{{.Name}} was not called
+func (f *Fake{{.Interface}}) Assert{{.Name}}Called(t *testing.T) {
 	t.Helper()
 	if len(f.{{.Name}}Calls) == 0 {
-		t.Error("Fake{{.InterfaceName}}.{{.Name}} not called, expected at least one")
+		t.Error("Fake{{.Interface}}.{{.Name}} not called, expected at least one")
 	}
 }
 
-// {{.Name}}NotCalled returns true if Fake{{.InterfaceName}}.{{.Name}} was not called
-func (f *Fake{{.InterfaceName}}) {{.Name}}NotCalled() bool {
+// {{.Name}}NotCalled returns true if Fake{{.Interface}}.{{.Name}} was not called
+func (f *Fake{{.Interface}}) {{.Name}}NotCalled() bool {
 	return len(f.{{.Name}}Calls) == 0
 }
 
-// Assert{{.Name}}NotCalled calls t.Error if Fake{{.InterfaceName}}.{{.Name}} was called
-func (f *Fake{{.InterfaceName}}) Assert{{.Name}}NotCalled(t *testing.T) {
+// Assert{{.Name}}NotCalled calls t.Error if Fake{{.Interface}}.{{.Name}} was called
+func (f *Fake{{.Interface}}) Assert{{.Name}}NotCalled(t *testing.T) {
 	t.Helper()
 	if len(f.{{.Name}}Calls) != 0 {
-		t.Error("Fake{{.InterfaceName}}.{{.Name}} called, expected none")
+		t.Error("Fake{{.Interface}}.{{.Name}} called, expected none")
 	}
 }
 
-// {{.Name}}CalledOnce returns true if Fake{{.InterfaceName}}.{{.Name}} was called exactly once
-func (f *Fake{{.InterfaceName}}) {{.Name}}CalledOnce() bool {
+// {{.Name}}CalledOnce returns true if Fake{{.Interface}}.{{.Name}} was called exactly once
+func (f *Fake{{.Interface}}) {{.Name}}CalledOnce() bool {
 	return len(f.{{.Name}}Calls) == 1
 }
 
-// Assert{{.Name}}CalledOnce calls t.Error if Fake{{.InterfaceName}}.{{.Name}} was not called exactly once
-func (f *Fake{{.InterfaceName}}) Assert{{.Name}}CalledOnce(t *testing.T) {
+// Assert{{.Name}}CalledOnce calls t.Error if Fake{{.Interface}}.{{.Name}} was not called exactly once
+func (f *Fake{{.Interface}}) Assert{{.Name}}CalledOnce(t *testing.T) {
 	t.Helper()
 	if len(f.{{.Name}}Calls) != 1 {
-		t.Errorf("Fake{{.InterfaceName}}.{{.Name}} called %d times, expected 1", len(f.{{.Name}}Calls))
+		t.Errorf("Fake{{.Interface}}.{{.Name}} called %d times, expected 1", len(f.{{.Name}}Calls))
 	}
 }
 
-// {{.Name}}CalledN returns true if Fake{{.InterfaceName}}.{{.Name}} was called at least n times
-func (f *Fake{{.InterfaceName}}) {{.Name}}CalledN(n int) bool {
+// {{.Name}}CalledN returns true if Fake{{.Interface}}.{{.Name}} was called at least n times
+func (f *Fake{{.Interface}}) {{.Name}}CalledN(n int) bool {
 	return len(f.{{.Name}}Calls) >= n
 }
 
-// Assert{{.Name}}CalledN calls t.Error if Fake{{.InterfaceName}}.{{.Name}} was called less than n times
-func (f *Fake{{.InterfaceName}}) Assert{{.Name}}CalledN(t *testing.T, n int) {
+// Assert{{.Name}}CalledN calls t.Error if Fake{{.Interface}}.{{.Name}} was called less than n times
+func (f *Fake{{.Interface}}) Assert{{.Name}}CalledN(t *testing.T, n int) {
 	t.Helper()
 	if len(f.{{.Name}}Calls) < n {
-		t.Errorf("Fake{{.InterfaceName}}.{{.Name}} called %d times, expected >= %d", len(f.{{.Name}}Calls), n)
+		t.Errorf("Fake{{.Interface}}.{{.Name}} called %d times, expected >= %d", len(f.{{.Name}}Calls), n)
 	}
 }
 
-{{if .Params}}// {{.Name}}CalledWith returns true if Fake{{.InterfaceName}}.{{.Name}} was called with the given values
-{{with $f := gensym}}func ({{$f}} *Fake{{$m.InterfaceName}}) {{$m.Name}}CalledWith({{$m.FormatParamsDeclaration}}) bool {
+{{if .Parameters}}// {{.Name}}CalledWith returns true if Fake{{.Interface}}.{{.Name}} was called with the given values
+{{with $f := gensym}}func ({{$f}} *Fake{{$m.Interface}}) {{$m.Name}}CalledWith({{$m.ParametersDeclaration}}) bool {
 	var found bool
 	for _, call := range {{$f}}.{{$m.Name}}Calls {
-		if {{range $i, $p := $m.Params}}{{if $i}} && {{end}}reflect.DeepEqual(call.Parameters.{{$p.CapitalName}}, {{$p.Name}}){{end}} {
+		if {{range $i, $p := $m.Parameters}}{{if $i}} && {{end}}reflect.DeepEqual(call.Parameters.{{$p.CapitalName}}, {{$p.Name}}){{end}} {
 			found = true
 			break
 		}
@@ -142,27 +142,27 @@ func (f *Fake{{.InterfaceName}}) Assert{{.Name}}CalledN(t *testing.T, n int) {
 	return found
 }{{end}}
 
-// Assert{{.Name}}CalledWith calls t.Error if Fake{{.InterfaceName}}.{{.Name}} was not called with the given values
-{{with $f := gensym}}func ({{$f}} *Fake{{$m.InterfaceName}}) Assert{{$m.Name}}CalledWith(t *testing.T, {{$m.FormatParamsDeclaration}}) {
+// Assert{{.Name}}CalledWith calls t.Error if Fake{{.Interface}}.{{.Name}} was not called with the given values
+{{with $f := gensym}}func ({{$f}} *Fake{{$m.Interface}}) Assert{{$m.Name}}CalledWith(t *testing.T, {{$m.ParametersDeclaration}}) {
 	t.Helper()
 	var found bool
 	for _, call := range {{$f}}.{{$m.Name}}Calls {
-		if {{range $i, $p := $m.Params}}{{if $i}} && {{end}}reflect.DeepEqual(call.Parameters.{{$p.CapitalName}}, {{$p.Name}}){{end}} {
+		if {{range $i, $p := $m.Parameters}}{{if $i}} && {{end}}reflect.DeepEqual(call.Parameters.{{$p.CapitalName}}, {{$p.Name}}){{end}} {
 			found = true
 			break
 		}
 	}
 
 	if !found {
-		t.Error("Fake{{$m.InterfaceName}}.{{$m.Name}} not called with expected parameters")
+		t.Error("Fake{{$m.Interface}}.{{$m.Name}} not called with expected parameters")
 	}
 }{{end}}
 
-// {{.Name}}CalledOnceWith returns true if Fake{{.InterfaceName}}.{{.Name}} was called exactly once with the given values
-{{with $f := gensym}}func ({{$f}} *Fake{{$m.InterfaceName}}) {{$m.Name}}CalledOnceWith({{$m.FormatParamsDeclaration}}) bool {
+// {{.Name}}CalledOnceWith returns true if Fake{{.Interface}}.{{.Name}} was called exactly once with the given values
+{{with $f := gensym}}func ({{$f}} *Fake{{$m.Interface}}) {{$m.Name}}CalledOnceWith({{$m.ParametersDeclaration}}) bool {
 	var count int
 	for _, call := range {{$f}}.{{$m.Name}}Calls {
-		if {{range $i, $p := $m.Params}}{{if $i}} && {{end}}reflect.DeepEqual(call.Parameters.{{$p.CapitalName}}, {{$p.Name}}){{end}} {
+		if {{range $i, $p := $m.Parameters}}{{if $i}} && {{end}}reflect.DeepEqual(call.Parameters.{{$p.CapitalName}}, {{$p.Name}}){{end}} {
 			count++
 		}
 	}
@@ -170,25 +170,25 @@ func (f *Fake{{.InterfaceName}}) Assert{{.Name}}CalledN(t *testing.T, n int) {
 	return count == 1
 }{{end}}
 
-// Assert{{.Name}}CalledOnceWith calls t.Error if Fake{{.InterfaceName}}.{{.Name}} was not called exactly once with the given values
-{{with $f := gensym}}func ({{$f}} *Fake{{$m.InterfaceName}}) Assert{{$m.Name}}OnceCalledWith(t *testing.T, {{$m.FormatParamsDeclaration}}) {
+// Assert{{.Name}}CalledOnceWith calls t.Error if Fake{{.Interface}}.{{.Name}} was not called exactly once with the given values
+{{with $f := gensym}}func ({{$f}} *Fake{{$m.Interface}}) Assert{{$m.Name}}OnceCalledWith(t *testing.T, {{$m.ParametersDeclaration}}) {
 	t.Helper()
 	var count int
 	for _, call := range {{$f}}.{{$m.Name}}Calls {
-		if {{range $i, $p := $m.Params}}{{if $i}} && {{end}}reflect.DeepEqual(call.Parameters.{{$p.CapitalName}}, {{$p.Name}}){{end}} {
+		if {{range $i, $p := $m.Parameters}}{{if $i}} && {{end}}reflect.DeepEqual(call.Parameters.{{$p.CapitalName}}, {{$p.Name}}){{end}} {
 			count++
 		}
 	}
 
 	if count != 1 {
-		t.Errorf("Fake{{$m.InterfaceName}}.{{$m.Name}} called %d times with expected parameters, expected one", count)
+		t.Errorf("Fake{{$m.Interface}}.{{$m.Name}} called %d times with expected parameters, expected one", count)
 	}
 }{{end}}
 
-// {{.Name}}ResultsForCall returns the result values for the first call to Fake{{.InterfaceName}}.{{.Name}} with the given values
-{{with $f := gensym}}func ({{$f}} *Fake{{$m.InterfaceName}}) {{$m.Name}}ResultsForCall({{$m.FormatParamsDeclaration}}) ({{$m.FormatResultsDeclaration}}, found bool) {
+// {{.Name}}ResultsForCall returns the result values for the first call to Fake{{.Interface}}.{{.Name}} with the given values
+{{with $f := gensym}}func ({{$f}} *Fake{{$m.Interface}}) {{$m.Name}}ResultsForCall({{$m.ParametersDeclaration}}) ({{$m.ResultsDeclaration}}, found bool) {
 	for _, call := range {{$f}}.{{$m.Name}}Calls {
-		if {{range $i, $p := $m.Params}}{{if $i}} && {{end}}reflect.DeepEqual(call.Parameters.{{$p.CapitalName}}, {{$p.Name}}){{end}} {
+		if {{range $i, $p := $m.Parameters}}{{if $i}} && {{end}}reflect.DeepEqual(call.Parameters.{{$p.CapitalName}}, {{$p.Name}}){{end}} {
 			{{range $m.Results}}{{.Name}} = call.Results.{{.CapitalName}}
 			{{end}}found = true
 			break
