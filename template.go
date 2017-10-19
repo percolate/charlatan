@@ -61,6 +61,28 @@ type Fake{{.Name}} struct {
 {{range .Methods}} {{.Name}}Calls []*{{.Name}}Invocation
 {{end}}}
 
+// NewFake{{.Name}}DefaultPanic returns an instance of Fake{{.Name}} with all hooks configured to panic
+func NewFake{{.Name}}DefaultPanic() *Fake{{.Name}} {
+	return &Fake{{.Name}}{
+{{range .Methods}}		{{.Name}}Hook: func({{.ParametersSignature}}) ({{.ResultsDeclaration}}) {
+			panic("Unexpected call to {{.Interface}}.{{.Name}}")
+			return
+		},
+{{end}}
+	}
+}
+
+// NewFake{{.Name}}DefaultFail returns an instance of Fake{{.Name}} with all hooks configured to call t.Fatal
+func NewFake{{.Name}}DefaultFail(t *testing.T) *Fake{{.Name}} {
+	return &Fake{{.Name}}{
+{{range .Methods}}		{{.Name}}Hook: func({{.ParametersSignature}}) ({{.ResultsDeclaration}}) {
+			t.Fatal("Unexpected call to {{.Interface}}.{{.Name}}")
+			return
+		},
+{{end}}
+	}
+}
+
 {{range $m := .Methods}}
 {{with $f := gensym}}func ({{$f}} *Fake{{$m.Interface}}) {{$m.Name}}({{$m.ParametersDeclaration}}) ({{$m.ResultsDeclaration}}) {
 	invocation := new({{$m.Name}}Invocation)
