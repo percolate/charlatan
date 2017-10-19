@@ -7,6 +7,7 @@ import (
 	"go/parser"
 	"go/token"
 	"go/types"
+	"log"
 	"os"
 	"path/filepath"
 	"strconv"
@@ -156,6 +157,14 @@ func (g *Generator) Generate(interfaceNames []string) ([]byte, error) {
 		decl, ok := g.interfaces[name]
 		if !ok {
 			return nil, fmt.Errorf("error: interface %q not found", name)
+		}
+		if len(decl.Methods) == 0 {
+			log.Printf("warning: ignoring empty interface %q\n", decl.Name)
+			continue
+		}
+		if decl.Name == "_" {
+			log.Println(`warning: ignorning interface named "_"`)
+			continue
 		}
 		decls = append(decls, decl)
 	}
