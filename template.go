@@ -130,8 +130,7 @@ func (f *Fake{{.Interface}}) Assert{{.Name}}CalledN(t *testing.T, n int) {
 }
 
 {{if .Parameters}}// {{.Name}}CalledWith returns true if Fake{{.Interface}}.{{.Name}} was called with the given values
-{{with $f := gensym}}func ({{$f}} *Fake{{$m.Interface}}) {{$m.Name}}CalledWith({{$m.ParametersDeclaration}}) bool {
-	var found bool
+{{with $f := gensym}}func ({{$f}} *Fake{{$m.Interface}}) {{$m.Name}}CalledWith({{$m.ParametersDeclaration}}) (found bool) {
 	for _, call := range {{$f}}.{{$m.Name}}Calls {
 		if {{range $i, $p := $m.Parameters}}{{if $i}} && {{end}}reflect.DeepEqual(call.Parameters.{{$p.TitleCase}}, {{$p.Name}}){{end}} {
 			found = true
@@ -139,7 +138,7 @@ func (f *Fake{{.Interface}}) Assert{{.Name}}CalledN(t *testing.T, n int) {
 		}
 	}
 
-	return found
+	return
 }{{end}}
 
 // Assert{{.Name}}CalledWith calls t.Error if Fake{{.Interface}}.{{.Name}} was not called with the given values
