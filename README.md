@@ -133,7 +133,7 @@ func TestUsingService(t *testing.T) {
 
 Create anonymous function implementations for only those interface
 methods that should be called in the code under test.  This will force
-a painc if any unexpected calls are made the mock implementation.
+a painc if any unexpected calls are made to the mock implementation.
 
 The generated code has `godoc` formatted comments explaining the use
 of the mock and its methods.
