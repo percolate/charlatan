@@ -197,9 +197,9 @@ func (f *Fake{{.Interface}}) Assert{{.Name}}CalledN(t *testing.T, n int) {
 
 	return
 }{{end}}
-{{end}}
-{{end}}
-{{end}}
+{{end}}{{/* end if .Parameters */}}
+{{end}}{{/* end range $m := .Methods */}}
+{{end}}{{/* end range .Interfaces */}}
 `
 
 var (
@@ -221,7 +221,7 @@ func (t *Template) Execute() ([]byte, error) {
 		return nil, err
 	}
 
-	src, err := format.Source(buf.Bytes())
+p	src, err := format.Source(buf.Bytes())
 	if err != nil {
 		// Should not happen except when developing this code.
 		// The user can compile the output to see the error.
