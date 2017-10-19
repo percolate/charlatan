@@ -65,7 +65,9 @@ func parsePackage(directory string, filenames []string) (*Generator, error) {
 		if err := generator.extractImports(file, importer); err != nil {
 			return nil, err
 		}
-		generator.extractInterfaces(file)
+		if err := generator.extractInterfaces(file); err != nil {
+			return nil, err
+		}
 		files = append(files, file)
 	}
 	if len(files) == 0 {
@@ -117,29 +119,34 @@ func (g *Generator) extractImports(file *ast.File, importer types.Importer) erro
 	return nil
 }
 
-func (g *Generator) extractInterfaces(file *ast.File) {
+func (g *Generator) extractInterfaces(file *ast.File) (err error) {
 	for _, node := range file.Decls {
-		decl, ok := node.(*ast.GenDecl)
-		if !ok || decl.Tok != token.TYPE {
+		gen, ok := node.(*ast.GenDecl)
+		if !ok || gen.Tok != token.TYPE {
 			continue
 		}
-		spec := decl.Specs[0].(*ast.TypeSpec)
+		spec := gen.Specs[0].(*ast.TypeSpec)
 		ifType, ok := spec.Type.(*ast.InterfaceType)
-		if !ok || len(ifType.Methods.List) == 0 || spec.Name.Name == "_" {
+		if !ok {
 			continue
 		}
 
-		ifDecl := &Interface{
+		decl := &Interface{
 			Name: spec.Name.Name,
 		}
-		g.interfaces[spec.Name.Name] = ifDecl
+		g.interfaces[spec.Name.Name] = decl
 
 		for _, method := range ifType.Methods.List {
 			if _, ok := method.Type.(*ast.FuncType); ok {
-				ifDecl.addMethod(method, g.imports)
+				err = decl.addMethod(method, g.imports)
+				if err != nil {
+					return
+				}
 			}
 		}
 	}
+
+	return
 }
 
 // Generate produces the charlatan source file data for the named interfaces.
