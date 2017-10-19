@@ -221,7 +221,7 @@ func (t *Template) Execute() ([]byte, error) {
 		return nil, err
 	}
 
-p	src, err := format.Source(buf.Bytes())
+	src, err := format.Source(buf.Bytes())
 	if err != nil {
 		// Should not happen except when developing this code.
 		// The user can compile the output to see the error.
