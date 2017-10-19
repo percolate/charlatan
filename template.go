@@ -56,7 +56,7 @@ should be called in the code under test.  This will force a painc if any
 unexpected calls are made to Fake{{.Name}}.
 {{end}}{{end}}*/
 type Fake{{.Name}} struct {
-{{range .Methods}} {{.Name}}Hook func({{.ParametersDeclaration}}) ({{.ResultsDeclaration}})
+{{range .Methods}} {{.Name}}Hook func({{.ParametersSignature}}) ({{.ResultsSignature}})
 {{end}}
 {{range .Methods}} {{.Name}}Calls []*{{.Name}}Invocation
 {{end}}}

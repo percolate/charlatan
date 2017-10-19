@@ -178,29 +178,46 @@ func unwrap(node ast.Expr, imports *ImportSet) Type {
 
 // Method represents a method in an interface's method set
 type Method struct {
-	Interface      string
-	Name           string
-	Parameters     []*Identifier
-	Results        []*Identifier
-	parametersDecl string
-	parametersCall string
-	resultsDecl    string
-	resultsCall    string
+	Interface             string
+	Name                  string
+	Parameters            []*Identifier
+	Results               []*Identifier
+	parametersDeclaration string
+	resultsDeclaration    string
+	parametersCall        string
+	resultsCall           string
+	parametersSignature   string
+	resultsSignature      string
 }
 
 func (m *Method) ParametersDeclaration() string {
 	if len(m.Parameters) == 0 {
 		return ""
 	}
-	if m.parametersDecl == "" {
-		params := make([]string, len(m.Parameters))
-		for i, param := range m.Parameters {
-			params[i] = param.ParameterFormat()
+	if m.parametersDeclaration == "" {
+		idents := make([]string, len(m.Parameters))
+		for i, ident := range m.Parameters {
+			idents[i] = ident.ParameterFormat()
 		}
-		m.parametersDecl = strings.Join(params, ", ")
+		m.parametersDeclaration = strings.Join(idents, ", ")
 	}
 
-	return m.parametersDecl
+	return m.parametersDeclaration
+}
+
+func (m *Method) ResultsDeclaration() string {
+	if len(m.Results) == 0 {
+		return ""
+	}
+	if m.resultsDeclaration == "" {
+		idents := make([]string, len(m.Results))
+		for i, ident := range m.Results {
+			idents[i] = ident.ParameterFormat()
+		}
+		m.resultsDeclaration = strings.Join(idents, ", ")
+	}
+
+	return m.resultsDeclaration
 }
 
 func (m *Method) ParametersReference() string {
@@ -208,29 +225,14 @@ func (m *Method) ParametersReference() string {
 		return ""
 	}
 	if m.parametersCall == "" {
-		params := make([]string, len(m.Parameters))
-		for i, param := range m.Parameters {
-			params[i] = param.ReferenceFormat()
+		idents := make([]string, len(m.Parameters))
+		for i, ident := range m.Parameters {
+			idents[i] = ident.ReferenceFormat()
 		}
-		m.parametersCall = strings.Join(params, ", ")
+		m.parametersCall = strings.Join(idents, ", ")
 	}
 
 	return m.parametersCall
-}
-
-func (m *Method) ResultsDeclaration() string {
-	if len(m.Results) == 0 {
-		return ""
-	}
-	if m.resultsDecl == "" {
-		params := make([]string, len(m.Results))
-		for i, param := range m.Results {
-			params[i] = param.ParameterFormat()
-		}
-		m.resultsDecl = strings.Join(params, ", ")
-	}
-
-	return m.resultsDecl
 }
 
 func (m *Method) ResultsReference() string {
@@ -238,14 +240,44 @@ func (m *Method) ResultsReference() string {
 		return ""
 	}
 	if m.resultsCall == "" {
-		params := make([]string, len(m.Results))
-		for i, param := range m.Results {
-			params[i] = param.ReferenceFormat()
+		idents := make([]string, len(m.Results))
+		for i, ident := range m.Results {
+			idents[i] = ident.ReferenceFormat()
 		}
-		m.resultsCall = strings.Join(params, ", ")
+		m.resultsCall = strings.Join(idents, ", ")
 	}
 
 	return m.resultsCall
+}
+
+func (m *Method) ParametersSignature() string {
+	if len(m.Parameters) == 0 {
+		return ""
+	}
+	if m.parametersSignature == "" {
+		idents := make([]string, len(m.Parameters))
+		for i, ident := range m.Parameters {
+			idents[i] = ident.Signature()
+		}
+		m.parametersSignature = strings.Join(idents, ", ")
+	}
+
+	return m.parametersSignature
+}
+
+func (m *Method) ResultsSignature() string {
+	if len(m.Results) == 0 {
+		return ""
+	}
+	if m.resultsSignature == "" {
+		idents := make([]string, len(m.Results))
+		for i, ident := range m.Results {
+			idents[i] = ident.Signature()
+		}
+		m.resultsSignature = strings.Join(idents, ", ")
+	}
+
+	return m.resultsSignature
 }
 
 type Identifier struct {
@@ -255,6 +287,7 @@ type Identifier struct {
 	parameterFormat string
 	referenceFormat string
 	fieldFormat     string
+	signature       string
 }
 
 func (i *Identifier) TitleCase() string {
@@ -286,6 +319,14 @@ func (i *Identifier) FieldFormat() string {
 	}
 
 	return i.fieldFormat
+}
+
+func (i *Identifier) Signature() string {
+	if i.signature == "" {
+		i.signature = i.valueType.ParameterFormat()
+	}
+
+	return i.signature
 }
 
 type Type interface {
