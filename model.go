@@ -1,8 +1,11 @@
 package main
 
 import (
+	"bytes"
 	"fmt"
 	"go/ast"
+	"go/format"
+	"go/token"
 	"strings"
 )
 
@@ -78,10 +81,10 @@ type Interface struct {
 	Methods []*Method
 }
 
-func (i *Interface) addMethod(field *ast.Field, imports *ImportSet) {
+func (i *Interface) addMethod(field *ast.Field, imports *ImportSet) error {
 	functionType, ok := field.Type.(*ast.FuncType)
 	if !ok {
-		return
+		return fmt.Errorf("internal error: expected *ast.FuncType, have: %#v", field)
 	}
 
 	method := &Method{
@@ -91,22 +94,32 @@ func (i *Interface) addMethod(field *ast.Field, imports *ImportSet) {
 
 	// `Params.List` can be 0-length, but `Results` can be nil
 	for _, parameter := range functionType.Params.List {
-		identifiers := extractIdentifiers(parameter, imports)
+		identifiers, err := extractIdentifiers(parameter, imports)
+		if err != nil {
+			return err
+		}
 		method.Parameters = append(method.Parameters, identifiers...)
 	}
 
 	if functionType.Results != nil {
 		for _, result := range functionType.Results.List {
-			identifiers := extractIdentifiers(result, imports)
+			identifiers, err := extractIdentifiers(result, imports)
+			if err != nil {
+				return err
+			}
 			method.Results = append(method.Results, identifiers...)
 		}
 	}
 
 	i.Methods = append(i.Methods, method)
+	return nil
 }
 
-func extractIdentifiers(field *ast.Field, imports *ImportSet) []*Identifier {
-	identifierType := unwrap(field.Type, imports)
+func extractIdentifiers(field *ast.Field, imports *ImportSet) ([]*Identifier, error) {
+	identifierType, err := unwrap(field.Type, imports)
+	if err != nil {
+		return nil, err
+	}
 
 	if len(field.Names) == 0 {
 		return []*Identifier{
@@ -114,7 +127,7 @@ func extractIdentifiers(field *ast.Field, imports *ImportSet) []*Identifier {
 				Name:      identSymGen.Next(),
 				valueType: identifierType,
 			},
-		}
+		}, nil
 	}
 
 	identifiers := make([]*Identifier, len(field.Names))
@@ -125,56 +138,83 @@ func extractIdentifiers(field *ast.Field, imports *ImportSet) []*Identifier {
 		}
 	}
 
-	return identifiers
+	return identifiers, nil
 }
 
-func unwrap(node ast.Expr, imports *ImportSet) Type {
+func unwrap(node ast.Expr, imports *ImportSet) (t Type, err error) {
 	switch nodeType := node.(type) {
 	case *ast.Ellipsis:
-		return &Ellipsis{
-			subType: unwrap(nodeType.Elt, imports),
+		var subType Type
+		subType, err = unwrap(nodeType.Elt, imports)
+		if err != nil {
+			return
+		}
+		t = &Ellipsis{
+			subType: subType,
 		}
 	case *ast.ChanType:
 		switch nodeType.Dir {
 		case ast.SEND:
-			return &SendChannel{
-				subType: unwrap(nodeType.Value, imports),
+			var subType Type
+			subType, err = unwrap(nodeType.Value, imports)
+			if err != nil {
+				return
+			}
+			t = &SendChannel{
+				subType: subType,
 			}
 		case ast.RECV:
-			return &ReceiveChannel{
-				subType: unwrap(nodeType.Value, imports),
+			var subType Type
+			subType, err = unwrap(nodeType.Value, imports)
+			if err != nil {
+				return
+			}
+			t = &ReceiveChannel{
+				subType: subType,
 			}
 		case ast.SEND + ast.RECV:
-			return &Channel{
-				subType: unwrap(nodeType.Value, imports),
+			var subType Type
+			subType, err = unwrap(nodeType.Value, imports)
+			if err != nil {
+				return
+			}
+			t = &Channel{
+				subType: subType,
 			}
 		}
 	case *ast.StarExpr:
-		return &Pointer{
-			subType: unwrap(nodeType.X, imports),
+		var subType Type
+		subType, err = unwrap(nodeType.X, imports)
+		if err != nil {
+			return
 		}
-	case *ast.InterfaceType:
-		return &BasicType{
-			Name: "interface{}",
+		t = &Pointer{
+			subType: subType,
 		}
-	case *ast.StructType:
-		return &BasicType{
-			Name: "struct{}",
+	case *ast.InterfaceType, *ast.StructType:
+		var buf bytes.Buffer
+		if err = format.Node(&buf, token.NewFileSet(), nodeType); err != nil {
+			return
+		}
+		t = &BasicType{
+			Name: buf.String(),
 		}
 	case *ast.SelectorExpr:
 		selector := nodeType.X.(*ast.Ident).Name
 		imports.RequireByName(selector)
-		return &BasicType{
+		t = &BasicType{
 			Qualifier: selector,
 			Name:      nodeType.Sel.Name,
 		}
 	case *ast.Ident:
-		return &BasicType{
+		t = &BasicType{
 			Name: nodeType.Name,
 		}
+	default:
+		err = fmt.Errorf("internal error: unsupported field type node: %#v", nodeType)
 	}
 
-	return nil
+	return
 }
 
 // Method represents a method in an interface's method set
