@@ -9,6 +9,7 @@ import (
 	"go/types"
 	"os"
 	"path/filepath"
+	"strconv"
 	"strings"
 )
 
@@ -52,6 +53,7 @@ func parsePackage(directory string, filenames []string) (*Generator, error) {
 	}
 	files := make([]*ast.File, 0, len(filenames))
 	fileset := token.NewFileSet()
+	importer := defaultImporter()
 	for _, filename := range filenames {
 		if !strings.HasSuffix(filename, ".go") {
 			continue
@@ -60,7 +62,9 @@ func parsePackage(directory string, filenames []string) (*Generator, error) {
 		if err != nil {
 			return nil, fmt.Errorf("syntax error: %s", err)
 		}
-		generator.extractImports(file)
+		if err := generator.extractImports(file, importer); err != nil {
+			return nil, err
+		}
 		generator.extractInterfaces(file)
 		files = append(files, file)
 	}
@@ -70,7 +74,7 @@ func parsePackage(directory string, filenames []string) (*Generator, error) {
 	generator.packageName = files[0].Name.Name
 
 	// Type check the package.
-	config := types.Config{Importer: defaultImporter(), Error: func(err error) { fmt.Fprintln(os.Stderr, err) }}
+	config := types.Config{Importer: importer, Error: func(err error) { fmt.Fprintln(os.Stderr, err) }}
 	if _, err := config.Check(directory, fileset, files, nil); err != nil {
 		return nil, fmt.Errorf("type check failed")
 	}
@@ -78,19 +82,39 @@ func parsePackage(directory string, filenames []string) (*Generator, error) {
 	return generator, nil
 }
 
-func (g *Generator) extractImports(file *ast.File) {
+func (g *Generator) extractImports(file *ast.File, importer types.Importer) error {
 	for _, spec := range file.Imports {
-		if spec.Name != nil {
-			// Only add un-named imports for now
-			// xxx - why?
+		path, err := strconv.Unquote(spec.Path.Value)
+		if err != nil {
+			return err
+		}
+		pkg, err := importer.Import(path)
+		if err != nil {
+			return err
+		}
+		decl := &Import{
+			Name: pkg.Name(),
+			Path: spec.Path.Value,
+		}
+
+		if spec.Name == nil {
+			g.imports.Add(decl)
 			continue
 		}
-		parts := strings.Split(spec.Path.Value, "/")
-		g.imports.Add(&Import{
-			Name: strings.Replace(parts[len(parts)-1], "\"", "", -1),
-			Path: spec.Path.Value,
-		})
+
+		switch spec.Name.Name {
+		case "_":
+			continue
+		case ".":
+			decl.Required = true
+			decl.Alias = "."
+		default:
+			decl.Alias = spec.Name.Name
+		}
+		g.imports.Add(decl)
 	}
+
+	return nil
 }
 
 func (g *Generator) extractInterfaces(file *ast.File) {

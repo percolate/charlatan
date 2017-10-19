@@ -13,6 +13,7 @@ var (
 // Import represents a declared import
 type Import struct {
 	Name     string // the package's name
+	Alias    string // the local alias for the package name
 	Path     string // import path for the package
 	Required bool   // is the import required in the charlatan output?
 }
@@ -65,7 +66,7 @@ func (r *ImportSet) GetRequired() []*Import {
 
 func (r *ImportSet) RequireByName(s string) {
 	for i, imp := range r.imports {
-		if imp.Name == s {
+		if imp.Name == s || imp.Alias == s {
 			r.imports[i].Required = true
 		}
 	}

@@ -14,7 +14,7 @@ package {{.PackageName}}
 import (
 	"reflect"
 	"testing"
-{{range .Imports}} {{.Path}}
+{{range .Imports}}	{{if .Alias}}{{.Alias}} {{end}}{{.Path}}
 {{end}}
 )
 {{range .Interfaces}}{{range .Methods}}
