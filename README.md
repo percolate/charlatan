@@ -68,8 +68,8 @@ type QueryInvocation struct {
 		Filter *QueryFilter
 	}
 	Results struct {
-		Ret0 []*Thing
-		Ret1 error
+		Ident1 []*Thing
+		Ident2 error
 	}
 }
 
@@ -78,27 +78,27 @@ type FetechInvocation struct {
 		Id string
 	}
 	Results struct {
-		Ret0 *Thing
-		Ret1 error
+		Ident3 *Thing
+		Ident4 error
 	}
 }
 
 type FakeService struct {
-	QueryHook func(filter *QueryFilter) ([]*Thing, error)
-	FetchHook func(id string) (*Thing, error)
+	QueryHook func(*QueryFilter) ([]*Thing, error)
+	FetchHook func(string) (*Thing, error)
 
 	QueryCalls []*QueryInvocation
 	FetchCalls []*FetchInvocation
 }
 
-func (f *FakeService) Query(filter *QueryFilter) (ret0 []*Thing, ret1 error) {
+func (f *FakeService) Query(filter *QueryFilter) (ident1 []*Thing, ident2 error) {
 	invocation := new(QueryInvocation)
 	invocation.Parameters.Filter = filter
 
-	ret0, ret1 := f.QueryHook(filter)
+	ident1, ident2 := f.QueryHook(filter)
 
-	invocation.Results.Ret0 = ret0
-	invocation.Results.Ret1 = ret1
+	invocation.Results.Ident1 = ident1
+	invocation.Results.Ident2 = ident2
 
 	return
 }
@@ -120,7 +120,7 @@ func TestUsingService(t *testing.T) {
 				t.Errorf("expected criteria value: %v, have: %v", filter.Criteria, expectedCriteria)
 				return nil, errors.New("unexpected criteria")
 			}
-            return expectedThings, nil
+			return expectedThings, nil
 		}
 	}
 
