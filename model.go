@@ -6,6 +6,10 @@ import (
 	"strings"
 )
 
+var (
+	identSymGen = SymbolGenerator{Prefix: "ident"}
+)
+
 // Import represents a declared import
 type Import struct {
 	Name     string // the package's name
@@ -85,14 +89,14 @@ func (i *Interface) addMethod(field *ast.Field, imports *ImportSet) {
 	}
 
 	// `Params.List` can be 0-length, but `Results` can be nil
-	for i, parameter := range functionType.Params.List {
-		identifiers := extractIdentifiers(parameter, i, "arg", imports)
+	for _, parameter := range functionType.Params.List {
+		identifiers := extractIdentifiers(parameter, imports)
 		method.Parameters = append(method.Parameters, identifiers...)
 	}
 
 	if functionType.Results != nil {
-		for i, result := range functionType.Results.List {
-			identifiers := extractIdentifiers(result, i, "ret", imports)
+		for _, result := range functionType.Results.List {
+			identifiers := extractIdentifiers(result, imports)
 			method.Results = append(method.Results, identifiers...)
 		}
 	}
@@ -100,13 +104,13 @@ func (i *Interface) addMethod(field *ast.Field, imports *ImportSet) {
 	i.Methods = append(i.Methods, method)
 }
 
-func extractIdentifiers(field *ast.Field, i int, prefix string, imports *ImportSet) []*Identifier {
+func extractIdentifiers(field *ast.Field, imports *ImportSet) []*Identifier {
 	identifierType := unwrap(field.Type, imports)
 
 	if len(field.Names) == 0 {
 		return []*Identifier{
 			&Identifier{
-				Name:      fmt.Sprintf("%s%d", prefix, i),
+				Name:      identSymGen.Next(),
 				valueType: identifierType,
 			},
 		}
