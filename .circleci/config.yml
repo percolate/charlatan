@@ -10,6 +10,12 @@ jobs:
 
     steps:
       - checkout
+      - run:
+          shell: /bin/bash
+          name: go fmt
+          command: |
+            ! gofmt -l . 2>&1 | read
+      - run: go vet
       - run: make test
       - run: sbin/codecov
 
@@ -21,7 +27,7 @@ jobs:
       - run:
           name: Validate Markdown
           command: |
-            mdl $(find . -path ./vendor -prune -o -type f -name '*.md' -print)
+            mdl -r ~MD010 $(find . -path ./vendor -prune -o -type f -name '*.md' -print)
 
   release:
     docker:

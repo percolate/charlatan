@@ -1,163 +1,170 @@
 package main
 
 import (
-	"bytes"
 	"fmt"
 	"go/ast"
 	"go/build"
-	"go/format"
 	"go/parser"
 	"go/token"
-	"log"
+	"go/types"
 	"os"
 	"path/filepath"
+	"strconv"
 	"strings"
 )
 
-// Generator holds the state of the analysis. Primarily used to buffer
-// the output for format.Source.
+// Generator holds the state of the analysis
 type Generator struct {
-	pkg           *Package // Package we are scanning.
-	targetPackage string
-	interfaces    []string
-	imports       *ImportSet
+	// PackageOverride can be set to control the package for the output file.  The default is the same package as the input interface(s).
+	PackageOverride string
+	packageName     string
+	imports         *ImportSet
+	interfaces      map[string]*Interface
 }
 
-// parsePackageDir parses the package residing in the directory.
-func (g *Generator) parsePackageDir(directory string) {
+// LoadPackageDir parses a package in the given directory.
+func LoadPackageDir(directory string) (*Generator, error) {
 	pkg, err := build.Default.ImportDir(directory, 0)
 	if err != nil {
-		log.Fatalf("cannot process directory %s: %s", directory, err)
+		return nil, fmt.Errorf("cannot process directory %s: %s", directory, err)
 	}
-	var names []string
-
+	names := make([]string, 0, len(pkg.GoFiles)+len(pkg.CgoFiles))
 	names = append(names, pkg.GoFiles...)
 	names = append(names, pkg.CgoFiles...)
-	names = append(names, pkg.SFiles...)
-	names = prefixDirectory(directory, names)
 
-	g.parsePackage(directory, names, nil)
+	if directory != "." {
+		for i, name := range names {
+			names[i] = filepath.Join(directory, name)
+		}
+	}
+
+	return parsePackage(directory, names)
 }
 
-// parsePackageFiles parses the package occupying the named files.
-func (g *Generator) parsePackageFiles(names []string) {
-	g.parsePackage(".", names, nil)
+// LoadPackageFiles parses a package using only the given files.
+func LoadPackageFiles(names []string) (*Generator, error) {
+	return parsePackage(".", names)
 }
 
-// parsePackage analyzes the single package constructed from the named files.
-// If text is non-nil, it is a string to be used instead of the content of the file,
-// to be used for testing. parsePackage exits if there is an error.
-func (g *Generator) parsePackage(directory string, names []string, text interface{}) {
-	var files []*File
-	var astFiles []*ast.File
-	g.pkg = new(Package)
-	fs := token.NewFileSet()
-	for _, name := range names {
-		if !strings.HasSuffix(name, ".go") {
+func parsePackage(directory string, filenames []string) (*Generator, error) {
+	generator := &Generator{
+		imports:    new(ImportSet),
+		interfaces: make(map[string]*Interface),
+	}
+	files := make([]*ast.File, 0, len(filenames))
+	fileset := token.NewFileSet()
+	importer := defaultImporter()
+	for _, filename := range filenames {
+		if !strings.HasSuffix(filename, ".go") {
 			continue
 		}
-		parsedFile, err := parser.ParseFile(fs, name, text, 0)
+		file, err := parser.ParseFile(fileset, filename, nil, 0)
 		if err != nil {
-			log.Fatalf("parsing package: %s: %s", name, err)
+			return nil, fmt.Errorf("syntax error: %s", err)
 		}
-		astFiles = append(astFiles, parsedFile)
-		files = append(files, &File{
-			file: parsedFile,
-			pkg:  g.pkg,
-		})
+		if err := generator.extractImports(file, importer); err != nil {
+			return nil, err
+		}
+		generator.extractInterfaces(file)
+		files = append(files, file)
 	}
-	if len(astFiles) == 0 {
-		log.Fatalf("%s: no buildable Go files", directory)
+	if len(files) == 0 {
+		return nil, fmt.Errorf("error: no Go files found in %s", directory)
 	}
-	g.pkg.name = astFiles[0].Name.Name
-	g.pkg.files = files
-	g.pkg.dir = directory
+	generator.packageName = files[0].Name.Name
+
 	// Type check the package.
-	g.pkg.check(fs, astFiles)
+	config := types.Config{Importer: importer, Error: func(err error) { fmt.Fprintln(os.Stderr, err) }}
+	if _, err := config.Check(directory, fileset, files, nil); err != nil {
+		return nil, fmt.Errorf("type check failed")
+	}
+
+	return generator, nil
 }
 
-// generate produces the charlatan file for the named interface.
-func (g *Generator) generate() []byte {
-	interfacedecs := make([]*InterfaceDeclaration, 0, 100)
-	g.imports = &ImportSet{
-		imports: make([]*Import, 0),
-	}
-	for _, file := range g.pkg.files {
-		// Set the state for this run of the walker.
-
-		if file.file != nil {
-			file.imports = g.imports
-			file.interfaceNames = g.interfaces
-			ast.Inspect(file.file, file.genDecl)
-
-			interfacedecs = append(interfacedecs, file.interfaces...)
+func (g *Generator) extractImports(file *ast.File, importer types.Importer) error {
+	for _, spec := range file.Imports {
+		path, err := strconv.Unquote(spec.Path.Value)
+		if err != nil {
+			return err
 		}
-	}
-
-	if len(interfacedecs) == 0 {
-		log.Fatalf("no interfaces named %s defined", g.interfaces)
-	}
-
-	if g.targetPackage == "" {
-		g.targetPackage = g.pkg.name
-	}
-
-	var buf bytes.Buffer
-	fmt.Fprintf(&buf, "// generated by \"charlatan %s\"; DO NOT EDIT.\n\n", strings.Join(os.Args[1:], " "))
-	fmt.Fprintf(&buf, "package %s\n\n", g.targetPackage)
-
-	allimps := g.imports.GetRequired()
-
-	if len(allimps) == 1 {
-		fmt.Fprintf(&buf, "import %s", allimps[0].Path)
-	} else if len(allimps) > 1 {
-		fmt.Fprintf(&buf, "import (\n")
-		for _, imp := range allimps {
-			fmt.Fprintf(&buf, "\t%s\n", imp.Path)
+		pkg, err := importer.Import(path)
+		if err != nil {
+			return err
 		}
-		fmt.Fprintf(&buf, ")\n")
-	}
-
-	fmt.Fprintf(&buf, "\n")
-
-	for _, i := range interfacedecs {
-		for _, m := range i.Methods {
-			if err := invocationTempl.Execute(&buf, m); err != nil {
-				log.Fatal(err)
-			}
+		decl := &Import{
+			Name: pkg.Name(),
+			Path: spec.Path.Value,
 		}
 
-		if err := fakeTempl.Execute(&buf, i); err != nil {
-			log.Fatal(err)
+		if spec.Name == nil {
+			g.imports.Add(decl)
+			continue
 		}
 
-		for _, m := range i.Methods {
-			if err := methodTempl.Execute(&buf, m); err != nil {
-				log.Fatal(err)
-			}
+		switch spec.Name.Name {
+		case "_":
+			continue
+		case ".":
+			decl.Required = true
+			decl.Alias = "."
+		default:
+			decl.Alias = spec.Name.Name
 		}
+		g.imports.Add(decl)
 	}
 
-	src, err := format.Source(buf.Bytes())
-	if err != nil {
-		// Should never happen, but can arise when developing this code.
-		// The user can compile the output to see the error.
-		log.Printf("warning: internal error: invalid Go generated: %s", err)
-		log.Printf("warning: compile the package to analyze the error")
-		return buf.Bytes()
-	}
-
-	return src
+	return nil
 }
 
-// prefixDirectory places the directory name on the beginning of each name in the list.
-func prefixDirectory(directory string, names []string) []string {
-	if directory == "." {
-		return names
+func (g *Generator) extractInterfaces(file *ast.File) {
+	for _, node := range file.Decls {
+		decl, ok := node.(*ast.GenDecl)
+		if !ok || decl.Tok != token.TYPE {
+			continue
+		}
+		spec := decl.Specs[0].(*ast.TypeSpec)
+		ifType, ok := spec.Type.(*ast.InterfaceType)
+		if !ok || len(ifType.Methods.List) == 0 || spec.Name.Name == "_" {
+			continue
+		}
+
+		ifDecl := &Interface{
+			Name: spec.Name.Name,
+		}
+		g.interfaces[spec.Name.Name] = ifDecl
+
+		for _, method := range ifType.Methods.List {
+			if _, ok := method.Type.(*ast.FuncType); ok {
+				ifDecl.addMethod(method, g.imports)
+			}
+		}
 	}
-	ret := make([]string, len(names))
-	for i, name := range names {
-		ret[i] = filepath.Join(directory, name)
+}
+
+// Generate produces the charlatan source file data for the named interfaces.
+func (g *Generator) Generate(interfaceNames []string) ([]byte, error) {
+	decls := make([]*Interface, 0, len(interfaceNames))
+	for _, name := range interfaceNames {
+		decl, ok := g.interfaces[name]
+		if !ok {
+			return nil, fmt.Errorf("error: interface %q not found", name)
+		}
+		decls = append(decls, decl)
 	}
-	return ret
+
+	packageName := g.packageName
+	if g.PackageOverride != "" {
+		packageName = g.PackageOverride
+	}
+
+	argv := []string{"charlatan"}
+	tmpl := Template{
+		CommandLine: strings.Join(append(argv, os.Args[1:]...), " "),
+		PackageName: packageName,
+		Imports:     g.imports.GetRequired(),
+		Interfaces:  decls,
+	}
+
+	return tmpl.Execute()
 }
