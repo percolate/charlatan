@@ -36,6 +36,8 @@ jobs:
       - checkout
       - deploy:
           name: Deploy to GitHub Releases
+          environment:
+            GITHUB_TOKEN: ${GITHUB_OAUTH_TOKEN}
           command: |
             ci-make-release $(cat VERSION.txt)
 
