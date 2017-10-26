@@ -49,7 +49,7 @@ func TestEndToEnd(t *testing.T) {
 		}
 
 		if strings.HasSuffix(name, "_ete.go") {
-		// Names are known to be ASCII and long enough.
+			// Names are known to be ASCII and long enough.
 			interfaceName := fmt.Sprintf("%c%s", name[0]+'A'-'a', name[1:len(name)-len("_ete.go")])
 			defName := fmt.Sprintf("%s_def.go", name[:len(name)-len("_ete.go")])
 
