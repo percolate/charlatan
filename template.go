@@ -183,7 +183,7 @@ func (f *Fake{{.Interface}}) Assert{{.Name}}CalledN(t *testing.T, n int) {
 		t.Errorf("Fake{{$m.Interface}}.{{$m.Name}} called %d times with expected parameters, expected one", count)
 	}
 }{{end}}
-
+{{if len $m.Results }}
 // {{.Name}}ResultsForCall returns the result values for the first call to Fake{{.Interface}}.{{.Name}} with the given values
 {{with $f := gensym}}func ({{$f}} *Fake{{$m.Interface}}) {{$m.Name}}ResultsForCall({{$m.ParametersDeclaration}}) ({{$m.ResultsDeclaration}}, found bool) {
 	for _, call := range {{$f}}.{{$m.Name}}Calls {
@@ -195,7 +195,7 @@ func (f *Fake{{.Interface}}) Assert{{.Name}}CalledN(t *testing.T, n int) {
 	}
 
 	return
-}{{end}}
+}{{end}}{{end}} {{/* end if .Results */}}
 {{end}}{{/* end if .Parameters */}}
 {{end}}{{/* end range $m := .Methods */}}
 {{end}}{{/* end range .Interfaces */}}
