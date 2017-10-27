@@ -42,8 +42,8 @@ func TestGolden(t *testing.T) {
 		}
 
 		// reset gensyms
-		symGen.count = 0
-		identSymGen.count = 0
+		symGen.Reset()
+		identSymGen.Reset()
 
 		readableOutput := string(outputFile)
 		readableResult := string(got)
