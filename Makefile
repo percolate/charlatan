@@ -9,6 +9,8 @@ DIAGRAMS := $(DIAGRAM_DIR)/architecture.png
 
 BUILD_DIR := build
 COVERAGE_DIR := $(BUILD_DIR)/coverage
+TESTDATA_SOURCES := $(shell find testdata -name "*_def.go")
+GENERATED_TESTDATA := $(subst _def,,$(TESTDATA_SOURCES))
 
 all: test
 
@@ -33,7 +35,15 @@ fmt:
 vet:
 	go vet ./...
 
+build_executable:
+	go build
+
+$(GENERATED_TESTDATA): $(TESTDATA_SOURCES) build_executable
+	var1=$(subst .go,,$(@F)); var2=`echo $${var1:0:1} | tr  '[a-z]' '[A-Z]'`$${var1:1}; ./charlatan -file=$(subst .go,_def.go,$@) -output=$@ $$var2
+
 test: $(COVERAGE_DIR)
 	go test -v -coverprofile=$(TOP_DIR)/$(COVERAGE_DIR)/$(@F)_coverage.out -covermode=atomic ./...
 
-.PHONY: clean doc vet fmt test
+generate_testdata: $(GENERATED_TESTDATA)
+
+.PHONY: clean doc vet fmt test generate_testdata
