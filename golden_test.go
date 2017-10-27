@@ -1,11 +1,11 @@
 package main
 
 import (
-	"testing"
-	"strings"
 	"github.com/sergi/go-diff/diffmatchpatch"
 	"github.com/stretchr/testify/assert"
 	"io/ioutil"
+	"strings"
+	"testing"
 )
 
 var golden = []string{

@@ -9,7 +9,7 @@ func main() {
 	mixedHookCalled := false
 	s := []string{"one", "two", "three"}
 	f := &FakeVariadic{
-		SingleVariadicHook: func(z... string) {
+		SingleVariadicHook: func(z ...string) {
 			singleHookCalled = true
 		},
 		MixedVariadicHook: func(int, int, int, ...string) {

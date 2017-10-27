@@ -233,7 +233,7 @@ func (t *Template) Execute() ([]byte, error) {
 func (t *Template) NeedsReflect() bool {
 	for _, intf := range t.Interfaces {
 		for _, mthd := range intf.Methods {
-			if len(mthd.Parameters) > 0  {
+			if len(mthd.Parameters) > 0 {
 				return true
 			}
 		}
