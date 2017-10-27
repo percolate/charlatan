@@ -72,11 +72,22 @@ func NewFake{{.Name}}DefaultPanic() *Fake{{.Name}} {
 	}
 }
 
-// NewFake{{.Name}}DefaultFail returns an instance of Fake{{.Name}} with all hooks configured to call t.Fatal
-func NewFake{{.Name}}DefaultFail(t *testing.T) *Fake{{.Name}} {
+// NewFake{{.Name}}DefaultFatal returns an instance of Fake{{.Name}} with all hooks configured to call t.Fatal
+func NewFake{{.Name}}DefaultFatal(t *testing.T) *Fake{{.Name}} {
 	return &Fake{{.Name}}{
 {{range .Methods}}		{{.Name}}Hook: func({{.ParametersSignature}}) ({{.ResultsDeclaration}}) {
 			t.Fatal("Unexpected call to {{.Interface}}.{{.Name}}")
+			return
+		},
+{{end}}
+	}
+}
+
+// NewFake{{.Name}}DefaultError returns an instance of Fake{{.Name}} with all hooks configured to call t.Error
+func NewFake{{.Name}}DefaultError(t *testing.T) *Fake{{.Name}} {
+	return &Fake{{.Name}}{
+{{range .Methods}}		{{.Name}}Hook: func({{.ParametersSignature}}) ({{.ResultsDeclaration}}) {
+			t.Error("Unexpected call to {{.Interface}}.{{.Name}}")
 			return
 		},
 {{end}}
