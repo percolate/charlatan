@@ -1,7 +1,8 @@
 # Charlatan
 
 [![Circle CI](https://circleci.com/gh/percolate/charlatan.svg?style=svg)](https://circleci.com/gh/percolate/charlatan)
- [![codecov.io](https://codecov.io/github/percolate/charlatan/coverage.svg?branch=master)](https://codecov.io/github/percolate/charlatan?branch=master) [![BSD](https://img.shields.io/badge/license-BSD-blue.svg)](https://github.com/percolate/charlatan/blob/master/LICENSE)
+[![codecov.io](https://codecov.io/github/percolate/charlatan/coverage.svg?branch=master)](https://codecov.io/github/percolate/charlatan?branch=master)
+[![BSD](https://img.shields.io/badge/license-BSD-blue.svg)](https://github.com/percolate/charlatan/blob/master/LICENSE)
 
 Percolate's Go Interface Mocking Tool.
 
@@ -91,14 +92,14 @@ type FakeService struct {
 	FetchCalls []*FetchInvocation
 }
 
-func (f *FakeService) Query(filter *QueryFilter) (ident1 []*Thing, ident2 error) {
+func (f *FakeService) Query(filter *QueryFilter) (id1 []*Thing, id2 error) {
 	invocation := new(QueryInvocation)
 	invocation.Parameters.Filter = filter
 
-	ident1, ident2 := f.QueryHook(filter)
+	id1, id2 := f.QueryHook(filter)
 
-	invocation.Results.Ident1 = ident1
-	invocation.Results.Ident2 = ident2
+	invocation.Results.Ident1 = id1
+	invocation.Results.Ident2 = id2
 
 	return
 }
