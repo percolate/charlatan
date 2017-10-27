@@ -3,7 +3,6 @@
 package main
 
 import (
-	"fmt"
 	"io"
 	"io/ioutil"
 	"os"
@@ -49,9 +48,9 @@ func TestEndToEnd(t *testing.T) {
 		}
 
 		if strings.HasSuffix(name, "_ete.go") {
-			// Names are known to be ASCII and long enough.
-			interfaceName := fmt.Sprintf("%c%s", name[0]+'A'-'a', name[1:len(name)-len("_ete.go")])
-			defName := fmt.Sprintf("%s_def.go", name[:len(name)-len("_ete.go")])
+			base := strings.TrimSuffix(name, "_ete.go")
+			interfaceName := strings.Title(base)
+			defName := base + "_def.go"
 
 			charlatanCompileAndRun(t, dir, charlatan, interfaceName, defName, name)
 		}

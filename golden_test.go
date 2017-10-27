@@ -32,7 +32,7 @@ func TestGolden(t *testing.T) {
 			t.Fatalf("ReadFile error: %s", err)
 		}
 
-		g, err := parsePackage(".", []string{inputFilename})
+		g, err := LoadPackageFiles([]string{inputFilename})
 		if err != nil {
 			t.Fatalf("parsePackage error: %s", err)
 		}
