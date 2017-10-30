@@ -48,8 +48,13 @@ func TestGolden(t *testing.T) {
 		readableOutput := string(outputFile)
 		readableResult := string(got)
 
+		// Only compare everything after the first line to avoid
+		// comparing the generation commands
+		outputStart := strings.Index(readableOutput, "\n")
+		resultStart := strings.Index(readableResult, "\n")
+
 		diffs := dmp.DiffMain(readableOutput, readableResult, false)
 
-		assert.Equal(t, string(outputFile), string(got), dmp.DiffPrettyText(diffs))
+		assert.Equal(t, readableOutput[outputStart:], readableResult[resultStart:], dmp.DiffPrettyText(diffs))
 	}
 }
