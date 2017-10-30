@@ -381,7 +381,7 @@ type Ellipsis struct {
 }
 
 func (t *Ellipsis) ParameterFormat() string {
-	return fmt.Sprintf("%s...", t.subType.ParameterFormat())
+	return fmt.Sprintf("...%s", t.subType.ParameterFormat())
 }
 
 func (t *Ellipsis) ReferenceFormat() string {
@@ -389,7 +389,7 @@ func (t *Ellipsis) ReferenceFormat() string {
 }
 
 func (t *Ellipsis) FieldFormat() string {
-	return fmt.Sprintf("%s[]", t.subType.FieldFormat())
+	return fmt.Sprintf("[]%s", t.subType.FieldFormat())
 }
 
 type Channel struct {

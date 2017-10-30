@@ -30,3 +30,7 @@ func (s *SymbolGenerator) Next() string {
 	s.count++
 	return fmt.Sprintf("%s%d%s", s.Prefix, s.count, s.Suffix)
 }
+
+func (s *SymbolGenerator) Reset() {
+	s.count = 0
+}
