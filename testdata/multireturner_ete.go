@@ -50,7 +50,7 @@ func main() {
 
 	ra, rb, rc, rd := f.NamedReturn()
 
-	if ra != a ||  rb != b || rc != c || rd != d {
+	if ra != a || rb != b || rc != c || rd != d {
 		panic(fmt.Sprintf("Unexpected results from Multireturn: %s, %s, %s, %s (expected %s, %s, %s, %s)", ra, rb, rc, rd, a, b, c, d))
 	}
 	if len(f.NamedReturnCalls) != 1 {

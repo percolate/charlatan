@@ -14,7 +14,7 @@ func main() {
 	ph := &h
 
 	f := &FakePointer{
-		PointHook: func(a *string) (int) {
+		PointHook: func(a *string) int {
 			pointHookCalled = true
 			x := len(*a)
 			return x

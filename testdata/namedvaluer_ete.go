@@ -14,7 +14,7 @@ func main() {
 	d := 4
 
 	f := &FakeNamedvaluer{
-		ManyNamedHook: func(a, b string, c, d int) bool{
+		ManyNamedHook: func(a, b string, c, d int) bool {
 			manyNamedHookCalled = true
 			if c == 3 {
 				return true
