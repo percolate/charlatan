@@ -14,7 +14,7 @@ type QualifyInvocation struct {
 		Ident1 fmt.Scanner
 	}
 	Results struct {
-		Ident2 *fmt.Scanner
+		Ident2 fmt.Scanner
 	}
 }
 
@@ -26,7 +26,7 @@ type NamedQualifyInvocation struct {
 		C fmt.Scanner
 	}
 	Results struct {
-		D *fmt.Scanner
+		D fmt.Scanner
 	}
 }
 
@@ -38,7 +38,7 @@ Use it in your tests as in this example:
 
 	func TestWithQualifier(t *testing.T) {
 		f := &main.FakeQualifier{
-			QualifyHook: func(ident1 fmt.Scanner) (ident2 *fmt.Scanner) {
+			QualifyHook: func(ident1 fmt.Scanner) (ident2 fmt.Scanner) {
 				// ensure parameters meet expections, signal errors using t, etc
 				return
 			},
@@ -55,8 +55,8 @@ should be called in the code under test.  This will force a painc if any
 unexpected calls are made to FakeQualify.
 */
 type FakeQualifier struct {
-	QualifyHook      func(fmt.Scanner) *fmt.Scanner
-	NamedQualifyHook func(fmt.Scanner, fmt.Scanner, fmt.Scanner) *fmt.Scanner
+	QualifyHook      func(fmt.Scanner) fmt.Scanner
+	NamedQualifyHook func(fmt.Scanner, fmt.Scanner, fmt.Scanner) fmt.Scanner
 
 	QualifyCalls      []*QualifyInvocation
 	NamedQualifyCalls []*NamedQualifyInvocation
@@ -65,11 +65,11 @@ type FakeQualifier struct {
 // NewFakeQualifierDefaultPanic returns an instance of FakeQualifier with all hooks configured to panic
 func NewFakeQualifierDefaultPanic() *FakeQualifier {
 	return &FakeQualifier{
-		QualifyHook: func(fmt.Scanner) (ident2 *fmt.Scanner) {
+		QualifyHook: func(fmt.Scanner) (ident2 fmt.Scanner) {
 			panic("Unexpected call to Qualifier.Qualify")
 			return
 		},
-		NamedQualifyHook: func(fmt.Scanner, fmt.Scanner, fmt.Scanner) (d *fmt.Scanner) {
+		NamedQualifyHook: func(fmt.Scanner, fmt.Scanner, fmt.Scanner) (d fmt.Scanner) {
 			panic("Unexpected call to Qualifier.NamedQualify")
 			return
 		},
@@ -79,11 +79,11 @@ func NewFakeQualifierDefaultPanic() *FakeQualifier {
 // NewFakeQualifierDefaultFatal returns an instance of FakeQualifier with all hooks configured to call t.Fatal
 func NewFakeQualifierDefaultFatal(t *testing.T) *FakeQualifier {
 	return &FakeQualifier{
-		QualifyHook: func(fmt.Scanner) (ident2 *fmt.Scanner) {
+		QualifyHook: func(fmt.Scanner) (ident2 fmt.Scanner) {
 			t.Fatal("Unexpected call to Qualifier.Qualify")
 			return
 		},
-		NamedQualifyHook: func(fmt.Scanner, fmt.Scanner, fmt.Scanner) (d *fmt.Scanner) {
+		NamedQualifyHook: func(fmt.Scanner, fmt.Scanner, fmt.Scanner) (d fmt.Scanner) {
 			t.Fatal("Unexpected call to Qualifier.NamedQualify")
 			return
 		},
@@ -93,18 +93,18 @@ func NewFakeQualifierDefaultFatal(t *testing.T) *FakeQualifier {
 // NewFakeQualifierDefaultError returns an instance of FakeQualifier with all hooks configured to call t.Error
 func NewFakeQualifierDefaultError(t *testing.T) *FakeQualifier {
 	return &FakeQualifier{
-		QualifyHook: func(fmt.Scanner) (ident2 *fmt.Scanner) {
+		QualifyHook: func(fmt.Scanner) (ident2 fmt.Scanner) {
 			t.Error("Unexpected call to Qualifier.Qualify")
 			return
 		},
-		NamedQualifyHook: func(fmt.Scanner, fmt.Scanner, fmt.Scanner) (d *fmt.Scanner) {
+		NamedQualifyHook: func(fmt.Scanner, fmt.Scanner, fmt.Scanner) (d fmt.Scanner) {
 			t.Error("Unexpected call to Qualifier.NamedQualify")
 			return
 		},
 	}
 }
 
-func (_f1 *FakeQualifier) Qualify(ident1 fmt.Scanner) (ident2 *fmt.Scanner) {
+func (_f1 *FakeQualifier) Qualify(ident1 fmt.Scanner) (ident2 fmt.Scanner) {
 	invocation := new(QualifyInvocation)
 
 	invocation.Parameters.Ident1 = ident1
@@ -226,7 +226,7 @@ func (_f5 *FakeQualifier) AssertQualifyOnceCalledWith(t *testing.T, ident1 fmt.S
 }
 
 // QualifyResultsForCall returns the result values for the first call to FakeQualifier.Qualify with the given values
-func (_f6 *FakeQualifier) QualifyResultsForCall(ident1 fmt.Scanner) (ident2 *fmt.Scanner, found bool) {
+func (_f6 *FakeQualifier) QualifyResultsForCall(ident1 fmt.Scanner) (ident2 fmt.Scanner, found bool) {
 	for _, call := range _f6.QualifyCalls {
 		if reflect.DeepEqual(call.Parameters.Ident1, ident1) {
 			ident2 = call.Results.Ident2
@@ -238,7 +238,7 @@ func (_f6 *FakeQualifier) QualifyResultsForCall(ident1 fmt.Scanner) (ident2 *fmt
 	return
 }
 
-func (_f7 *FakeQualifier) NamedQualify(a fmt.Scanner, b fmt.Scanner, c fmt.Scanner) (d *fmt.Scanner) {
+func (_f7 *FakeQualifier) NamedQualify(a fmt.Scanner, b fmt.Scanner, c fmt.Scanner) (d fmt.Scanner) {
 	invocation := new(NamedQualifyInvocation)
 
 	invocation.Parameters.A = a
@@ -362,7 +362,7 @@ func (_f11 *FakeQualifier) AssertNamedQualifyOnceCalledWith(t *testing.T, a fmt.
 }
 
 // NamedQualifyResultsForCall returns the result values for the first call to FakeQualifier.NamedQualify with the given values
-func (_f12 *FakeQualifier) NamedQualifyResultsForCall(a fmt.Scanner, b fmt.Scanner, c fmt.Scanner) (d *fmt.Scanner, found bool) {
+func (_f12 *FakeQualifier) NamedQualifyResultsForCall(a fmt.Scanner, b fmt.Scanner, c fmt.Scanner) (d fmt.Scanner, found bool) {
 	for _, call := range _f12.NamedQualifyCalls {
 		if reflect.DeepEqual(call.Parameters.A, a) && reflect.DeepEqual(call.Parameters.B, b) && reflect.DeepEqual(call.Parameters.C, c) {
 			d = call.Results.D

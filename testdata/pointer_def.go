@@ -1,5 +1,5 @@
 package main
 
 type Pointer interface {
-	Point(*string) *int
+	Point(*string) int
 }

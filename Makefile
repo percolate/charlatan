@@ -38,12 +38,13 @@ vet:
 build_executable:
 	go build
 
-$(GENERATED_TESTDATA): $(TESTDATA_SOURCES) build_executable
-	var1=$(subst .go,,$(@F)); var2=`echo $${var1:0:1} | tr  '[a-z]' '[A-Z]'`$${var1:1}; ./charlatan -file=$(subst .go,_def.go,$@) -output=$@ $$var2
+# Get the capitalized interface name from the filename and pass it to charlatan
+%.go: %_def.go
+	iface=$(*F); ./charlatan -file=$< -output=$@ $${iface^}
 
 test: $(COVERAGE_DIR)
 	go test -v -coverprofile=$(TOP_DIR)/$(COVERAGE_DIR)/$(@F)_coverage.out -covermode=atomic ./...
 
-generate_testdata: $(GENERATED_TESTDATA)
+generate_testdata: build_executable $(GENERATED_TESTDATA)
 
 .PHONY: clean doc vet fmt test generate_testdata

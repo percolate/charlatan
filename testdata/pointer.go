@@ -13,7 +13,7 @@ type PointInvocation struct {
 		Ident1 *string
 	}
 	Results struct {
-		Ident2 *int
+		Ident2 int
 	}
 }
 
@@ -25,7 +25,7 @@ Use it in your tests as in this example:
 
 	func TestWithPointer(t *testing.T) {
 		f := &main.FakePointer{
-			PointHook: func(ident1 *string) (ident2 *int) {
+			PointHook: func(ident1 *string) (ident2 int) {
 				// ensure parameters meet expections, signal errors using t, etc
 				return
 			},
@@ -42,7 +42,7 @@ should be called in the code under test.  This will force a painc if any
 unexpected calls are made to FakePoint.
 */
 type FakePointer struct {
-	PointHook func(*string) *int
+	PointHook func(*string) int
 
 	PointCalls []*PointInvocation
 }
@@ -50,7 +50,7 @@ type FakePointer struct {
 // NewFakePointerDefaultPanic returns an instance of FakePointer with all hooks configured to panic
 func NewFakePointerDefaultPanic() *FakePointer {
 	return &FakePointer{
-		PointHook: func(*string) (ident2 *int) {
+		PointHook: func(*string) (ident2 int) {
 			panic("Unexpected call to Pointer.Point")
 			return
 		},
@@ -60,7 +60,7 @@ func NewFakePointerDefaultPanic() *FakePointer {
 // NewFakePointerDefaultFatal returns an instance of FakePointer with all hooks configured to call t.Fatal
 func NewFakePointerDefaultFatal(t *testing.T) *FakePointer {
 	return &FakePointer{
-		PointHook: func(*string) (ident2 *int) {
+		PointHook: func(*string) (ident2 int) {
 			t.Fatal("Unexpected call to Pointer.Point")
 			return
 		},
@@ -70,14 +70,14 @@ func NewFakePointerDefaultFatal(t *testing.T) *FakePointer {
 // NewFakePointerDefaultError returns an instance of FakePointer with all hooks configured to call t.Error
 func NewFakePointerDefaultError(t *testing.T) *FakePointer {
 	return &FakePointer{
-		PointHook: func(*string) (ident2 *int) {
+		PointHook: func(*string) (ident2 int) {
 			t.Error("Unexpected call to Pointer.Point")
 			return
 		},
 	}
 }
 
-func (_f1 *FakePointer) Point(ident1 *string) (ident2 *int) {
+func (_f1 *FakePointer) Point(ident1 *string) (ident2 int) {
 	invocation := new(PointInvocation)
 
 	invocation.Parameters.Ident1 = ident1
@@ -199,7 +199,7 @@ func (_f5 *FakePointer) AssertPointOnceCalledWith(t *testing.T, ident1 *string) 
 }
 
 // PointResultsForCall returns the result values for the first call to FakePointer.Point with the given values
-func (_f6 *FakePointer) PointResultsForCall(ident1 *string) (ident2 *int, found bool) {
+func (_f6 *FakePointer) PointResultsForCall(ident1 *string) (ident2 int, found bool) {
 	for _, call := range _f6.PointCalls {
 		if reflect.DeepEqual(call.Parameters.Ident1, ident1) {
 			ident2 = call.Results.Ident2
