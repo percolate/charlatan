@@ -17,7 +17,7 @@ jobs:
             ! gofmt -l *.go testdata/*.go 2>&1 | read
       - run: go vet
       - run: make test
-      - run: sbin/codecov
+      - run: sbin/codecov -s build/coverage/
 
   mdl:
     docker:
