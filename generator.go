@@ -169,6 +169,11 @@ func (g *Generator) Generate(interfaceNames []string) ([]byte, error) {
 		decls = append(decls, decl)
 	}
 
+	if len(decls) == 0 {
+		log.Println(`warning: No valid interfaces provided`)
+		return []byte{}, nil
+	}
+
 	packageName := g.packageName
 	if g.PackageOverride != "" {
 		packageName = g.PackageOverride
