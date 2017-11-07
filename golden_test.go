@@ -54,6 +54,8 @@ func TestGolden(t *testing.T) {
 			msg := fmt.Sprintf(`file "%s" does not exist, or interface "%s" should result in an empty file`, outputFilename, interfaceName)
 			assert.Equal(t, outputFile, got, msg)
 			continue
+		} else if len(got) == 0 {
+			t.Fatalf(`"%s" resulted in an emtpy file when the contents of "%s" were expected`, interfaceName, outputFilename)
 		}
 
 		readableOutput := string(outputFile)
