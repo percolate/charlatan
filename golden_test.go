@@ -9,6 +9,8 @@ import (
 )
 
 var golden = []string{
+	"_",
+	"Emptier",
 	"Channeler",
 	"Voider",
 	"Namedvaluer",
