@@ -11,6 +11,7 @@ import (
 var golden = []string{
 	"_",
 	"Emptier",
+	"Importer",
 	"Channeler",
 	"Voider",
 	"Namedvaluer",
