@@ -24,7 +24,7 @@ var (
 		"Embedder",
 		"Qualifier",
 	}
-	unsupported = [] string{
+	unsupported = []string{
 		"_",
 		"Emptier",
 	}
