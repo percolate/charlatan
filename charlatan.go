@@ -108,10 +108,6 @@ func main() {
 	if src == nil {
 		os.Exit(1)
 	}
-	if len(src) == 0 {
-		log.Println(`warning: No code to generate, exiting`)
-		os.Exit(0)
-	}
 
 	if *outputPath == "" {
 		*outputPath = "charlatan.go"

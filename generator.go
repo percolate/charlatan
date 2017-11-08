@@ -170,8 +170,7 @@ func (g *Generator) Generate(interfaceNames []string) ([]byte, error) {
 	}
 
 	if len(decls) == 0 {
-		log.Println(`warning: No valid interfaces provided`)
-		return []byte{}, nil
+		return nil, fmt.Errorf("error: no valid interface names provided")
 	}
 
 	packageName := g.packageName
