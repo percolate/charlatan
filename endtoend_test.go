@@ -7,6 +7,7 @@ import (
 	"io/ioutil"
 	"os"
 	"os/exec"
+	"path"
 	"path/filepath"
 	"strings"
 	"testing"
@@ -18,69 +19,69 @@ import (
 // and run the testdata/x.go program. The resulting binary panics if the mock
 // structs are broken, including for error cases.
 
-func TestEndToEnd(t *testing.T) {
+type endToEndTest struct {
+	exe  string
+	file string
+}
+
+func (e *endToEndTest) compileAndRun(t *testing.T) {
+	t.Parallel()
 	dir, err := ioutil.TempDir("", "charlatan")
 	if err != nil {
 		t.Fatal(err)
 	}
 	defer os.RemoveAll(dir)
+
+	source := filepath.Join(dir, path.Base(e.file))
+	err = copy(source, e.file)
+	if err != nil {
+		t.Fatalf("copying end-to-end test file to temporary directory: %s", err)
+	}
+
+	base := strings.TrimSuffix(path.Base(e.file), "_ete.go")
+	interfaceName := strings.Title(base)
+
+	sourceDef := filepath.Join(dir, base+"_def.go")
+	err = copy(sourceDef, filepath.Join("testdata", base+"_def.go"))
+	if err != nil {
+		t.Fatalf("copying end-to-end interface definition file to temporary directory: %s", err)
+	}
+
+	charlatanSource := filepath.Join(dir, interfaceName+"_charlatan.go")
+	// Run charlatan in temporary directory.
+	err = run(e.exe, "-file", sourceDef, "-output", charlatanSource, "-package", "main", interfaceName)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	// Run the binary in the temporary directory.
+	err = run("go", "run", charlatanSource, sourceDef, source)
+	if err != nil {
+		t.Fatal(err)
+	}
+}
+
+func TestEndToEnd(t *testing.T) {
+	dir, err := ioutil.TempDir("", "charlatan")
+	if err != nil {
+		t.Fatal(err)
+	}
+
 	// Create charlatan in temporary directory.
 	charlatan := filepath.Join(dir, "charlatan.exe")
 	err = run("go", "build", "-o", charlatan)
 	if err != nil {
 		t.Fatalf("building charlatan: %s", err)
 	}
-	// Read the testdata directory.
-	fd, err := os.Open("testdata")
+
+	names, err := filepath.Glob("testdata/*_ete.go")
 	if err != nil {
-		t.Fatal(err)
+		t.Fatalf("finding end-to-end test files: %s", err)
 	}
-	defer fd.Close()
-	names, err := fd.Readdirnames(-1)
-	if err != nil {
-		t.Fatalf("Readdirnames: %s", err)
-	}
-	// Generate, compile, and run the test programs.
+
 	for _, name := range names {
-		if !strings.HasSuffix(name, ".go") {
-			t.Errorf("%s is not a Go file", name)
-			continue
-		}
-
-		if strings.HasSuffix(name, "_ete.go") {
-			base := strings.TrimSuffix(name, "_ete.go")
-			interfaceName := strings.Title(base)
-			defName := base + "_def.go"
-
-			charlatanCompileAndRun(t, dir, charlatan, interfaceName, defName, name)
-		}
-	}
-}
-
-// charlatanCompileAndRun runs charlatan for the named file and compiles and
-// runs the target binary in directory dir. That binary will panic if the mock is broken.
-func charlatanCompileAndRun(t *testing.T, dir, charlatan, interfaceName, defName, fileName string) {
-	t.Logf("run: %s %s\n", fileName, interfaceName)
-	source := filepath.Join(dir, fileName)
-	sourceDef := filepath.Join(dir, defName)
-	err := copy(source, filepath.Join("testdata", fileName))
-	if err != nil {
-		t.Fatalf("copying file to temporary directory: %s", err)
-	}
-	err = copy(sourceDef, filepath.Join("testdata", defName))
-	if err != nil {
-		t.Fatalf("copying file to temporary directory: %s", err)
-	}
-	charlatanSource := filepath.Join(dir, interfaceName+"_charlatan.go")
-	// Run charlatan in temporary directory.
-	err = run(charlatan, "-file", sourceDef, "-output", charlatanSource, "-package", "main", interfaceName)
-	if err != nil {
-		t.Fatal(err)
-	}
-	// Run the binary in the temporary directory.
-	err = run("go", "run", charlatanSource, sourceDef, source)
-	if err != nil {
-		t.Fatal(err)
+		e2e := endToEndTest{charlatan, name}
+		t.Run(path.Base(name), e2e.compileAndRun)
 	}
 }
 
