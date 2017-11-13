@@ -203,7 +203,7 @@ func (f *Fake{{.Interface}}) Assert{{.Name}}CalledN(t *testing.T, n int) {
 }{{end}}
 
 // Assert{{.Name}}CalledOnceWith calls t.Error if Fake{{.Interface}}.{{.Name}} was not called exactly once with the given values
-{{with $f := gensym}}func ({{$f}} *Fake{{$m.Interface}}) Assert{{$m.Name}}OnceCalledWith(t *testing.T, {{$m.ParametersDeclaration}}) {
+{{with $f := gensym}}func ({{$f}} *Fake{{$m.Interface}}) Assert{{$m.Name}}CalledOnceWith(t *testing.T, {{$m.ParametersDeclaration}}) {
 	t.Helper()
 	var count int
 	for _, call := range {{$f}}.{{$m.Name}}Calls {

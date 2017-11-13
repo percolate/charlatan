@@ -10,7 +10,8 @@ DIAGRAMS := $(DIAGRAM_DIR)/architecture.png
 BUILD_DIR := build
 COVERAGE_DIR := $(BUILD_DIR)/coverage
 TESTDATA_SOURCES := $(shell find testdata -name "*_def.go")
-GENERATED_TESTDATA := $(subst _def,,$(TESTDATA_SOURCES))
+IGNORED_TESTDATA := testdata/__def.go testdata/emptier_def.go
+GENERATED_TESTDATA := $(subst _def,,$(filter-out $(IGNORED_TESTDATA),$(TESTDATA_SOURCES)))
 
 all: test
 
@@ -35,7 +36,7 @@ fmt:
 vet:
 	go vet ./...
 
-build_executable:
+charlatan:
 	go build
 
 # Get the capitalized interface name from the filename and pass it to charlatan
@@ -45,6 +46,6 @@ build_executable:
 test: $(COVERAGE_DIR)
 	go test -v -coverprofile=$(TOP_DIR)/$(COVERAGE_DIR)/$(@F)_coverage.out -covermode=atomic ./...
 
-generate_testdata: build_executable $(GENERATED_TESTDATA)
+testdata: charlatan $(GENERATED_TESTDATA)
 
-.PHONY: clean doc vet fmt test generate_testdata
+.PHONY: clean doc vet fmt charlatan test testdata

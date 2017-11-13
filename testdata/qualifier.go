@@ -211,7 +211,7 @@ func (_f4 *FakeQualifier) QualifyCalledOnceWith(ident1 fmt.Scanner) bool {
 }
 
 // AssertQualifyCalledOnceWith calls t.Error if FakeQualifier.Qualify was not called exactly once with the given values
-func (_f5 *FakeQualifier) AssertQualifyOnceCalledWith(t *testing.T, ident1 fmt.Scanner) {
+func (_f5 *FakeQualifier) AssertQualifyCalledOnceWith(t *testing.T, ident1 fmt.Scanner) {
 	t.Helper()
 	var count int
 	for _, call := range _f5.QualifyCalls {
@@ -347,7 +347,7 @@ func (_f10 *FakeQualifier) NamedQualifyCalledOnceWith(a fmt.Scanner, b fmt.Scann
 }
 
 // AssertNamedQualifyCalledOnceWith calls t.Error if FakeQualifier.NamedQualify was not called exactly once with the given values
-func (_f11 *FakeQualifier) AssertNamedQualifyOnceCalledWith(t *testing.T, a fmt.Scanner, b fmt.Scanner, c fmt.Scanner) {
+func (_f11 *FakeQualifier) AssertNamedQualifyCalledOnceWith(t *testing.T, a fmt.Scanner, b fmt.Scanner, c fmt.Scanner) {
 	t.Helper()
 	var count int
 	for _, call := range _f11.NamedQualifyCalls {

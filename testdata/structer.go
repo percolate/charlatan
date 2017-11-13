@@ -289,7 +289,7 @@ func (_f4 *FakeStructer) StructCalledOnceWith(ident1 struct {
 }
 
 // AssertStructCalledOnceWith calls t.Error if FakeStructer.Struct was not called exactly once with the given values
-func (_f5 *FakeStructer) AssertStructOnceCalledWith(t *testing.T, ident1 struct {
+func (_f5 *FakeStructer) AssertStructCalledOnceWith(t *testing.T, ident1 struct {
 	a string
 	b string
 }) {
@@ -447,7 +447,7 @@ func (_f10 *FakeStructer) NamedStructCalledOnceWith(a struct {
 }
 
 // AssertNamedStructCalledOnceWith calls t.Error if FakeStructer.NamedStruct was not called exactly once with the given values
-func (_f11 *FakeStructer) AssertNamedStructOnceCalledWith(t *testing.T, a struct {
+func (_f11 *FakeStructer) AssertNamedStructCalledOnceWith(t *testing.T, a struct {
 	a string
 	b string
 }) {

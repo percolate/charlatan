@@ -203,7 +203,7 @@ func (_f4 *FakeVariadic) SingleVariadicCalledOnceWith(a ...string) bool {
 }
 
 // AssertSingleVariadicCalledOnceWith calls t.Error if FakeVariadic.SingleVariadic was not called exactly once with the given values
-func (_f5 *FakeVariadic) AssertSingleVariadicOnceCalledWith(t *testing.T, a ...string) {
+func (_f5 *FakeVariadic) AssertSingleVariadicCalledOnceWith(t *testing.T, a ...string) {
 	t.Helper()
 	var count int
 	for _, call := range _f5.SingleVariadicCalls {
@@ -325,7 +325,7 @@ func (_f9 *FakeVariadic) MixedVariadicCalledOnceWith(a int, b int, c int, d ...s
 }
 
 // AssertMixedVariadicCalledOnceWith calls t.Error if FakeVariadic.MixedVariadic was not called exactly once with the given values
-func (_f10 *FakeVariadic) AssertMixedVariadicOnceCalledWith(t *testing.T, a int, b int, c int, d ...string) {
+func (_f10 *FakeVariadic) AssertMixedVariadicCalledOnceWith(t *testing.T, a int, b int, c int, d ...string) {
 	t.Helper()
 	var count int
 	for _, call := range _f10.MixedVariadicCalls {

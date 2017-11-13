@@ -184,7 +184,7 @@ func (_f4 *FakePointer) PointCalledOnceWith(ident1 *string) bool {
 }
 
 // AssertPointCalledOnceWith calls t.Error if FakePointer.Point was not called exactly once with the given values
-func (_f5 *FakePointer) AssertPointOnceCalledWith(t *testing.T, ident1 *string) {
+func (_f5 *FakePointer) AssertPointCalledOnceWith(t *testing.T, ident1 *string) {
 	t.Helper()
 	var count int
 	for _, call := range _f5.PointCalls {

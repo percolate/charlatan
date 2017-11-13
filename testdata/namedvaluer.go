@@ -215,7 +215,7 @@ func (_f4 *FakeNamedvaluer) ManyNamedCalledOnceWith(a string, b string, f int, g
 }
 
 // AssertManyNamedCalledOnceWith calls t.Error if FakeNamedvaluer.ManyNamed was not called exactly once with the given values
-func (_f5 *FakeNamedvaluer) AssertManyNamedOnceCalledWith(t *testing.T, a string, b string, f int, g int) {
+func (_f5 *FakeNamedvaluer) AssertManyNamedCalledOnceWith(t *testing.T, a string, b string, f int, g int) {
 	t.Helper()
 	var count int
 	for _, call := range _f5.ManyNamedCalls {
@@ -350,7 +350,7 @@ func (_f10 *FakeNamedvaluer) NamedCalledOnceWith(a int, b string) bool {
 }
 
 // AssertNamedCalledOnceWith calls t.Error if FakeNamedvaluer.Named was not called exactly once with the given values
-func (_f11 *FakeNamedvaluer) AssertNamedOnceCalledWith(t *testing.T, a int, b string) {
+func (_f11 *FakeNamedvaluer) AssertNamedCalledOnceWith(t *testing.T, a int, b string) {
 	t.Helper()
 	var count int
 	for _, call := range _f11.NamedCalls {
