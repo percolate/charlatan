@@ -186,7 +186,7 @@ func (_f4 *FakeImporter) ScanCalledOnceWith(ident1 *Scanner) bool {
 }
 
 // AssertScanCalledOnceWith calls t.Error if FakeImporter.Scan was not called exactly once with the given values
-func (_f5 *FakeImporter) AssertScanOnceCalledWith(t *testing.T, ident1 *Scanner) {
+func (_f5 *FakeImporter) AssertScanCalledOnceWith(t *testing.T, ident1 *Scanner) {
 	t.Helper()
 	var count int
 	for _, call := range _f5.ScanCalls {

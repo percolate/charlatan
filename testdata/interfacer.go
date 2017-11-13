@@ -208,7 +208,7 @@ func (_f4 *FakeInterfacer) InterfaceCalledOnceWith(ident1 interface{}) bool {
 }
 
 // AssertInterfaceCalledOnceWith calls t.Error if FakeInterfacer.Interface was not called exactly once with the given values
-func (_f5 *FakeInterfacer) AssertInterfaceOnceCalledWith(t *testing.T, ident1 interface{}) {
+func (_f5 *FakeInterfacer) AssertInterfaceCalledOnceWith(t *testing.T, ident1 interface{}) {
 	t.Helper()
 	var count int
 	for _, call := range _f5.InterfaceCalls {
@@ -342,7 +342,7 @@ func (_f10 *FakeInterfacer) NamedInterfaceCalledOnceWith(a interface{}) bool {
 }
 
 // AssertNamedInterfaceCalledOnceWith calls t.Error if FakeInterfacer.NamedInterface was not called exactly once with the given values
-func (_f11 *FakeInterfacer) AssertNamedInterfaceOnceCalledWith(t *testing.T, a interface{}) {
+func (_f11 *FakeInterfacer) AssertNamedInterfaceCalledOnceWith(t *testing.T, a interface{}) {
 	t.Helper()
 	var count int
 	for _, call := range _f11.NamedInterfaceCalls {

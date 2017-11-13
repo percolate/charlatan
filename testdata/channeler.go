@@ -280,7 +280,7 @@ func (_f4 *FakeChanneler) ChannelCalledOnceWith(ident1 chan int) bool {
 }
 
 // AssertChannelCalledOnceWith calls t.Error if FakeChanneler.Channel was not called exactly once with the given values
-func (_f5 *FakeChanneler) AssertChannelOnceCalledWith(t *testing.T, ident1 chan int) {
+func (_f5 *FakeChanneler) AssertChannelCalledOnceWith(t *testing.T, ident1 chan int) {
 	t.Helper()
 	var count int
 	for _, call := range _f5.ChannelCalls {
@@ -414,7 +414,7 @@ func (_f10 *FakeChanneler) ChannelReceiveCalledOnceWith(ident3 <-chan int) bool 
 }
 
 // AssertChannelReceiveCalledOnceWith calls t.Error if FakeChanneler.ChannelReceive was not called exactly once with the given values
-func (_f11 *FakeChanneler) AssertChannelReceiveOnceCalledWith(t *testing.T, ident3 <-chan int) {
+func (_f11 *FakeChanneler) AssertChannelReceiveCalledOnceWith(t *testing.T, ident3 <-chan int) {
 	t.Helper()
 	var count int
 	for _, call := range _f11.ChannelReceiveCalls {
@@ -548,7 +548,7 @@ func (_f16 *FakeChanneler) ChannelSendCalledOnceWith(ident5 chan<- int) bool {
 }
 
 // AssertChannelSendCalledOnceWith calls t.Error if FakeChanneler.ChannelSend was not called exactly once with the given values
-func (_f17 *FakeChanneler) AssertChannelSendOnceCalledWith(t *testing.T, ident5 chan<- int) {
+func (_f17 *FakeChanneler) AssertChannelSendCalledOnceWith(t *testing.T, ident5 chan<- int) {
 	t.Helper()
 	var count int
 	for _, call := range _f17.ChannelSendCalls {
@@ -682,7 +682,7 @@ func (_f22 *FakeChanneler) ChannelPointerCalledOnceWith(ident7 *chan int) bool {
 }
 
 // AssertChannelPointerCalledOnceWith calls t.Error if FakeChanneler.ChannelPointer was not called exactly once with the given values
-func (_f23 *FakeChanneler) AssertChannelPointerOnceCalledWith(t *testing.T, ident7 *chan int) {
+func (_f23 *FakeChanneler) AssertChannelPointerCalledOnceWith(t *testing.T, ident7 *chan int) {
 	t.Helper()
 	var count int
 	for _, call := range _f23.ChannelPointerCalls {
@@ -816,7 +816,7 @@ func (_f28 *FakeChanneler) ChannelInterfaceCalledOnceWith(ident9 chan interface{
 }
 
 // AssertChannelInterfaceCalledOnceWith calls t.Error if FakeChanneler.ChannelInterface was not called exactly once with the given values
-func (_f29 *FakeChanneler) AssertChannelInterfaceOnceCalledWith(t *testing.T, ident9 chan interface{}) {
+func (_f29 *FakeChanneler) AssertChannelInterfaceCalledOnceWith(t *testing.T, ident9 chan interface{}) {
 	t.Helper()
 	var count int
 	for _, call := range _f29.ChannelInterfaceCalls {
