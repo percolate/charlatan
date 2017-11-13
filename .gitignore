@@ -3,6 +3,7 @@
 *.a
 *.so
 build
+charlatan
 
 # go noise
 *.[568vq]
