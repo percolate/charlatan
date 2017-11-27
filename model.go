@@ -152,6 +152,15 @@ func unwrap(node ast.Expr, imports *ImportSet) (t Type, err error) {
 		t = &Ellipsis{
 			subType: subType,
 		}
+	case *ast.ArrayType:
+		var subType Type
+		subType, err = unwrap(nodeType.Elt, imports)
+		if err != nil {
+			return
+		}
+		t = &Array{
+			subType: subType,
+		}
 	case *ast.ChanType:
 		switch nodeType.Dir {
 		case ast.SEND:
@@ -374,6 +383,22 @@ type Type interface {
 	ParameterFormat() string
 	ReferenceFormat() string
 	FieldFormat() string
+}
+
+type Array struct {
+	subType Type
+}
+
+func (t *Array) ParameterFormat() string {
+	return fmt.Sprintf("[]%s", t.subType.ParameterFormat())
+}
+
+func (t *Array) ReferenceFormat() string {
+	return t.subType.ReferenceFormat()
+}
+
+func (t *Array) FieldFormat() string {
+	return fmt.Sprintf("[]%s", t.subType.FieldFormat())
 }
 
 type Ellipsis struct {
