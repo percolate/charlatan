@@ -158,9 +158,18 @@ func unwrap(node ast.Expr, imports *ImportSet) (t Type, err error) {
 		if err != nil {
 			return
 		}
-		t = &Array{
+		a := &Array{
 			subType: subType,
 		}
+		if(nodeType.Len != nil) {
+			if lit, ok := nodeType.Len.(*ast.BasicLit); ok {
+				a.scale = lit.Value
+			} else {
+				err = fmt.Errorf("internal error: unsupported array len type node: %#v", nodeType.Len)
+				return
+			}
+		}
+		t = a
 	case *ast.ChanType:
 		switch nodeType.Dir {
 		case ast.SEND:
@@ -387,10 +396,11 @@ type Type interface {
 
 type Array struct {
 	subType Type
+	scale   string
 }
 
 func (t *Array) ParameterFormat() string {
-	return fmt.Sprintf("[]%s", t.subType.ParameterFormat())
+	return fmt.Sprintf("[%s]%s", t.scale, t.subType.ParameterFormat())
 }
 
 func (t *Array) ReferenceFormat() string {
@@ -398,7 +408,7 @@ func (t *Array) ReferenceFormat() string {
 }
 
 func (t *Array) FieldFormat() string {
-	return fmt.Sprintf("[]%s", t.subType.FieldFormat())
+	return fmt.Sprintf("[%s]%s", t.scale, t.subType.FieldFormat())
 }
 
 type Ellipsis struct {

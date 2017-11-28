@@ -10,14 +10,28 @@ import (
 // ArrayParameterInvocation represents a single call of FakeArray.ArrayParameter
 type ArrayParameterInvocation struct {
 	Parameters struct {
-		Ident1 []string
+		Ident1 [3]string
 	}
 }
 
 // ArrayReturnInvocation represents a single call of FakeArray.ArrayReturn
 type ArrayReturnInvocation struct {
 	Results struct {
-		Ident2 []string
+		Ident2 [3]string
+	}
+}
+
+// SliceParameterInvocation represents a single call of FakeArray.SliceParameter
+type SliceParameterInvocation struct {
+	Parameters struct {
+		Ident3 []string
+	}
+}
+
+// SliceReturnInvocation represents a single call of FakeArray.SliceReturn
+type SliceReturnInvocation struct {
+	Results struct {
+		Ident4 []string
 	}
 }
 
@@ -29,7 +43,7 @@ Use it in your tests as in this example:
 
 	func TestWithArray(t *testing.T) {
 		f := &main.FakeArray{
-			ArrayParameterHook: func(ident1 []string) () {
+			ArrayParameterHook: func(ident1 [3]string) () {
 				// ensure parameters meet expections, signal errors using t, etc
 				return
 			},
@@ -46,22 +60,34 @@ should be called in the code under test.  This will force a painc if any
 unexpected calls are made to FakeArrayParameter.
 */
 type FakeArray struct {
-	ArrayParameterHook func([]string)
-	ArrayReturnHook    func() []string
+	ArrayParameterHook func([3]string)
+	ArrayReturnHook    func() [3]string
+	SliceParameterHook func([]string)
+	SliceReturnHook    func() []string
 
 	ArrayParameterCalls []*ArrayParameterInvocation
 	ArrayReturnCalls    []*ArrayReturnInvocation
+	SliceParameterCalls []*SliceParameterInvocation
+	SliceReturnCalls    []*SliceReturnInvocation
 }
 
 // NewFakeArrayDefaultPanic returns an instance of FakeArray with all hooks configured to panic
 func NewFakeArrayDefaultPanic() *FakeArray {
 	return &FakeArray{
-		ArrayParameterHook: func([]string) {
+		ArrayParameterHook: func([3]string) {
 			panic("Unexpected call to Array.ArrayParameter")
 			return
 		},
-		ArrayReturnHook: func() (ident2 []string) {
+		ArrayReturnHook: func() (ident2 [3]string) {
 			panic("Unexpected call to Array.ArrayReturn")
+			return
+		},
+		SliceParameterHook: func([]string) {
+			panic("Unexpected call to Array.SliceParameter")
+			return
+		},
+		SliceReturnHook: func() (ident4 []string) {
+			panic("Unexpected call to Array.SliceReturn")
 			return
 		},
 	}
@@ -70,12 +96,20 @@ func NewFakeArrayDefaultPanic() *FakeArray {
 // NewFakeArrayDefaultFatal returns an instance of FakeArray with all hooks configured to call t.Fatal
 func NewFakeArrayDefaultFatal(t *testing.T) *FakeArray {
 	return &FakeArray{
-		ArrayParameterHook: func([]string) {
+		ArrayParameterHook: func([3]string) {
 			t.Fatal("Unexpected call to Array.ArrayParameter")
 			return
 		},
-		ArrayReturnHook: func() (ident2 []string) {
+		ArrayReturnHook: func() (ident2 [3]string) {
 			t.Fatal("Unexpected call to Array.ArrayReturn")
+			return
+		},
+		SliceParameterHook: func([]string) {
+			t.Fatal("Unexpected call to Array.SliceParameter")
+			return
+		},
+		SliceReturnHook: func() (ident4 []string) {
+			t.Fatal("Unexpected call to Array.SliceReturn")
 			return
 		},
 	}
@@ -84,18 +118,26 @@ func NewFakeArrayDefaultFatal(t *testing.T) *FakeArray {
 // NewFakeArrayDefaultError returns an instance of FakeArray with all hooks configured to call t.Error
 func NewFakeArrayDefaultError(t *testing.T) *FakeArray {
 	return &FakeArray{
-		ArrayParameterHook: func([]string) {
+		ArrayParameterHook: func([3]string) {
 			t.Error("Unexpected call to Array.ArrayParameter")
 			return
 		},
-		ArrayReturnHook: func() (ident2 []string) {
+		ArrayReturnHook: func() (ident2 [3]string) {
 			t.Error("Unexpected call to Array.ArrayReturn")
+			return
+		},
+		SliceParameterHook: func([]string) {
+			t.Error("Unexpected call to Array.SliceParameter")
+			return
+		},
+		SliceReturnHook: func() (ident4 []string) {
+			t.Error("Unexpected call to Array.SliceReturn")
 			return
 		},
 	}
 }
 
-func (_f1 *FakeArray) ArrayParameter(ident1 []string) {
+func (_f1 *FakeArray) ArrayParameter(ident1 [3]string) {
 	invocation := new(ArrayParameterInvocation)
 
 	invocation.Parameters.Ident1 = ident1
@@ -160,7 +202,7 @@ func (f *FakeArray) AssertArrayParameterCalledN(t *testing.T, n int) {
 }
 
 // ArrayParameterCalledWith returns true if FakeArray.ArrayParameter was called with the given values
-func (_f2 *FakeArray) ArrayParameterCalledWith(ident1 []string) (found bool) {
+func (_f2 *FakeArray) ArrayParameterCalledWith(ident1 [3]string) (found bool) {
 	for _, call := range _f2.ArrayParameterCalls {
 		if reflect.DeepEqual(call.Parameters.Ident1, ident1) {
 			found = true
@@ -172,7 +214,7 @@ func (_f2 *FakeArray) ArrayParameterCalledWith(ident1 []string) (found bool) {
 }
 
 // AssertArrayParameterCalledWith calls t.Error if FakeArray.ArrayParameter was not called with the given values
-func (_f3 *FakeArray) AssertArrayParameterCalledWith(t *testing.T, ident1 []string) {
+func (_f3 *FakeArray) AssertArrayParameterCalledWith(t *testing.T, ident1 [3]string) {
 	t.Helper()
 	var found bool
 	for _, call := range _f3.ArrayParameterCalls {
@@ -188,7 +230,7 @@ func (_f3 *FakeArray) AssertArrayParameterCalledWith(t *testing.T, ident1 []stri
 }
 
 // ArrayParameterCalledOnceWith returns true if FakeArray.ArrayParameter was called exactly once with the given values
-func (_f4 *FakeArray) ArrayParameterCalledOnceWith(ident1 []string) bool {
+func (_f4 *FakeArray) ArrayParameterCalledOnceWith(ident1 [3]string) bool {
 	var count int
 	for _, call := range _f4.ArrayParameterCalls {
 		if reflect.DeepEqual(call.Parameters.Ident1, ident1) {
@@ -200,7 +242,7 @@ func (_f4 *FakeArray) ArrayParameterCalledOnceWith(ident1 []string) bool {
 }
 
 // AssertArrayParameterCalledOnceWith calls t.Error if FakeArray.ArrayParameter was not called exactly once with the given values
-func (_f5 *FakeArray) AssertArrayParameterCalledOnceWith(t *testing.T, ident1 []string) {
+func (_f5 *FakeArray) AssertArrayParameterCalledOnceWith(t *testing.T, ident1 [3]string) {
 	t.Helper()
 	var count int
 	for _, call := range _f5.ArrayParameterCalls {
@@ -214,7 +256,7 @@ func (_f5 *FakeArray) AssertArrayParameterCalledOnceWith(t *testing.T, ident1 []
 	}
 }
 
-func (_f6 *FakeArray) ArrayReturn() (ident2 []string) {
+func (_f6 *FakeArray) ArrayReturn() (ident2 [3]string) {
 	invocation := new(ArrayReturnInvocation)
 
 	ident2 = _f6.ArrayReturnHook()
@@ -275,5 +317,188 @@ func (f *FakeArray) AssertArrayReturnCalledN(t *testing.T, n int) {
 	t.Helper()
 	if len(f.ArrayReturnCalls) < n {
 		t.Errorf("FakeArray.ArrayReturn called %d times, expected >= %d", len(f.ArrayReturnCalls), n)
+	}
+}
+
+func (_f7 *FakeArray) SliceParameter(ident3 []string) {
+	invocation := new(SliceParameterInvocation)
+
+	invocation.Parameters.Ident3 = ident3
+
+	_f7.SliceParameterHook(ident3)
+
+	_f7.SliceParameterCalls = append(_f7.SliceParameterCalls, invocation)
+
+	return
+}
+
+// SliceParameterCalled returns true if FakeArray.SliceParameter was called
+func (f *FakeArray) SliceParameterCalled() bool {
+	return len(f.SliceParameterCalls) != 0
+}
+
+// AssertSliceParameterCalled calls t.Error if FakeArray.SliceParameter was not called
+func (f *FakeArray) AssertSliceParameterCalled(t *testing.T) {
+	t.Helper()
+	if len(f.SliceParameterCalls) == 0 {
+		t.Error("FakeArray.SliceParameter not called, expected at least one")
+	}
+}
+
+// SliceParameterNotCalled returns true if FakeArray.SliceParameter was not called
+func (f *FakeArray) SliceParameterNotCalled() bool {
+	return len(f.SliceParameterCalls) == 0
+}
+
+// AssertSliceParameterNotCalled calls t.Error if FakeArray.SliceParameter was called
+func (f *FakeArray) AssertSliceParameterNotCalled(t *testing.T) {
+	t.Helper()
+	if len(f.SliceParameterCalls) != 0 {
+		t.Error("FakeArray.SliceParameter called, expected none")
+	}
+}
+
+// SliceParameterCalledOnce returns true if FakeArray.SliceParameter was called exactly once
+func (f *FakeArray) SliceParameterCalledOnce() bool {
+	return len(f.SliceParameterCalls) == 1
+}
+
+// AssertSliceParameterCalledOnce calls t.Error if FakeArray.SliceParameter was not called exactly once
+func (f *FakeArray) AssertSliceParameterCalledOnce(t *testing.T) {
+	t.Helper()
+	if len(f.SliceParameterCalls) != 1 {
+		t.Errorf("FakeArray.SliceParameter called %d times, expected 1", len(f.SliceParameterCalls))
+	}
+}
+
+// SliceParameterCalledN returns true if FakeArray.SliceParameter was called at least n times
+func (f *FakeArray) SliceParameterCalledN(n int) bool {
+	return len(f.SliceParameterCalls) >= n
+}
+
+// AssertSliceParameterCalledN calls t.Error if FakeArray.SliceParameter was called less than n times
+func (f *FakeArray) AssertSliceParameterCalledN(t *testing.T, n int) {
+	t.Helper()
+	if len(f.SliceParameterCalls) < n {
+		t.Errorf("FakeArray.SliceParameter called %d times, expected >= %d", len(f.SliceParameterCalls), n)
+	}
+}
+
+// SliceParameterCalledWith returns true if FakeArray.SliceParameter was called with the given values
+func (_f8 *FakeArray) SliceParameterCalledWith(ident3 []string) (found bool) {
+	for _, call := range _f8.SliceParameterCalls {
+		if reflect.DeepEqual(call.Parameters.Ident3, ident3) {
+			found = true
+			break
+		}
+	}
+
+	return
+}
+
+// AssertSliceParameterCalledWith calls t.Error if FakeArray.SliceParameter was not called with the given values
+func (_f9 *FakeArray) AssertSliceParameterCalledWith(t *testing.T, ident3 []string) {
+	t.Helper()
+	var found bool
+	for _, call := range _f9.SliceParameterCalls {
+		if reflect.DeepEqual(call.Parameters.Ident3, ident3) {
+			found = true
+			break
+		}
+	}
+
+	if !found {
+		t.Error("FakeArray.SliceParameter not called with expected parameters")
+	}
+}
+
+// SliceParameterCalledOnceWith returns true if FakeArray.SliceParameter was called exactly once with the given values
+func (_f10 *FakeArray) SliceParameterCalledOnceWith(ident3 []string) bool {
+	var count int
+	for _, call := range _f10.SliceParameterCalls {
+		if reflect.DeepEqual(call.Parameters.Ident3, ident3) {
+			count++
+		}
+	}
+
+	return count == 1
+}
+
+// AssertSliceParameterCalledOnceWith calls t.Error if FakeArray.SliceParameter was not called exactly once with the given values
+func (_f11 *FakeArray) AssertSliceParameterCalledOnceWith(t *testing.T, ident3 []string) {
+	t.Helper()
+	var count int
+	for _, call := range _f11.SliceParameterCalls {
+		if reflect.DeepEqual(call.Parameters.Ident3, ident3) {
+			count++
+		}
+	}
+
+	if count != 1 {
+		t.Errorf("FakeArray.SliceParameter called %d times with expected parameters, expected one", count)
+	}
+}
+
+func (_f12 *FakeArray) SliceReturn() (ident4 []string) {
+	invocation := new(SliceReturnInvocation)
+
+	ident4 = _f12.SliceReturnHook()
+
+	invocation.Results.Ident4 = ident4
+
+	_f12.SliceReturnCalls = append(_f12.SliceReturnCalls, invocation)
+
+	return
+}
+
+// SliceReturnCalled returns true if FakeArray.SliceReturn was called
+func (f *FakeArray) SliceReturnCalled() bool {
+	return len(f.SliceReturnCalls) != 0
+}
+
+// AssertSliceReturnCalled calls t.Error if FakeArray.SliceReturn was not called
+func (f *FakeArray) AssertSliceReturnCalled(t *testing.T) {
+	t.Helper()
+	if len(f.SliceReturnCalls) == 0 {
+		t.Error("FakeArray.SliceReturn not called, expected at least one")
+	}
+}
+
+// SliceReturnNotCalled returns true if FakeArray.SliceReturn was not called
+func (f *FakeArray) SliceReturnNotCalled() bool {
+	return len(f.SliceReturnCalls) == 0
+}
+
+// AssertSliceReturnNotCalled calls t.Error if FakeArray.SliceReturn was called
+func (f *FakeArray) AssertSliceReturnNotCalled(t *testing.T) {
+	t.Helper()
+	if len(f.SliceReturnCalls) != 0 {
+		t.Error("FakeArray.SliceReturn called, expected none")
+	}
+}
+
+// SliceReturnCalledOnce returns true if FakeArray.SliceReturn was called exactly once
+func (f *FakeArray) SliceReturnCalledOnce() bool {
+	return len(f.SliceReturnCalls) == 1
+}
+
+// AssertSliceReturnCalledOnce calls t.Error if FakeArray.SliceReturn was not called exactly once
+func (f *FakeArray) AssertSliceReturnCalledOnce(t *testing.T) {
+	t.Helper()
+	if len(f.SliceReturnCalls) != 1 {
+		t.Errorf("FakeArray.SliceReturn called %d times, expected 1", len(f.SliceReturnCalls))
+	}
+}
+
+// SliceReturnCalledN returns true if FakeArray.SliceReturn was called at least n times
+func (f *FakeArray) SliceReturnCalledN(n int) bool {
+	return len(f.SliceReturnCalls) >= n
+}
+
+// AssertSliceReturnCalledN calls t.Error if FakeArray.SliceReturn was called less than n times
+func (f *FakeArray) AssertSliceReturnCalledN(t *testing.T, n int) {
+	t.Helper()
+	if len(f.SliceReturnCalls) < n {
+		t.Errorf("FakeArray.SliceReturn called %d times, expected >= %d", len(f.SliceReturnCalls), n)
 	}
 }
