@@ -395,10 +395,10 @@ type Type interface {
 }
 
 type Array struct {
-	subType Type
-	scale   string
+	subType         Type
+	scale           string
 	parameterFormat string
-	fieldFormat string
+	fieldFormat     string
 }
 
 func (t *Array) ParameterFormat() string {
@@ -426,9 +426,9 @@ func (t *Array) FieldFormat() string {
 }
 
 type Ellipsis struct {
-	subType Type
+	subType         Type
 	parameterFormat string
-	fieldFormat string
+	fieldFormat     string
 }
 
 func (t *Ellipsis) ParameterFormat() string {
@@ -456,9 +456,9 @@ func (t *Ellipsis) FieldFormat() string {
 }
 
 type Channel struct {
-	subType Type
+	subType         Type
 	parameterFormat string
-	fieldFormat string
+	fieldFormat     string
 }
 
 func (t *Channel) ParameterFormat() string {
@@ -486,9 +486,9 @@ func (t *Channel) FieldFormat() string {
 }
 
 type ReceiveChannel struct {
-	subType Type
+	subType         Type
 	parameterFormat string
-	fieldFormat string
+	fieldFormat     string
 }
 
 func (t *ReceiveChannel) ParameterFormat() string {
@@ -516,9 +516,9 @@ func (t *ReceiveChannel) FieldFormat() string {
 }
 
 type SendChannel struct {
-	subType Type
+	subType         Type
 	parameterFormat string
-	fieldFormat string
+	fieldFormat     string
 }
 
 func (t *SendChannel) ParameterFormat() string {
@@ -546,9 +546,9 @@ func (t *SendChannel) FieldFormat() string {
 }
 
 type Pointer struct {
-	subType Type
+	subType         Type
 	parameterFormat string
-	fieldFormat string
+	fieldFormat     string
 }
 
 func (t *Pointer) ParameterFormat() string {
@@ -576,10 +576,10 @@ func (t *Pointer) FieldFormat() string {
 }
 
 type BasicType struct {
-	Name      string
-	Qualifier string
+	Name            string
+	Qualifier       string
 	parameterFormat string
-	fieldFormat string
+	fieldFormat     string
 }
 
 func (t *BasicType) ParameterFormat() string {
