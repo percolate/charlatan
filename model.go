@@ -34,15 +34,6 @@ func (r *ImportSet) Add(value *Import) {
 	}
 }
 
-func (r *ImportSet) Remove(ri *Import) {
-	for index, i := range r.imports {
-		if i.Name == ri.Name && i.Path == ri.Path {
-			r.imports = append(r.imports[:index], r.imports[index+1:]...)
-			return
-		}
-	}
-}
-
 func (r *ImportSet) Contains(ri *Import) bool {
 	for _, i := range r.imports {
 		if i.Name == ri.Name && i.Path == ri.Path {
@@ -51,10 +42,6 @@ func (r *ImportSet) Contains(ri *Import) bool {
 	}
 
 	return false
-}
-
-func (r *ImportSet) GetAll() []*Import {
-	return r.imports
 }
 
 func (r *ImportSet) GetRequired() []*Import {
