@@ -34,15 +34,6 @@ func (r *ImportSet) Add(value *Import) {
 	}
 }
 
-func (r *ImportSet) Remove(ri *Import) {
-	for index, i := range r.imports {
-		if i.Name == ri.Name && i.Path == ri.Path {
-			r.imports = append(r.imports[:index], r.imports[index+1:]...)
-			return
-		}
-	}
-}
-
 func (r *ImportSet) Contains(ri *Import) bool {
 	for _, i := range r.imports {
 		if i.Name == ri.Name && i.Path == ri.Path {
@@ -51,10 +42,6 @@ func (r *ImportSet) Contains(ri *Import) bool {
 	}
 
 	return false
-}
-
-func (r *ImportSet) GetAll() []*Import {
-	return r.imports
 }
 
 func (r *ImportSet) GetRequired() []*Import {
@@ -152,6 +139,24 @@ func unwrap(node ast.Expr, imports *ImportSet) (t Type, err error) {
 		t = &Ellipsis{
 			subType: subType,
 		}
+	case *ast.ArrayType:
+		var subType Type
+		subType, err = unwrap(nodeType.Elt, imports)
+		if err != nil {
+			return
+		}
+		a := &Array{
+			subType: subType,
+		}
+		if nodeType.Len != nil {
+			if lit, ok := nodeType.Len.(*ast.BasicLit); ok {
+				a.scale = lit.Value
+			} else {
+				err = fmt.Errorf("internal error: unsupported array len type node: %#v", nodeType.Len)
+				return
+			}
+		}
+		t = a
 	case *ast.ChanType:
 		switch nodeType.Dir {
 		case ast.SEND:
@@ -376,12 +381,51 @@ type Type interface {
 	FieldFormat() string
 }
 
+type Array struct {
+	subType         Type
+	scale           string
+	parameterFormat string
+	fieldFormat     string
+}
+
+func (t *Array) ParameterFormat() string {
+	if t.parameterFormat != "" {
+		return t.parameterFormat
+	}
+
+	t.parameterFormat = fmt.Sprintf("[%s]%s", t.scale, t.subType.ParameterFormat())
+
+	return t.parameterFormat
+}
+
+func (t *Array) ReferenceFormat() string {
+	return t.subType.ReferenceFormat()
+}
+
+func (t *Array) FieldFormat() string {
+	if t.fieldFormat != "" {
+		return t.fieldFormat
+	}
+
+	t.fieldFormat = fmt.Sprintf("[%s]%s", t.scale, t.subType.FieldFormat())
+
+	return t.fieldFormat
+}
+
 type Ellipsis struct {
-	subType Type
+	subType         Type
+	parameterFormat string
+	fieldFormat     string
 }
 
 func (t *Ellipsis) ParameterFormat() string {
-	return fmt.Sprintf("...%s", t.subType.ParameterFormat())
+	if t.parameterFormat != "" {
+		return t.parameterFormat
+	}
+
+	t.parameterFormat = fmt.Sprintf("...%s", t.subType.ParameterFormat())
+
+	return t.parameterFormat
 }
 
 func (t *Ellipsis) ReferenceFormat() string {
@@ -389,15 +433,29 @@ func (t *Ellipsis) ReferenceFormat() string {
 }
 
 func (t *Ellipsis) FieldFormat() string {
-	return fmt.Sprintf("[]%s", t.subType.FieldFormat())
+	if t.fieldFormat != "" {
+		return t.fieldFormat
+	}
+
+	t.fieldFormat = fmt.Sprintf("[]%s", t.subType.FieldFormat())
+
+	return t.fieldFormat
 }
 
 type Channel struct {
-	subType Type
+	subType         Type
+	parameterFormat string
+	fieldFormat     string
 }
 
 func (t *Channel) ParameterFormat() string {
-	return fmt.Sprintf("chan %s", t.subType.ParameterFormat())
+	if t.parameterFormat != "" {
+		return t.parameterFormat
+	}
+
+	t.parameterFormat = fmt.Sprintf("chan %s", t.subType.ParameterFormat())
+
+	return t.parameterFormat
 }
 
 func (t *Channel) ReferenceFormat() string {
@@ -405,15 +463,29 @@ func (t *Channel) ReferenceFormat() string {
 }
 
 func (t *Channel) FieldFormat() string {
-	return fmt.Sprintf("chan %s", t.subType.FieldFormat())
+	if t.fieldFormat != "" {
+		return t.fieldFormat
+	}
+
+	t.fieldFormat = fmt.Sprintf("chan %s", t.subType.FieldFormat())
+
+	return t.fieldFormat
 }
 
 type ReceiveChannel struct {
-	subType Type
+	subType         Type
+	parameterFormat string
+	fieldFormat     string
 }
 
 func (t *ReceiveChannel) ParameterFormat() string {
-	return fmt.Sprintf("<-chan %s", t.subType.ParameterFormat())
+	if t.parameterFormat != "" {
+		return t.parameterFormat
+	}
+
+	t.parameterFormat = fmt.Sprintf("<-chan %s", t.subType.ParameterFormat())
+
+	return t.parameterFormat
 }
 
 func (t *ReceiveChannel) ReferenceFormat() string {
@@ -421,15 +493,29 @@ func (t *ReceiveChannel) ReferenceFormat() string {
 }
 
 func (t *ReceiveChannel) FieldFormat() string {
-	return fmt.Sprintf("<-chan %s", t.subType.FieldFormat())
+	if t.fieldFormat != "" {
+		return t.fieldFormat
+	}
+
+	t.fieldFormat = fmt.Sprintf("<-chan %s", t.subType.FieldFormat())
+
+	return t.fieldFormat
 }
 
 type SendChannel struct {
-	subType Type
+	subType         Type
+	parameterFormat string
+	fieldFormat     string
 }
 
 func (t *SendChannel) ParameterFormat() string {
-	return fmt.Sprintf("chan<- %s", t.subType.ParameterFormat())
+	if t.parameterFormat != "" {
+		return t.parameterFormat
+	}
+
+	t.parameterFormat = fmt.Sprintf("chan<- %s", t.subType.ParameterFormat())
+
+	return t.parameterFormat
 }
 
 func (t *SendChannel) ReferenceFormat() string {
@@ -437,15 +523,29 @@ func (t *SendChannel) ReferenceFormat() string {
 }
 
 func (t *SendChannel) FieldFormat() string {
-	return fmt.Sprintf("chan<- %s", t.subType.FieldFormat())
+	if t.fieldFormat != "" {
+		return t.fieldFormat
+	}
+
+	t.fieldFormat = fmt.Sprintf("chan<- %s", t.subType.FieldFormat())
+
+	return t.fieldFormat
 }
 
 type Pointer struct {
-	subType Type
+	subType         Type
+	parameterFormat string
+	fieldFormat     string
 }
 
 func (t *Pointer) ParameterFormat() string {
-	return fmt.Sprintf("*%s", t.subType.ParameterFormat())
+	if t.parameterFormat != "" {
+		return t.parameterFormat
+	}
+
+	t.parameterFormat = fmt.Sprintf("*%s", t.subType.ParameterFormat())
+
+	return t.parameterFormat
 }
 
 func (t *Pointer) ReferenceFormat() string {
@@ -453,20 +553,34 @@ func (t *Pointer) ReferenceFormat() string {
 }
 
 func (t *Pointer) FieldFormat() string {
-	return fmt.Sprintf("*%s", t.subType.FieldFormat())
+	if t.fieldFormat != "" {
+		return t.fieldFormat
+	}
+
+	t.fieldFormat = fmt.Sprintf("*%s", t.subType.FieldFormat())
+
+	return t.fieldFormat
 }
 
 type BasicType struct {
-	Name      string
-	Qualifier string
+	Name            string
+	Qualifier       string
+	parameterFormat string
+	fieldFormat     string
 }
 
 func (t *BasicType) ParameterFormat() string {
-	if t.Qualifier != "" {
-		return fmt.Sprintf("%s.%s", t.Qualifier, t.Name)
+	if t.parameterFormat != "" {
+		return t.parameterFormat
 	}
 
-	return t.Name
+	if t.Qualifier != "" {
+		t.parameterFormat = fmt.Sprintf("%s.%s", t.Qualifier, t.Name)
+	} else {
+		t.parameterFormat = t.Name
+	}
+
+	return t.parameterFormat
 }
 
 func (t *BasicType) ReferenceFormat() string {
@@ -474,9 +588,15 @@ func (t *BasicType) ReferenceFormat() string {
 }
 
 func (t *BasicType) FieldFormat() string {
-	if t.Qualifier != "" {
-		return fmt.Sprintf("%s.%s", t.Qualifier, t.Name)
+	if t.fieldFormat != "" {
+		return t.fieldFormat
 	}
 
-	return t.Name
+	if t.Qualifier != "" {
+		t.fieldFormat = fmt.Sprintf("%s.%s", t.Qualifier, t.Name)
+	} else {
+		t.fieldFormat = t.Name
+	}
+
+	return t.fieldFormat
 }

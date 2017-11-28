@@ -25,9 +25,15 @@
   revision = "69483b4bd14f5845b5a1e55bca19e954e827f1d0"
   version = "v1.1.4"
 
+[[projects]]
+  branch = "master"
+  name = "golang.org/x/tools"
+  packages = ["go/ast/astutil","imports"]
+  revision = "6d70fb2e85323e81c89374331d3d2b93304faa36"
+
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "7d2b3640edf8ebb1283bdcc9e08de5c139aeb8516f353465421b1b7542ed5b40"
+  inputs-digest = "04831e2590a3991d1b99fcd21a9046a57933844304a9b8090a7fce891d6bbee5"
   solver-name = "gps-cdcl"
   solver-version = 1

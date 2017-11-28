@@ -18,6 +18,7 @@ var (
 		"Namedvaluer",
 		"Multireturner",
 		"Variadic",
+		"Array",
 		"Pointer",
 		"Interfacer",
 		"Structer",
