@@ -161,7 +161,7 @@ func unwrap(node ast.Expr, imports *ImportSet) (t Type, err error) {
 		a := &Array{
 			subType: subType,
 		}
-		if(nodeType.Len != nil) {
+		if nodeType.Len != nil {
 			if lit, ok := nodeType.Len.(*ast.BasicLit); ok {
 				a.scale = lit.Value
 			} else {
