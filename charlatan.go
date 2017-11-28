@@ -41,14 +41,12 @@ var (
 	outputPath    = flag.String("output", "", "output file path [default: ./charlatan.go]")
 	outputPackage = flag.String("package", "", "output package name [default: \"<current package>\"]")
 	dirName       = flag.String("dir", "", "input package directory [default: current package directory]")
-	fileNames     stringSliceValue
 )
 
 func init() {
 	log.SetFlags(0)
 	log.SetPrefix("charlatan: ")
 	flag.Usage = usage
-	flag.Var(&fileNames, "file", "name of input file, may be repeated, ignored if -dir is present")
 }
 
 func usage() {
@@ -71,32 +69,14 @@ func main() {
 		os.Exit(1)
 	}
 
-	var (
-		g   *Generator
-		err error
-	)
-
+	packageDirectory := "."
 	if *dirName != "" {
-		g, err = LoadPackageDir(*dirName)
-		if err != nil {
-			log.Fatal(err)
-		}
-	} else if len(fileNames) != 0 {
-		for _, name := range fileNames[1:] {
-			if *dirName != filepath.Dir(name) {
-				log.Fatal("all input source files must be in the same package directory")
-			}
-		}
-		g, err = LoadPackageFiles(fileNames)
-		if err != nil {
-			log.Fatal(err)
-		}
-	} else {
-		// process the package in current directory.
-		g, err = LoadPackageDir(".")
-		if err != nil {
-			log.Fatal(err)
-		}
+		packageDirectory = *dirName
+	}
+
+	g, err := LoadPackageDir(packageDirectory)
+	if err != nil {
+		log.Fatal(err)
 	}
 
 	g.PackageOverride = *outputPackage

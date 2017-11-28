@@ -42,11 +42,6 @@ func LoadPackageDir(directory string) (*Generator, error) {
 	return parsePackage(directory, names)
 }
 
-// LoadPackageFiles parses a package using only the given files.
-func LoadPackageFiles(names []string) (*Generator, error) {
-	return parsePackage(".", names)
-}
-
 func parsePackage(directory string, filenames []string) (*Generator, error) {
 	generator := &Generator{
 		imports:    new(ImportSet),
