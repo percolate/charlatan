@@ -10,7 +10,7 @@ DIAGRAMS := $(DIAGRAM_DIR)/architecture.png
 BUILD_DIR := build
 COVERAGE_DIR := $(BUILD_DIR)/coverage
 TESTDATA_SOURCES := $(shell find testdata -name "*_def.go")
-IGNORED_TESTDATA := testdata/__def.go testdata/emptier_def.go
+IGNORED_TESTDATA := testdata/_/__def.go testdata/emptier/emptier_def.go
 GENERATED_TESTDATA := $(subst _def,,$(filter-out $(IGNORED_TESTDATA),$(TESTDATA_SOURCES)))
 
 all: test
@@ -41,7 +41,7 @@ charlatan:
 
 # Get the capitalized interface name from the filename and pass it to charlatan
 %.go: %_def.go
-	iface=$(*F); ./charlatan -file=$< -output=$@ $${iface^}
+	iface=$(*F); ./charlatan -dir=testdata/$(*F) -output=$@ $${iface^}
 
 test: $(COVERAGE_DIR)
 	go test -v -coverprofile=$(TOP_DIR)/$(COVERAGE_DIR)/$(@F)_coverage.out -covermode=atomic ./...
