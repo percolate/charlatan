@@ -4,7 +4,7 @@ version: 2
 jobs:
   build:
     docker:
-      - image: circleci/golang:1.9.0
+      - image: circleci/golang:1.9.2-stretch
 
     working_directory: /go/src/github.com/percolate/charlatan
 
@@ -14,7 +14,7 @@ jobs:
           shell: /bin/bash
           name: go fmt
           command: |
-            ! gofmt -l $(find . -type f -name '*.go') 2>&1 | read
+            ! gofmt -l $(find . -path ./vendor -prune -o  -type f -name '*.go' -print) 2>&1 | read
       - run: go vet
       - run: make test
       - run: sbin/codecov -s build/coverage/
