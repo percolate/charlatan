@@ -6,6 +6,8 @@ import (
 	"go/ast"
 	"go/format"
 	"go/token"
+	"go/types"
+	"strconv"
 	"strings"
 )
 
@@ -66,9 +68,10 @@ func (r *ImportSet) RequireByName(s string) {
 type Interface struct {
 	Name    string
 	Methods []*Method
+	embeds  []string
 }
 
-func (i *Interface) addMethod(field *ast.Field, imports *ImportSet) error {
+func (i *Interface) addMethodFromField(field *ast.Field, imports *ImportSet) error {
 	functionType, ok := field.Type.(*ast.FuncType)
 	if !ok {
 		return fmt.Errorf("internal error: expected *ast.FuncType, have: %#v", field)
@@ -81,7 +84,7 @@ func (i *Interface) addMethod(field *ast.Field, imports *ImportSet) error {
 
 	// `Params.List` can be 0-length, but `Results` can be nil
 	for _, parameter := range functionType.Params.List {
-		identifiers, err := extractIdentifiers(parameter, imports)
+		identifiers, err := extractIdentifiersFromField(parameter, imports)
 		if err != nil {
 			return err
 		}
@@ -90,7 +93,7 @@ func (i *Interface) addMethod(field *ast.Field, imports *ImportSet) error {
 
 	if functionType.Results != nil {
 		for _, result := range functionType.Results.List {
-			identifiers, err := extractIdentifiers(result, imports)
+			identifiers, err := extractIdentifiersFromField(result, imports)
 			if err != nil {
 				return err
 			}
@@ -102,8 +105,8 @@ func (i *Interface) addMethod(field *ast.Field, imports *ImportSet) error {
 	return nil
 }
 
-func extractIdentifiers(field *ast.Field, imports *ImportSet) ([]*Identifier, error) {
-	identifierType, err := unwrap(field.Type, imports)
+func extractIdentifiersFromField(field *ast.Field, imports *ImportSet) ([]*Identifier, error) {
+	identifierType, err := unwrapExpr(field.Type, imports)
 	if err != nil {
 		return nil, err
 	}
@@ -128,11 +131,11 @@ func extractIdentifiers(field *ast.Field, imports *ImportSet) ([]*Identifier, er
 	return identifiers, nil
 }
 
-func unwrap(node ast.Expr, imports *ImportSet) (t Type, err error) {
+func unwrapExpr(node ast.Expr, imports *ImportSet) (t Type, err error) {
 	switch nodeType := node.(type) {
 	case *ast.Ellipsis:
 		var subType Type
-		subType, err = unwrap(nodeType.Elt, imports)
+		subType, err = unwrapExpr(nodeType.Elt, imports)
 		if err != nil {
 			return
 		}
@@ -141,7 +144,7 @@ func unwrap(node ast.Expr, imports *ImportSet) (t Type, err error) {
 		}
 	case *ast.ArrayType:
 		var subType Type
-		subType, err = unwrap(nodeType.Elt, imports)
+		subType, err = unwrapExpr(nodeType.Elt, imports)
 		if err != nil {
 			return
 		}
@@ -157,39 +160,31 @@ func unwrap(node ast.Expr, imports *ImportSet) (t Type, err error) {
 			}
 		}
 		t = a
+	// xxx - map type
+	// xxx - func type
 	case *ast.ChanType:
+		var subType Type
+		subType, err = unwrapExpr(nodeType.Value, imports)
+		if err != nil {
+			return
+		}
 		switch nodeType.Dir {
 		case ast.SEND:
-			var subType Type
-			subType, err = unwrap(nodeType.Value, imports)
-			if err != nil {
-				return
-			}
 			t = &SendChannel{
 				subType: subType,
 			}
 		case ast.RECV:
-			var subType Type
-			subType, err = unwrap(nodeType.Value, imports)
-			if err != nil {
-				return
-			}
 			t = &ReceiveChannel{
 				subType: subType,
 			}
 		case ast.SEND + ast.RECV:
-			var subType Type
-			subType, err = unwrap(nodeType.Value, imports)
-			if err != nil {
-				return
-			}
 			t = &Channel{
 				subType: subType,
 			}
 		}
 	case *ast.StarExpr:
 		var subType Type
-		subType, err = unwrap(nodeType.X, imports)
+		subType, err = unwrapExpr(nodeType.X, imports)
 		if err != nil {
 			return
 		}
@@ -216,7 +211,124 @@ func unwrap(node ast.Expr, imports *ImportSet) (t Type, err error) {
 			Name: nodeType.Name,
 		}
 	default:
-		err = fmt.Errorf("internal error: unsupported field type node: %#v", nodeType)
+		err = fmt.Errorf("internal error: unsupported parameter type: %#v", nodeType)
+	}
+
+	return
+}
+
+func (i *Interface) addMethodFromType(f *types.Func, imports *ImportSet) error {
+	method := &Method{
+		Interface: i.Name,
+		Name:      f.Name(),
+	}
+
+	sig := f.Type().(*types.Signature)
+	parameters, err := extractIdentifiersFromTuple(sig.Params(), imports)
+	if err != nil {
+		return err
+	}
+	if sig.Variadic() {
+		last := parameters[len(parameters)-1]
+		if avt, ok := last.valueType.(*Array); ok {
+			last.valueType = &Ellipsis{subType: avt.subType}
+		} else {
+			last.valueType = &Ellipsis{subType: last.valueType}
+		}
+	}
+	method.Parameters = append(method.Parameters, parameters...)
+
+	results, err := extractIdentifiersFromTuple(sig.Results(), imports)
+	if err != nil {
+		return err
+	}
+	method.Results = append(method.Results, results...)
+
+	i.Methods = append(i.Methods, method)
+
+	return nil
+}
+
+func extractIdentifiersFromTuple(tuple *types.Tuple, imports *ImportSet) ([]*Identifier, error) {
+	if 0 == tuple.Len() {
+		return nil, nil
+	}
+
+	idents := make([]*Identifier, tuple.Len())
+	for i := 0; i < tuple.Len(); i++ {
+		p := tuple.At(i)
+		identifierType, err := unwrapType(p.Type(), imports)
+		if err != nil {
+			return nil, err
+		}
+		ident := &Identifier{
+			Name:      p.Name(),
+			valueType: identifierType,
+		}
+		if "" == ident.Name {
+			ident.Name = identSymGen.Next()
+		}
+		idents[i] = ident
+	}
+
+	return idents, nil
+}
+
+func unwrapType(t types.Type, imports *ImportSet) (r Type, err error) {
+	switch actual := t.(type) {
+	case *types.Array:
+		var subType Type
+		subType, err = unwrapType(actual.Elem(), imports)
+		if err != nil {
+			return
+		}
+		a := &Array{subType: subType}
+		if actual.Len() != 0 {
+			a.scale = strconv.FormatInt(actual.Len(), 10)
+		}
+		r = a
+	case *types.Slice:
+		var subType Type
+		subType, err = unwrapType(actual.Elem(), imports)
+		if err != nil {
+			return
+		}
+		r = &Array{subType: subType}
+	// xxx - map type
+	case *types.Chan:
+		var subType Type
+		subType, err = unwrapType(actual.Elem(), imports)
+		if err != nil {
+			return
+		}
+		switch actual.Dir() {
+		case types.SendOnly:
+			r = &SendChannel{subType: subType}
+		case types.RecvOnly:
+			r = &ReceiveChannel{subType: subType}
+		case types.SendRecv:
+			r = &Channel{subType: subType}
+		}
+	case *types.Pointer:
+		var subType Type
+		subType, err = unwrapType(actual.Elem(), imports)
+		if err != nil {
+			return nil, err
+		}
+		r = &Pointer{subType: subType}
+	case *types.Interface, *types.Struct, *types.Signature:
+		r = &BasicType{Name: actual.String()}
+	// xxx - variadic type?
+	case *types.Named:
+		b := &BasicType{Name: actual.Obj().Name()}
+		if actual.Obj().Pkg() != nil {
+			b.Qualifier = actual.Obj().Pkg().Name()
+		}
+		r = b
+	case *types.Basic:
+		r = &BasicType{Name: actual.Name()}
+	default:
+		err = fmt.Errorf("internal error: unsupported parameter type: %#v", actual)
 	}
 
 	return

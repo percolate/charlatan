@@ -59,7 +59,6 @@ func parsePackage(directory string, filenames []string) (*Generator, error) {
 		if err != nil {
 			return nil, fmt.Errorf("syntax error: %s", err)
 		}
-		// xxx - process the file in just one pass
 		if err := generator.processImports(file, importer); err != nil {
 			return nil, err
 		}
@@ -72,7 +71,7 @@ func parsePackage(directory string, filenames []string) (*Generator, error) {
 		return nil, fmt.Errorf("error: no Go files found in %s", directory)
 	}
 
-	// Type check the package.
+	// N.B. - type check the package
 	config := types.Config{Importer: importer, Error: func(err error) { fmt.Fprintln(os.Stderr, err) }}
 	pkg, err := config.Check(directory, fileset, files, nil)
 	if err != nil {
@@ -133,6 +132,11 @@ func (g *Generator) processImportInterfaces(pkg *types.Package) error {
 	for _, name := range pkg.Scope().Names() {
 		obj := pkg.Scope().Lookup(name)
 
+		qname := fmt.Sprintf("%s.%s", pkg.Name(), obj.Name())
+		if _, exists := g.interfaces[qname]; exists {
+			continue
+		}
+
 		if _, isType := obj.(*types.TypeName); !isType || !obj.Exported() || !types.IsInterface(obj.Type()) {
 			continue
 		}
@@ -152,7 +156,7 @@ func (g *Generator) processImportInterfaces(pkg *types.Package) error {
 			}
 		}
 
-		g.interfaces[fmt.Sprintf("%s.%s", pkg.Name(), obj.Name())] = decl
+		g.interfaces[qname] = decl
 	}
 
 	return nil
@@ -188,7 +192,7 @@ func (g *Generator) processInterface(name string, ifType *ast.InterfaceType) (*I
 	for _, field := range ifType.Methods.List {
 		switch f := field.Type.(type) {
 		case *ast.FuncType:
-			if err := decl.addMethod(field, g.imports); err != nil {
+			if err := decl.addMethodFromField(field, g.imports); err != nil {
 				return nil, err
 			}
 		case *ast.Ident:
