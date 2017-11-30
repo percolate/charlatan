@@ -13,18 +13,20 @@ import (
 
 var (
 	golden = []string{
-		"Importer",
-		"Channeler",
-		"Voider",
-		"Namedvaluer",
-		"Multireturner",
-		"Variadic",
 		"Array",
-		"Pointer",
-		"Interfacer",
-		"Structer",
+		"Channeler",
 		"Embedder",
+		"Funcer",
+		"Interfacer",
+		"Importer",
+		"Mapper",
+		"Multireturner",
+		"Namedvaluer",
+		"Pointer",
 		"Qualifier",
+		"Structer",
+		"Variadic",
+		"Voider",
 	}
 	unsupported = []string{
 		"_",

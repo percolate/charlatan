@@ -160,8 +160,18 @@ func unwrapExpr(node ast.Expr, imports *ImportSet) (t Type, err error) {
 			}
 		}
 		t = a
-	// xxx - map type
-	// xxx - func type
+	case *ast.MapType:
+		var keyType Type
+		keyType, err = unwrapExpr(nodeType.Key, imports)
+		if err != nil {
+			return
+		}
+		var subType Type
+		subType, err = unwrapExpr(nodeType.Value, imports)
+		if err != nil {
+			return
+		}
+		t = &Map{keyType: keyType, subType: subType}
 	case *ast.ChanType:
 		var subType Type
 		subType, err = unwrapExpr(nodeType.Value, imports)
@@ -191,7 +201,7 @@ func unwrapExpr(node ast.Expr, imports *ImportSet) (t Type, err error) {
 		t = &Pointer{
 			subType: subType,
 		}
-	case *ast.InterfaceType, *ast.StructType:
+	case *ast.InterfaceType, *ast.StructType, *ast.FuncType:
 		var buf bytes.Buffer
 		if err = format.Node(&buf, token.NewFileSet(), nodeType); err != nil {
 			return
@@ -294,7 +304,18 @@ func unwrapType(t types.Type, imports *ImportSet) (r Type, err error) {
 			return
 		}
 		r = &Array{subType: subType}
-	// xxx - map type
+	case *types.Map:
+		var keyType Type
+		keyType, err = unwrapType(actual.Key(), imports)
+		if err != nil {
+			return
+		}
+		var subType Type
+		subType, err = unwrapType(actual.Elem(), imports)
+		if err != nil {
+			return
+		}
+		r = &Map{keyType: keyType, subType: subType}
 	case *types.Chan:
 		var subType Type
 		subType, err = unwrapType(actual.Elem(), imports)
@@ -318,11 +339,11 @@ func unwrapType(t types.Type, imports *ImportSet) (r Type, err error) {
 		r = &Pointer{subType: subType}
 	case *types.Interface, *types.Struct, *types.Signature:
 		r = &BasicType{Name: actual.String()}
-	// xxx - variadic type?
 	case *types.Named:
 		b := &BasicType{Name: actual.Obj().Name()}
 		if actual.Obj().Pkg() != nil {
 			b.Qualifier = actual.Obj().Pkg().Name()
+			imports.RequireByName(b.Qualifier)
 		}
 		r = b
 	case *types.Basic:
@@ -511,7 +532,7 @@ func (t *Array) ParameterFormat() string {
 }
 
 func (t *Array) ReferenceFormat() string {
-	return t.subType.ReferenceFormat()
+	return ""
 }
 
 func (t *Array) FieldFormat() string {
@@ -520,6 +541,37 @@ func (t *Array) FieldFormat() string {
 	}
 
 	t.fieldFormat = fmt.Sprintf("[%s]%s", t.scale, t.subType.FieldFormat())
+
+	return t.fieldFormat
+}
+
+type Map struct {
+	keyType         Type
+	subType         Type
+	parameterFormat string
+	fieldFormat     string
+}
+
+func (t *Map) ParameterFormat() string {
+	if t.parameterFormat != "" {
+		return t.parameterFormat
+	}
+
+	t.parameterFormat = fmt.Sprintf("map[%s]%s", t.keyType.ParameterFormat(), t.subType.ParameterFormat())
+
+	return t.parameterFormat
+}
+
+func (t *Map) ReferenceFormat() string {
+	return ""
+}
+
+func (t *Map) FieldFormat() string {
+	if t.fieldFormat != "" {
+		return t.fieldFormat
+	}
+
+	t.fieldFormat = fmt.Sprintf("map[%s]%s", t.keyType.FieldFormat(), t.subType.FieldFormat())
 
 	return t.fieldFormat
 }
@@ -571,7 +623,7 @@ func (t *Channel) ParameterFormat() string {
 }
 
 func (t *Channel) ReferenceFormat() string {
-	return t.subType.ReferenceFormat()
+	return ""
 }
 
 func (t *Channel) FieldFormat() string {
@@ -601,7 +653,7 @@ func (t *ReceiveChannel) ParameterFormat() string {
 }
 
 func (t *ReceiveChannel) ReferenceFormat() string {
-	return t.subType.ReferenceFormat()
+	return ""
 }
 
 func (t *ReceiveChannel) FieldFormat() string {
@@ -631,7 +683,7 @@ func (t *SendChannel) ParameterFormat() string {
 }
 
 func (t *SendChannel) ReferenceFormat() string {
-	return t.subType.ReferenceFormat()
+	return ""
 }
 
 func (t *SendChannel) FieldFormat() string {
