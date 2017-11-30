@@ -9,6 +9,9 @@ var _ Embedder = &FakeEmbedder{}
 func main() {
 	embedHookCalled := false
 	otherHookCalled := false
+	stringHookCalled := false
+
+	answer := "42"
 
 	f := &FakeEmbedder{
 		EmbedHook: func(v string) string {
@@ -19,9 +22,11 @@ func main() {
 			otherHookCalled = true
 			return v
 		},
+		StringHook: func() string {
+			stringHookCalled = true
+			return answer
+		},
 	}
-
-	answer := "42"
 
 	e := f.Embed(answer)
 
@@ -81,5 +86,29 @@ func main() {
 	}
 	if !f.OtherCalledOnceWith(answer) {
 		panic(fmt.Sprintf("OtherCalledOnceWith: Other not called once with %s", answer))
+	}
+
+	s := f.String()
+
+	if s != answer {
+		panic("unexpected result from String method")
+	}
+	if len(f.StringCalls) != 1 {
+		panic(fmt.Sprintf("StringCalls: %d", len(f.StringCalls)))
+	}
+	if !stringHookCalled {
+		panic("StringHook not called")
+	}
+	if !f.StringCalled() {
+		panic("StringCalled: String not called")
+	}
+	if !f.StringCalledOnce() {
+		panic("StringCalledOnce: String not called once")
+	}
+	if f.StringNotCalled() {
+		panic("StringNotCalled: String not called")
+	}
+	if !f.StringCalledN(1) {
+		panic("StringCalledN: String not called once")
 	}
 }
