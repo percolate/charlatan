@@ -1,10 +1,10 @@
 package main
 
-type Embeddable interface {
-	Embed()
-}
-
 type Embedder interface {
 	Embeddable
-	Other()
+	Other(string) string
+}
+
+type Embeddable interface {
+	Embed(string) string
 }

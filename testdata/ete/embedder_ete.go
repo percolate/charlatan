@@ -12,7 +12,7 @@ func main() {
 
 	f := &FakeEmbedder{
 		EmbedHook: func(v string) string {
-			otherHookCalled = true
+			embedHookCalled = true
 			return v
 		},
 		OtherHook: func(v string) string {
@@ -31,7 +31,7 @@ func main() {
 	if len(f.EmbedCalls) != 1 {
 		panic(fmt.Sprintf("EmbedCalls: %d", len(f.EmbedCalls)))
 	}
-	if !interfaceHookCalled {
+	if !embedHookCalled {
 		panic("EmbedHook not called")
 	}
 	if !f.EmbedCalled() {
@@ -61,7 +61,7 @@ func main() {
 	if len(f.OtherCalls) != 1 {
 		panic(fmt.Sprintf("OtherCalls: %d", len(f.OtherCalls)))
 	}
-	if !interfaceHookCalled {
+	if !otherHookCalled {
 		panic("OtherHook not called")
 	}
 	if !f.OtherCalled() {
