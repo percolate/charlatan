@@ -14,7 +14,7 @@ jobs:
           shell: /bin/bash
           name: go fmt
           command: |
-            ! gofmt -l *.go testdata/*.go 2>&1 | read
+            ! gofmt -l $(find . -type f -name '*.go') 2>&1 | read
       - run: go vet
       - run: make test
       - run: sbin/codecov -s build/coverage/
