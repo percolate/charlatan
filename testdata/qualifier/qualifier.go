@@ -51,7 +51,7 @@ Use it in your tests as in this example:
 	}
 
 Create anonymous function implementations for only those interface methods that
-should be called in the code under test.  This will force a painc if any
+should be called in the code under test.  This will force a panic if any
 unexpected calls are made to FakeQualify.
 */
 type FakeQualifier struct {
@@ -67,11 +67,9 @@ func NewFakeQualifierDefaultPanic() *FakeQualifier {
 	return &FakeQualifier{
 		QualifyHook: func(fmt.Scanner) (ident7 fmt.Scanner) {
 			panic("Unexpected call to Qualifier.Qualify")
-			return
 		},
 		NamedQualifyHook: func(fmt.Scanner, fmt.Scanner, fmt.Scanner) (d fmt.Scanner) {
 			panic("Unexpected call to Qualifier.NamedQualify")
-			return
 		},
 	}
 }

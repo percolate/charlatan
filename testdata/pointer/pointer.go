@@ -38,7 +38,7 @@ Use it in your tests as in this example:
 	}
 
 Create anonymous function implementations for only those interface methods that
-should be called in the code under test.  This will force a painc if any
+should be called in the code under test.  This will force a panic if any
 unexpected calls are made to FakePoint.
 */
 type FakePointer struct {
@@ -52,7 +52,6 @@ func NewFakePointerDefaultPanic() *FakePointer {
 	return &FakePointer{
 		PointHook: func(*string) (ident2 int) {
 			panic("Unexpected call to Pointer.Point")
-			return
 		},
 	}
 }

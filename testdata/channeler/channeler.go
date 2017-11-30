@@ -78,7 +78,7 @@ Use it in your tests as in this example:
 	}
 
 Create anonymous function implementations for only those interface methods that
-should be called in the code under test.  This will force a painc if any
+should be called in the code under test.  This will force a panic if any
 unexpected calls are made to FakeChannel.
 */
 type FakeChanneler struct {
@@ -100,23 +100,18 @@ func NewFakeChannelerDefaultPanic() *FakeChanneler {
 	return &FakeChanneler{
 		ChannelHook: func(chan int) (ident2 chan int) {
 			panic("Unexpected call to Channeler.Channel")
-			return
 		},
 		ChannelReceiveHook: func(<-chan int) (ident4 <-chan int) {
 			panic("Unexpected call to Channeler.ChannelReceive")
-			return
 		},
 		ChannelSendHook: func(chan<- int) (ident6 chan<- int) {
 			panic("Unexpected call to Channeler.ChannelSend")
-			return
 		},
 		ChannelPointerHook: func(*chan int) (ident8 *chan int) {
 			panic("Unexpected call to Channeler.ChannelPointer")
-			return
 		},
 		ChannelInterfaceHook: func(chan interface{}) (ident10 chan interface{}) {
 			panic("Unexpected call to Channeler.ChannelInterface")
-			return
 		},
 	}
 }

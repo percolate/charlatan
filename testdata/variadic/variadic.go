@@ -45,7 +45,7 @@ Use it in your tests as in this example:
 	}
 
 Create anonymous function implementations for only those interface methods that
-should be called in the code under test.  This will force a painc if any
+should be called in the code under test.  This will force a panic if any
 unexpected calls are made to FakeSingleVariadic.
 */
 type FakeVariadic struct {
@@ -61,11 +61,9 @@ func NewFakeVariadicDefaultPanic() *FakeVariadic {
 	return &FakeVariadic{
 		SingleVariadicHook: func(...string) {
 			panic("Unexpected call to Variadic.SingleVariadic")
-			return
 		},
 		MixedVariadicHook: func(int, int, int, ...string) {
 			panic("Unexpected call to Variadic.MixedVariadic")
-			return
 		},
 	}
 }

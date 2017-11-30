@@ -52,7 +52,7 @@ Use it in your tests as in this example:
 	}
 
 Create anonymous function implementations for only those interface methods that
-should be called in the code under test.  This will force a painc if any
+should be called in the code under test.  This will force a panic if any
 unexpected calls are made to FakeManyNamed.
 */
 type FakeNamedvaluer struct {
@@ -68,11 +68,9 @@ func NewFakeNamedvaluerDefaultPanic() *FakeNamedvaluer {
 	return &FakeNamedvaluer{
 		ManyNamedHook: func(string, string, int, int) (ret bool) {
 			panic("Unexpected call to Namedvaluer.ManyNamed")
-			return
 		},
 		NamedHook: func(int, string) (ret bool) {
 			panic("Unexpected call to Namedvaluer.Named")
-			return
 		},
 	}
 }

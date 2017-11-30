@@ -56,7 +56,7 @@ Use it in your tests as in this example:
 	}
 
 Create anonymous function implementations for only those interface methods that
-should be called in the code under test.  This will force a painc if any
+should be called in the code under test.  This will force a panic if any
 unexpected calls are made to FakeArrayParameter.
 */
 type FakeArray struct {
@@ -76,19 +76,15 @@ func NewFakeArrayDefaultPanic() *FakeArray {
 	return &FakeArray{
 		ArrayParameterHook: func([3]string) {
 			panic("Unexpected call to Array.ArrayParameter")
-			return
 		},
 		ArrayReturnHook: func() (ident2 [3]string) {
 			panic("Unexpected call to Array.ArrayReturn")
-			return
 		},
 		SliceParameterHook: func([]string) {
 			panic("Unexpected call to Array.SliceParameter")
-			return
 		},
 		SliceReturnHook: func() (ident4 []string) {
 			panic("Unexpected call to Array.SliceReturn")
-			return
 		},
 	}
 }

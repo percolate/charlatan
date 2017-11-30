@@ -42,7 +42,7 @@ Use it in your tests as in this example:
 	}
 
 Create anonymous function implementations for only those interface methods that
-should be called in the code under test.  This will force a painc if any
+should be called in the code under test.  This will force a panic if any
 unexpected calls are made to FakeFuncParameter.
 */
 type FakeFuncer struct {
@@ -58,11 +58,9 @@ func NewFakeFuncerDefaultPanic() *FakeFuncer {
 	return &FakeFuncer{
 		FuncParameterHook: func(func(string) string) {
 			panic("Unexpected call to Funcer.FuncParameter")
-			return
 		},
 		FuncReturnHook: func() (ident2 func(string) string) {
 			panic("Unexpected call to Funcer.FuncReturn")
-			return
 		},
 	}
 }

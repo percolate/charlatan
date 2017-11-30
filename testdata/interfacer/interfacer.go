@@ -48,7 +48,7 @@ Use it in your tests as in this example:
 	}
 
 Create anonymous function implementations for only those interface methods that
-should be called in the code under test.  This will force a painc if any
+should be called in the code under test.  This will force a panic if any
 unexpected calls are made to FakeInterface.
 */
 type FakeInterfacer struct {
@@ -64,11 +64,9 @@ func NewFakeInterfacerDefaultPanic() *FakeInterfacer {
 	return &FakeInterfacer{
 		InterfaceHook: func(interface{}) (ident2 interface{}) {
 			panic("Unexpected call to Interfacer.Interface")
-			return
 		},
 		NamedInterfaceHook: func(interface{}) (z interface{}) {
 			panic("Unexpected call to Interfacer.NamedInterface")
-			return
 		},
 	}
 }

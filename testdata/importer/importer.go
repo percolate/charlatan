@@ -40,7 +40,7 @@ Use it in your tests as in this example:
 	}
 
 Create anonymous function implementations for only those interface methods that
-should be called in the code under test.  This will force a painc if any
+should be called in the code under test.  This will force a panic if any
 unexpected calls are made to FakeScan.
 */
 type FakeImporter struct {
@@ -54,7 +54,6 @@ func NewFakeImporterDefaultPanic() *FakeImporter {
 	return &FakeImporter{
 		ScanHook: func(*Scanner) (ident10 z.Reader) {
 			panic("Unexpected call to Importer.Scan")
-			return
 		},
 	}
 }

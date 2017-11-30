@@ -31,7 +31,7 @@ Use it in your tests as in this example:
 	}
 
 Create anonymous function implementations for only those interface methods that
-should be called in the code under test.  This will force a painc if any
+should be called in the code under test.  This will force a panic if any
 unexpected calls are made to FakeVoidMethod.
 */
 type FakeVoider struct {
@@ -45,7 +45,6 @@ func NewFakeVoiderDefaultPanic() *FakeVoider {
 	return &FakeVoider{
 		VoidMethodHook: func() {
 			panic("Unexpected call to Voider.VoidMethod")
-			return
 		},
 	}
 }
