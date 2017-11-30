@@ -44,7 +44,7 @@ func CheckOneUnsupported(t *testing.T) {
 	lname := strings.ToLower(name)
 	inputFilename := fmt.Sprintf("testdata/%s/%s_def.go", lname, lname)
 
-	g, err := parsePackage("testdata", []string{inputFilename})
+	g, err := parsePackage("testdata/"+lname, []string{inputFilename})
 	if err != nil {
 		t.Fatalf("parsePackage error: %s", err)
 	}
@@ -80,7 +80,7 @@ func CheckOneGolden(t *testing.T) {
 		outputFile = []byte{}
 	}
 
-	g, err := parsePackage("testdata", []string{inputFilename})
+	g, err := parsePackage("testdata/"+lname, []string{inputFilename})
 	if err != nil {
 		t.Fatalf("parsePackage error: %s", err)
 	}

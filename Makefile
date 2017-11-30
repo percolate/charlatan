@@ -41,6 +41,7 @@ charlatan:
 
 # Get the capitalized interface name from the filename and pass it to charlatan
 %.go: %_def.go
+	rm $@
 	iface=$(*F); ./charlatan -dir=testdata/$(*F) -output=$@ $${iface^}
 
 test: $(COVERAGE_DIR)
