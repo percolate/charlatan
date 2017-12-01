@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"io/ioutil"
 	"path"
 	"strings"
@@ -12,18 +13,20 @@ import (
 
 var (
 	golden = []string{
-		"Importer",
-		"Channeler",
-		"Voider",
-		"Namedvaluer",
-		"Multireturner",
-		"Variadic",
 		"Array",
-		"Pointer",
-		"Interfacer",
-		"Structer",
+		"Channeler",
 		"Embedder",
+		"Funcer",
+		"Interfacer",
+		"Importer",
+		"Mapper",
+		"Multireturner",
+		"Namedvaluer",
+		"Pointer",
 		"Qualifier",
+		"Structer",
+		"Variadic",
+		"Voider",
 	}
 	unsupported = []string{
 		"_",
@@ -40,9 +43,10 @@ func TestUnsupported(t *testing.T) {
 
 func CheckOneUnsupported(t *testing.T) {
 	name := path.Base(t.Name())
-	inputFilename := "testdata/" + strings.ToLower(name) + "_def.go"
+	lname := strings.ToLower(name)
+	inputFilename := fmt.Sprintf("testdata/%s/%s_def.go", lname, lname)
 
-	g, err := LoadPackageFiles([]string{inputFilename})
+	g, err := parsePackage("testdata/"+lname, []string{inputFilename})
 	if err != nil {
 		t.Fatalf("parsePackage error: %s", err)
 	}
@@ -64,20 +68,21 @@ func TestGolden(t *testing.T) {
 
 func CheckOneGolden(t *testing.T) {
 	name := path.Base(t.Name())
+	lname := strings.ToLower(name)
 
 	// reset gensyms
 	symGen.Reset()
 	identSymGen.Reset()
 
-	inputFilename := "./testdata/" + strings.ToLower(name) + "_def.go"
-	outputFilename := "./testdata/" + strings.ToLower(name) + ".go"
+	inputFilename := fmt.Sprintf("./testdata/%s/%s_def.go", lname, lname)
+	outputFilename := fmt.Sprintf("./testdata/%s/%s.go", lname, lname)
 
 	outputFile, err := ioutil.ReadFile(outputFilename)
 	if err != nil {
 		outputFile = []byte{}
 	}
 
-	g, err := LoadPackageFiles([]string{inputFilename})
+	g, err := parsePackage("testdata/"+lname, []string{inputFilename})
 	if err != nil {
 		t.Fatalf("parsePackage error: %s", err)
 	}
