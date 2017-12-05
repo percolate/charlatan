@@ -100,4 +100,6 @@ func main() {
 	if err := ioutil.WriteFile(*outputPath, src, 0644); err != nil {
 		log.Fatalf("error writing output: %s", err)
 	}
+
+	log.Printf("wrote %s\n", *outputPath)
 }
