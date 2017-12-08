@@ -76,6 +76,10 @@ func NewFakePointerDefaultError(t *testing.T) *FakePointer {
 	}
 }
 
+func (f *FakePointer) Reset() {
+	f.PointCalls = []*PointInvocation{}
+}
+
 func (_f1 *FakePointer) Point(ident1 *string) (ident2 int) {
 	invocation := new(PointInvocation)
 

@@ -165,6 +165,11 @@ func NewFakeStructerDefaultError(t *testing.T) *FakeStructer {
 	}
 }
 
+func (f *FakeStructer) Reset() {
+	f.StructCalls = []*StructInvocation{}
+	f.NamedStructCalls = []*NamedStructInvocation{}
+}
+
 func (_f1 *FakeStructer) Struct(ident1 struct {
 	a string
 	b string

@@ -96,6 +96,11 @@ func NewFakeVariadicDefaultError(t *testing.T) *FakeVariadic {
 	}
 }
 
+func (f *FakeVariadic) Reset() {
+	f.SingleVariadicCalls = []*SingleVariadicInvocation{}
+	f.MixedVariadicCalls = []*MixedVariadicInvocation{}
+}
+
 func (_f1 *FakeVariadic) SingleVariadic(a ...string) {
 	invocation := new(SingleVariadicInvocation)
 

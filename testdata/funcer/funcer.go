@@ -17,7 +17,7 @@ type FuncParameterInvocation struct {
 // FuncReturnInvocation represents a single call of FakeFuncer.FuncReturn
 type FuncReturnInvocation struct {
 	Results struct {
-		Ident2 func(string) string
+		Ident1 func(string) string
 	}
 }
 
@@ -59,7 +59,7 @@ func NewFakeFuncerDefaultPanic() *FakeFuncer {
 		FuncParameterHook: func(func(string) string) {
 			panic("Unexpected call to Funcer.FuncParameter")
 		},
-		FuncReturnHook: func() (ident2 func(string) string) {
+		FuncReturnHook: func() (ident1 func(string) string) {
 			panic("Unexpected call to Funcer.FuncReturn")
 		},
 	}
@@ -72,7 +72,7 @@ func NewFakeFuncerDefaultFatal(t *testing.T) *FakeFuncer {
 			t.Fatal("Unexpected call to Funcer.FuncParameter")
 			return
 		},
-		FuncReturnHook: func() (ident2 func(string) string) {
+		FuncReturnHook: func() (ident1 func(string) string) {
 			t.Fatal("Unexpected call to Funcer.FuncReturn")
 			return
 		},
@@ -86,11 +86,16 @@ func NewFakeFuncerDefaultError(t *testing.T) *FakeFuncer {
 			t.Error("Unexpected call to Funcer.FuncParameter")
 			return
 		},
-		FuncReturnHook: func() (ident2 func(string) string) {
+		FuncReturnHook: func() (ident1 func(string) string) {
 			t.Error("Unexpected call to Funcer.FuncReturn")
 			return
 		},
 	}
+}
+
+func (f *FakeFuncer) Reset() {
+	f.FuncParameterCalls = []*FuncParameterInvocation{}
+	f.FuncReturnCalls = []*FuncReturnInvocation{}
 }
 
 func (_f1 *FakeFuncer) FuncParameter(ident1 func(string) string) {
@@ -212,12 +217,12 @@ func (_f5 *FakeFuncer) AssertFuncParameterCalledOnceWith(t *testing.T, ident1 fu
 	}
 }
 
-func (_f6 *FakeFuncer) FuncReturn() (ident2 func(string) string) {
+func (_f6 *FakeFuncer) FuncReturn() (ident1 func(string) string) {
 	invocation := new(FuncReturnInvocation)
 
-	ident2 = _f6.FuncReturnHook()
+	ident1 = _f6.FuncReturnHook()
 
-	invocation.Results.Ident2 = ident2
+	invocation.Results.Ident1 = ident1
 
 	_f6.FuncReturnCalls = append(_f6.FuncReturnCalls, invocation)
 
