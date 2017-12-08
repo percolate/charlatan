@@ -82,6 +82,7 @@ func (i *Interface) addMethodFromField(field *ast.Field, imports *ImportSet) err
 		Name:      field.Names[0].Name,
 	}
 
+	identSymGen.Reset()
 	// `Params.List` can be 0-length, but `Results` can be nil
 	for _, parameter := range functionType.Params.List {
 		identifiers, err := extractIdentifiersFromField(parameter, imports)
