@@ -17,7 +17,7 @@ type MapParameterInvocation struct {
 // MapReturnInvocation represents a single call of FakeMapper.MapReturn
 type MapReturnInvocation struct {
 	Results struct {
-		Ident2 map[string]string
+		Ident1 map[string]string
 	}
 }
 
@@ -59,7 +59,7 @@ func NewFakeMapperDefaultPanic() *FakeMapper {
 		MapParameterHook: func(map[string]string) {
 			panic("Unexpected call to Mapper.MapParameter")
 		},
-		MapReturnHook: func() (ident2 map[string]string) {
+		MapReturnHook: func() (ident1 map[string]string) {
 			panic("Unexpected call to Mapper.MapReturn")
 		},
 	}
@@ -72,7 +72,7 @@ func NewFakeMapperDefaultFatal(t *testing.T) *FakeMapper {
 			t.Fatal("Unexpected call to Mapper.MapParameter")
 			return
 		},
-		MapReturnHook: func() (ident2 map[string]string) {
+		MapReturnHook: func() (ident1 map[string]string) {
 			t.Fatal("Unexpected call to Mapper.MapReturn")
 			return
 		},
@@ -86,11 +86,16 @@ func NewFakeMapperDefaultError(t *testing.T) *FakeMapper {
 			t.Error("Unexpected call to Mapper.MapParameter")
 			return
 		},
-		MapReturnHook: func() (ident2 map[string]string) {
+		MapReturnHook: func() (ident1 map[string]string) {
 			t.Error("Unexpected call to Mapper.MapReturn")
 			return
 		},
 	}
+}
+
+func (f *FakeMapper) Reset() {
+	f.MapParameterCalls = []*MapParameterInvocation{}
+	f.MapReturnCalls = []*MapReturnInvocation{}
 }
 
 func (_f1 *FakeMapper) MapParameter(ident1 map[string]string) {
@@ -212,12 +217,12 @@ func (_f5 *FakeMapper) AssertMapParameterCalledOnceWith(t *testing.T, ident1 map
 	}
 }
 
-func (_f6 *FakeMapper) MapReturn() (ident2 map[string]string) {
+func (_f6 *FakeMapper) MapReturn() (ident1 map[string]string) {
 	invocation := new(MapReturnInvocation)
 
-	ident2 = _f6.MapReturnHook()
+	ident1 = _f6.MapReturnHook()
 
-	invocation.Results.Ident2 = ident2
+	invocation.Results.Ident1 = ident1
 
 	_f6.MapReturnCalls = append(_f6.MapReturnCalls, invocation)
 

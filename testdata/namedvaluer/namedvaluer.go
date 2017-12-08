@@ -103,6 +103,11 @@ func NewFakeNamedvaluerDefaultError(t *testing.T) *FakeNamedvaluer {
 	}
 }
 
+func (f *FakeNamedvaluer) Reset() {
+	f.ManyNamedCalls = []*ManyNamedInvocation{}
+	f.NamedCalls = []*NamedInvocation{}
+}
+
 func (_f1 *FakeNamedvaluer) ManyNamed(a string, b string, f int, g int) (ret bool) {
 	invocation := new(ManyNamedInvocation)
 

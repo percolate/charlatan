@@ -17,21 +17,21 @@ type ArrayParameterInvocation struct {
 // ArrayReturnInvocation represents a single call of FakeArray.ArrayReturn
 type ArrayReturnInvocation struct {
 	Results struct {
-		Ident2 [3]string
+		Ident1 [3]string
 	}
 }
 
 // SliceParameterInvocation represents a single call of FakeArray.SliceParameter
 type SliceParameterInvocation struct {
 	Parameters struct {
-		Ident3 []string
+		Ident1 []string
 	}
 }
 
 // SliceReturnInvocation represents a single call of FakeArray.SliceReturn
 type SliceReturnInvocation struct {
 	Results struct {
-		Ident4 []string
+		Ident1 []string
 	}
 }
 
@@ -77,13 +77,13 @@ func NewFakeArrayDefaultPanic() *FakeArray {
 		ArrayParameterHook: func([3]string) {
 			panic("Unexpected call to Array.ArrayParameter")
 		},
-		ArrayReturnHook: func() (ident2 [3]string) {
+		ArrayReturnHook: func() (ident1 [3]string) {
 			panic("Unexpected call to Array.ArrayReturn")
 		},
 		SliceParameterHook: func([]string) {
 			panic("Unexpected call to Array.SliceParameter")
 		},
-		SliceReturnHook: func() (ident4 []string) {
+		SliceReturnHook: func() (ident1 []string) {
 			panic("Unexpected call to Array.SliceReturn")
 		},
 	}
@@ -96,7 +96,7 @@ func NewFakeArrayDefaultFatal(t *testing.T) *FakeArray {
 			t.Fatal("Unexpected call to Array.ArrayParameter")
 			return
 		},
-		ArrayReturnHook: func() (ident2 [3]string) {
+		ArrayReturnHook: func() (ident1 [3]string) {
 			t.Fatal("Unexpected call to Array.ArrayReturn")
 			return
 		},
@@ -104,7 +104,7 @@ func NewFakeArrayDefaultFatal(t *testing.T) *FakeArray {
 			t.Fatal("Unexpected call to Array.SliceParameter")
 			return
 		},
-		SliceReturnHook: func() (ident4 []string) {
+		SliceReturnHook: func() (ident1 []string) {
 			t.Fatal("Unexpected call to Array.SliceReturn")
 			return
 		},
@@ -118,7 +118,7 @@ func NewFakeArrayDefaultError(t *testing.T) *FakeArray {
 			t.Error("Unexpected call to Array.ArrayParameter")
 			return
 		},
-		ArrayReturnHook: func() (ident2 [3]string) {
+		ArrayReturnHook: func() (ident1 [3]string) {
 			t.Error("Unexpected call to Array.ArrayReturn")
 			return
 		},
@@ -126,11 +126,18 @@ func NewFakeArrayDefaultError(t *testing.T) *FakeArray {
 			t.Error("Unexpected call to Array.SliceParameter")
 			return
 		},
-		SliceReturnHook: func() (ident4 []string) {
+		SliceReturnHook: func() (ident1 []string) {
 			t.Error("Unexpected call to Array.SliceReturn")
 			return
 		},
 	}
+}
+
+func (f *FakeArray) Reset() {
+	f.ArrayParameterCalls = []*ArrayParameterInvocation{}
+	f.ArrayReturnCalls = []*ArrayReturnInvocation{}
+	f.SliceParameterCalls = []*SliceParameterInvocation{}
+	f.SliceReturnCalls = []*SliceReturnInvocation{}
 }
 
 func (_f1 *FakeArray) ArrayParameter(ident1 [3]string) {
@@ -252,12 +259,12 @@ func (_f5 *FakeArray) AssertArrayParameterCalledOnceWith(t *testing.T, ident1 [3
 	}
 }
 
-func (_f6 *FakeArray) ArrayReturn() (ident2 [3]string) {
+func (_f6 *FakeArray) ArrayReturn() (ident1 [3]string) {
 	invocation := new(ArrayReturnInvocation)
 
-	ident2 = _f6.ArrayReturnHook()
+	ident1 = _f6.ArrayReturnHook()
 
-	invocation.Results.Ident2 = ident2
+	invocation.Results.Ident1 = ident1
 
 	_f6.ArrayReturnCalls = append(_f6.ArrayReturnCalls, invocation)
 
@@ -316,12 +323,12 @@ func (f *FakeArray) AssertArrayReturnCalledN(t *testing.T, n int) {
 	}
 }
 
-func (_f7 *FakeArray) SliceParameter(ident3 []string) {
+func (_f7 *FakeArray) SliceParameter(ident1 []string) {
 	invocation := new(SliceParameterInvocation)
 
-	invocation.Parameters.Ident3 = ident3
+	invocation.Parameters.Ident1 = ident1
 
-	_f7.SliceParameterHook(ident3)
+	_f7.SliceParameterHook(ident1)
 
 	_f7.SliceParameterCalls = append(_f7.SliceParameterCalls, invocation)
 
@@ -381,9 +388,9 @@ func (f *FakeArray) AssertSliceParameterCalledN(t *testing.T, n int) {
 }
 
 // SliceParameterCalledWith returns true if FakeArray.SliceParameter was called with the given values
-func (_f8 *FakeArray) SliceParameterCalledWith(ident3 []string) (found bool) {
+func (_f8 *FakeArray) SliceParameterCalledWith(ident1 []string) (found bool) {
 	for _, call := range _f8.SliceParameterCalls {
-		if reflect.DeepEqual(call.Parameters.Ident3, ident3) {
+		if reflect.DeepEqual(call.Parameters.Ident1, ident1) {
 			found = true
 			break
 		}
@@ -393,11 +400,11 @@ func (_f8 *FakeArray) SliceParameterCalledWith(ident3 []string) (found bool) {
 }
 
 // AssertSliceParameterCalledWith calls t.Error if FakeArray.SliceParameter was not called with the given values
-func (_f9 *FakeArray) AssertSliceParameterCalledWith(t *testing.T, ident3 []string) {
+func (_f9 *FakeArray) AssertSliceParameterCalledWith(t *testing.T, ident1 []string) {
 	t.Helper()
 	var found bool
 	for _, call := range _f9.SliceParameterCalls {
-		if reflect.DeepEqual(call.Parameters.Ident3, ident3) {
+		if reflect.DeepEqual(call.Parameters.Ident1, ident1) {
 			found = true
 			break
 		}
@@ -409,10 +416,10 @@ func (_f9 *FakeArray) AssertSliceParameterCalledWith(t *testing.T, ident3 []stri
 }
 
 // SliceParameterCalledOnceWith returns true if FakeArray.SliceParameter was called exactly once with the given values
-func (_f10 *FakeArray) SliceParameterCalledOnceWith(ident3 []string) bool {
+func (_f10 *FakeArray) SliceParameterCalledOnceWith(ident1 []string) bool {
 	var count int
 	for _, call := range _f10.SliceParameterCalls {
-		if reflect.DeepEqual(call.Parameters.Ident3, ident3) {
+		if reflect.DeepEqual(call.Parameters.Ident1, ident1) {
 			count++
 		}
 	}
@@ -421,11 +428,11 @@ func (_f10 *FakeArray) SliceParameterCalledOnceWith(ident3 []string) bool {
 }
 
 // AssertSliceParameterCalledOnceWith calls t.Error if FakeArray.SliceParameter was not called exactly once with the given values
-func (_f11 *FakeArray) AssertSliceParameterCalledOnceWith(t *testing.T, ident3 []string) {
+func (_f11 *FakeArray) AssertSliceParameterCalledOnceWith(t *testing.T, ident1 []string) {
 	t.Helper()
 	var count int
 	for _, call := range _f11.SliceParameterCalls {
-		if reflect.DeepEqual(call.Parameters.Ident3, ident3) {
+		if reflect.DeepEqual(call.Parameters.Ident1, ident1) {
 			count++
 		}
 	}
@@ -435,12 +442,12 @@ func (_f11 *FakeArray) AssertSliceParameterCalledOnceWith(t *testing.T, ident3 [
 	}
 }
 
-func (_f12 *FakeArray) SliceReturn() (ident4 []string) {
+func (_f12 *FakeArray) SliceReturn() (ident1 []string) {
 	invocation := new(SliceReturnInvocation)
 
-	ident4 = _f12.SliceReturnHook()
+	ident1 = _f12.SliceReturnHook()
 
-	invocation.Results.Ident4 = ident4
+	invocation.Results.Ident1 = ident1
 
 	_f12.SliceReturnCalls = append(_f12.SliceReturnCalls, invocation)
 

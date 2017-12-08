@@ -101,5 +101,9 @@ func main() {
 		log.Fatalf("error writing output: %s", err)
 	}
 
-	log.Printf("wrote %s\n", *outputPath)
+	out, err := filepath.Abs(*outputPath)
+	if err != nil {
+		out = *outputPath
+	}
+	log.Printf("wrote %s\n", out)
 }

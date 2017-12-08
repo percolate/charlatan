@@ -69,6 +69,10 @@ func NewFakeVoiderDefaultError(t *testing.T) *FakeVoider {
 	}
 }
 
+func (f *FakeVoider) Reset() {
+	f.VoidMethodCalls = []*VoidMethodInvocation{}
+}
+
 func (_f1 *FakeVoider) VoidMethod() {
 	invocation := new(VoidMethodInvocation)
 

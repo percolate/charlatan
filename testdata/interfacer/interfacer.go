@@ -99,6 +99,11 @@ func NewFakeInterfacerDefaultError(t *testing.T) *FakeInterfacer {
 	}
 }
 
+func (f *FakeInterfacer) Reset() {
+	f.InterfaceCalls = []*InterfaceInvocation{}
+	f.NamedInterfaceCalls = []*NamedInterfaceInvocation{}
+}
+
 func (_f1 *FakeInterfacer) Interface(ident1 interface{}) (ident2 interface{}) {
 	invocation := new(InterfaceInvocation)
 

@@ -96,6 +96,11 @@ func NewFakeMultireturnerDefaultError(t *testing.T) *FakeMultireturner {
 	}
 }
 
+func (f *FakeMultireturner) Reset() {
+	f.MultiReturnCalls = []*MultiReturnInvocation{}
+	f.NamedReturnCalls = []*NamedReturnInvocation{}
+}
+
 func (_f1 *FakeMultireturner) MultiReturn() (ident1 string, ident2 int) {
 	invocation := new(MultiReturnInvocation)
 
