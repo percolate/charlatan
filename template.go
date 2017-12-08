@@ -94,6 +94,10 @@ func NewFake{{.Name}}DefaultError(t *testing.T) *Fake{{.Name}} {
 	}
 }
 
+func (f *Fake{{.Name}}) Reset() {
+{{range .Methods}} f.{{.Name}}Calls = []*{{.Name}}Invocation{}
+{{end}}}
+
 {{range $m := .Methods}}
 {{with $f := gensym}}func ({{$f}} *Fake{{$m.Interface}}) {{$m.Name}}({{$m.ParametersDeclaration}}) ({{$m.ResultsDeclaration}}) {
 	invocation := new({{$m.Name}}Invocation)
