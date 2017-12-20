@@ -7,8 +7,8 @@ import (
 	"testing"
 )
 
-// InterfaceInvocation represents a single call of FakeInterfacer.Interface
-type InterfaceInvocation struct {
+// InterfacerInterfaceInvocation represents a single call of FakeInterfacer.Interface
+type InterfacerInterfaceInvocation struct {
 	Parameters struct {
 		Ident1 interface{}
 	}
@@ -17,8 +17,8 @@ type InterfaceInvocation struct {
 	}
 }
 
-// NamedInterfaceInvocation represents a single call of FakeInterfacer.NamedInterface
-type NamedInterfaceInvocation struct {
+// InterfacerNamedInterfaceInvocation represents a single call of FakeInterfacer.NamedInterface
+type InterfacerNamedInterfaceInvocation struct {
 	Parameters struct {
 		A interface{}
 	}
@@ -55,8 +55,8 @@ type FakeInterfacer struct {
 	InterfaceHook      func(interface{}) interface{}
 	NamedInterfaceHook func(interface{}) interface{}
 
-	InterfaceCalls      []*InterfaceInvocation
-	NamedInterfaceCalls []*NamedInterfaceInvocation
+	InterfaceCalls      []*InterfacerInterfaceInvocation
+	NamedInterfaceCalls []*InterfacerNamedInterfaceInvocation
 }
 
 // NewFakeInterfacerDefaultPanic returns an instance of FakeInterfacer with all hooks configured to panic
@@ -100,12 +100,12 @@ func NewFakeInterfacerDefaultError(t *testing.T) *FakeInterfacer {
 }
 
 func (f *FakeInterfacer) Reset() {
-	f.InterfaceCalls = []*InterfaceInvocation{}
-	f.NamedInterfaceCalls = []*NamedInterfaceInvocation{}
+	f.InterfaceCalls = []*InterfacerInterfaceInvocation{}
+	f.NamedInterfaceCalls = []*InterfacerNamedInterfaceInvocation{}
 }
 
 func (_f1 *FakeInterfacer) Interface(ident1 interface{}) (ident2 interface{}) {
-	invocation := new(InterfaceInvocation)
+	invocation := new(InterfacerInterfaceInvocation)
 
 	invocation.Parameters.Ident1 = ident1
 
@@ -239,7 +239,7 @@ func (_f6 *FakeInterfacer) InterfaceResultsForCall(ident1 interface{}) (ident2 i
 }
 
 func (_f7 *FakeInterfacer) NamedInterface(a interface{}) (z interface{}) {
-	invocation := new(NamedInterfaceInvocation)
+	invocation := new(InterfacerNamedInterfaceInvocation)
 
 	invocation.Parameters.A = a
 

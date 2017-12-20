@@ -7,8 +7,8 @@ import (
 	"testing"
 )
 
-// StructInvocation represents a single call of FakeStructer.Struct
-type StructInvocation struct {
+// StructerStructInvocation represents a single call of FakeStructer.Struct
+type StructerStructInvocation struct {
 	Parameters struct {
 		Ident1 struct {
 			a string
@@ -23,8 +23,8 @@ type StructInvocation struct {
 	}
 }
 
-// NamedStructInvocation represents a single call of FakeStructer.NamedStruct
-type NamedStructInvocation struct {
+// StructerNamedStructInvocation represents a single call of FakeStructer.NamedStruct
+type StructerNamedStructInvocation struct {
 	Parameters struct {
 		A struct {
 			a string
@@ -85,8 +85,8 @@ type FakeStructer struct {
 		d string
 	}
 
-	StructCalls      []*StructInvocation
-	NamedStructCalls []*NamedStructInvocation
+	StructCalls      []*StructerStructInvocation
+	NamedStructCalls []*StructerNamedStructInvocation
 }
 
 // NewFakeStructerDefaultPanic returns an instance of FakeStructer with all hooks configured to panic
@@ -166,8 +166,8 @@ func NewFakeStructerDefaultError(t *testing.T) *FakeStructer {
 }
 
 func (f *FakeStructer) Reset() {
-	f.StructCalls = []*StructInvocation{}
-	f.NamedStructCalls = []*NamedStructInvocation{}
+	f.StructCalls = []*StructerStructInvocation{}
+	f.NamedStructCalls = []*StructerNamedStructInvocation{}
 }
 
 func (_f1 *FakeStructer) Struct(ident1 struct {
@@ -177,7 +177,7 @@ func (_f1 *FakeStructer) Struct(ident1 struct {
 	c string
 	d string
 }) {
-	invocation := new(StructInvocation)
+	invocation := new(StructerStructInvocation)
 
 	invocation.Parameters.Ident1 = ident1
 
@@ -335,7 +335,7 @@ func (_f7 *FakeStructer) NamedStruct(a struct {
 	c string
 	d string
 }) {
-	invocation := new(NamedStructInvocation)
+	invocation := new(StructerNamedStructInvocation)
 
 	invocation.Parameters.A = a
 

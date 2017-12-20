@@ -7,15 +7,15 @@ import (
 	"testing"
 )
 
-// SingleVariadicInvocation represents a single call of FakeVariadic.SingleVariadic
-type SingleVariadicInvocation struct {
+// VariadicSingleVariadicInvocation represents a single call of FakeVariadic.SingleVariadic
+type VariadicSingleVariadicInvocation struct {
 	Parameters struct {
 		A []string
 	}
 }
 
-// MixedVariadicInvocation represents a single call of FakeVariadic.MixedVariadic
-type MixedVariadicInvocation struct {
+// VariadicMixedVariadicInvocation represents a single call of FakeVariadic.MixedVariadic
+type VariadicMixedVariadicInvocation struct {
 	Parameters struct {
 		A int
 		B int
@@ -52,8 +52,8 @@ type FakeVariadic struct {
 	SingleVariadicHook func(...string)
 	MixedVariadicHook  func(int, int, int, ...string)
 
-	SingleVariadicCalls []*SingleVariadicInvocation
-	MixedVariadicCalls  []*MixedVariadicInvocation
+	SingleVariadicCalls []*VariadicSingleVariadicInvocation
+	MixedVariadicCalls  []*VariadicMixedVariadicInvocation
 }
 
 // NewFakeVariadicDefaultPanic returns an instance of FakeVariadic with all hooks configured to panic
@@ -97,12 +97,12 @@ func NewFakeVariadicDefaultError(t *testing.T) *FakeVariadic {
 }
 
 func (f *FakeVariadic) Reset() {
-	f.SingleVariadicCalls = []*SingleVariadicInvocation{}
-	f.MixedVariadicCalls = []*MixedVariadicInvocation{}
+	f.SingleVariadicCalls = []*VariadicSingleVariadicInvocation{}
+	f.MixedVariadicCalls = []*VariadicMixedVariadicInvocation{}
 }
 
 func (_f1 *FakeVariadic) SingleVariadic(a ...string) {
-	invocation := new(SingleVariadicInvocation)
+	invocation := new(VariadicSingleVariadicInvocation)
 
 	invocation.Parameters.A = a
 
@@ -221,7 +221,7 @@ func (_f5 *FakeVariadic) AssertSingleVariadicCalledOnceWith(t *testing.T, a ...s
 }
 
 func (_f6 *FakeVariadic) MixedVariadic(a int, b int, c int, d ...string) {
-	invocation := new(MixedVariadicInvocation)
+	invocation := new(VariadicMixedVariadicInvocation)
 
 	invocation.Parameters.A = a
 	invocation.Parameters.B = b

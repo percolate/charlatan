@@ -8,8 +8,8 @@ import (
 	"testing"
 )
 
-// QualifyInvocation represents a single call of FakeQualifier.Qualify
-type QualifyInvocation struct {
+// QualifierQualifyInvocation represents a single call of FakeQualifier.Qualify
+type QualifierQualifyInvocation struct {
 	Parameters struct {
 		Ident1 fmt.Scanner
 	}
@@ -18,8 +18,8 @@ type QualifyInvocation struct {
 	}
 }
 
-// NamedQualifyInvocation represents a single call of FakeQualifier.NamedQualify
-type NamedQualifyInvocation struct {
+// QualifierNamedQualifyInvocation represents a single call of FakeQualifier.NamedQualify
+type QualifierNamedQualifyInvocation struct {
 	Parameters struct {
 		A fmt.Scanner
 		B fmt.Scanner
@@ -58,8 +58,8 @@ type FakeQualifier struct {
 	QualifyHook      func(fmt.Scanner) fmt.Scanner
 	NamedQualifyHook func(fmt.Scanner, fmt.Scanner, fmt.Scanner) fmt.Scanner
 
-	QualifyCalls      []*QualifyInvocation
-	NamedQualifyCalls []*NamedQualifyInvocation
+	QualifyCalls      []*QualifierQualifyInvocation
+	NamedQualifyCalls []*QualifierNamedQualifyInvocation
 }
 
 // NewFakeQualifierDefaultPanic returns an instance of FakeQualifier with all hooks configured to panic
@@ -103,12 +103,12 @@ func NewFakeQualifierDefaultError(t *testing.T) *FakeQualifier {
 }
 
 func (f *FakeQualifier) Reset() {
-	f.QualifyCalls = []*QualifyInvocation{}
-	f.NamedQualifyCalls = []*NamedQualifyInvocation{}
+	f.QualifyCalls = []*QualifierQualifyInvocation{}
+	f.NamedQualifyCalls = []*QualifierNamedQualifyInvocation{}
 }
 
 func (_f1 *FakeQualifier) Qualify(ident1 fmt.Scanner) (ident2 fmt.Scanner) {
-	invocation := new(QualifyInvocation)
+	invocation := new(QualifierQualifyInvocation)
 
 	invocation.Parameters.Ident1 = ident1
 
@@ -242,7 +242,7 @@ func (_f6 *FakeQualifier) QualifyResultsForCall(ident1 fmt.Scanner) (ident2 fmt.
 }
 
 func (_f7 *FakeQualifier) NamedQualify(a fmt.Scanner, b fmt.Scanner, c fmt.Scanner) (d fmt.Scanner) {
-	invocation := new(NamedQualifyInvocation)
+	invocation := new(QualifierNamedQualifyInvocation)
 
 	invocation.Parameters.A = a
 	invocation.Parameters.B = b

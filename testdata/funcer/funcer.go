@@ -7,15 +7,15 @@ import (
 	"testing"
 )
 
-// FuncParameterInvocation represents a single call of FakeFuncer.FuncParameter
-type FuncParameterInvocation struct {
+// FuncerFuncParameterInvocation represents a single call of FakeFuncer.FuncParameter
+type FuncerFuncParameterInvocation struct {
 	Parameters struct {
 		Ident1 func(string) string
 	}
 }
 
-// FuncReturnInvocation represents a single call of FakeFuncer.FuncReturn
-type FuncReturnInvocation struct {
+// FuncerFuncReturnInvocation represents a single call of FakeFuncer.FuncReturn
+type FuncerFuncReturnInvocation struct {
 	Results struct {
 		Ident1 func(string) string
 	}
@@ -49,8 +49,8 @@ type FakeFuncer struct {
 	FuncParameterHook func(func(string) string)
 	FuncReturnHook    func() func(string) string
 
-	FuncParameterCalls []*FuncParameterInvocation
-	FuncReturnCalls    []*FuncReturnInvocation
+	FuncParameterCalls []*FuncerFuncParameterInvocation
+	FuncReturnCalls    []*FuncerFuncReturnInvocation
 }
 
 // NewFakeFuncerDefaultPanic returns an instance of FakeFuncer with all hooks configured to panic
@@ -94,12 +94,12 @@ func NewFakeFuncerDefaultError(t *testing.T) *FakeFuncer {
 }
 
 func (f *FakeFuncer) Reset() {
-	f.FuncParameterCalls = []*FuncParameterInvocation{}
-	f.FuncReturnCalls = []*FuncReturnInvocation{}
+	f.FuncParameterCalls = []*FuncerFuncParameterInvocation{}
+	f.FuncReturnCalls = []*FuncerFuncReturnInvocation{}
 }
 
 func (_f1 *FakeFuncer) FuncParameter(ident1 func(string) string) {
-	invocation := new(FuncParameterInvocation)
+	invocation := new(FuncerFuncParameterInvocation)
 
 	invocation.Parameters.Ident1 = ident1
 
@@ -218,7 +218,7 @@ func (_f5 *FakeFuncer) AssertFuncParameterCalledOnceWith(t *testing.T, ident1 fu
 }
 
 func (_f6 *FakeFuncer) FuncReturn() (ident1 func(string) string) {
-	invocation := new(FuncReturnInvocation)
+	invocation := new(FuncerFuncReturnInvocation)
 
 	ident1 = _f6.FuncReturnHook()
 

@@ -6,16 +6,16 @@ import (
 	"testing"
 )
 
-// MultiReturnInvocation represents a single call of FakeMultireturner.MultiReturn
-type MultiReturnInvocation struct {
+// MultireturnerMultiReturnInvocation represents a single call of FakeMultireturner.MultiReturn
+type MultireturnerMultiReturnInvocation struct {
 	Results struct {
 		Ident1 string
 		Ident2 int
 	}
 }
 
-// NamedReturnInvocation represents a single call of FakeMultireturner.NamedReturn
-type NamedReturnInvocation struct {
+// MultireturnerNamedReturnInvocation represents a single call of FakeMultireturner.NamedReturn
+type MultireturnerNamedReturnInvocation struct {
 	Results struct {
 		A int
 		B int
@@ -52,8 +52,8 @@ type FakeMultireturner struct {
 	MultiReturnHook func() (string, int)
 	NamedReturnHook func() (int, int, int, int)
 
-	MultiReturnCalls []*MultiReturnInvocation
-	NamedReturnCalls []*NamedReturnInvocation
+	MultiReturnCalls []*MultireturnerMultiReturnInvocation
+	NamedReturnCalls []*MultireturnerNamedReturnInvocation
 }
 
 // NewFakeMultireturnerDefaultPanic returns an instance of FakeMultireturner with all hooks configured to panic
@@ -97,12 +97,12 @@ func NewFakeMultireturnerDefaultError(t *testing.T) *FakeMultireturner {
 }
 
 func (f *FakeMultireturner) Reset() {
-	f.MultiReturnCalls = []*MultiReturnInvocation{}
-	f.NamedReturnCalls = []*NamedReturnInvocation{}
+	f.MultiReturnCalls = []*MultireturnerMultiReturnInvocation{}
+	f.NamedReturnCalls = []*MultireturnerNamedReturnInvocation{}
 }
 
 func (_f1 *FakeMultireturner) MultiReturn() (ident1 string, ident2 int) {
-	invocation := new(MultiReturnInvocation)
+	invocation := new(MultireturnerMultiReturnInvocation)
 
 	ident1, ident2 = _f1.MultiReturnHook()
 
@@ -167,7 +167,7 @@ func (f *FakeMultireturner) AssertMultiReturnCalledN(t *testing.T, n int) {
 }
 
 func (_f2 *FakeMultireturner) NamedReturn() (a int, b int, c int, d int) {
-	invocation := new(NamedReturnInvocation)
+	invocation := new(MultireturnerNamedReturnInvocation)
 
 	a, b, c, d = _f2.NamedReturnHook()
 
