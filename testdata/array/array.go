@@ -7,29 +7,29 @@ import (
 	"testing"
 )
 
-// ArrayParameterInvocation represents a single call of FakeArray.ArrayParameter
-type ArrayParameterInvocation struct {
+// ArrayArrayParameterInvocation represents a single call of FakeArray.ArrayParameter
+type ArrayArrayParameterInvocation struct {
 	Parameters struct {
 		Ident1 [3]string
 	}
 }
 
-// ArrayReturnInvocation represents a single call of FakeArray.ArrayReturn
-type ArrayReturnInvocation struct {
+// ArrayArrayReturnInvocation represents a single call of FakeArray.ArrayReturn
+type ArrayArrayReturnInvocation struct {
 	Results struct {
 		Ident1 [3]string
 	}
 }
 
-// SliceParameterInvocation represents a single call of FakeArray.SliceParameter
-type SliceParameterInvocation struct {
+// ArraySliceParameterInvocation represents a single call of FakeArray.SliceParameter
+type ArraySliceParameterInvocation struct {
 	Parameters struct {
 		Ident1 []string
 	}
 }
 
-// SliceReturnInvocation represents a single call of FakeArray.SliceReturn
-type SliceReturnInvocation struct {
+// ArraySliceReturnInvocation represents a single call of FakeArray.SliceReturn
+type ArraySliceReturnInvocation struct {
 	Results struct {
 		Ident1 []string
 	}
@@ -65,10 +65,10 @@ type FakeArray struct {
 	SliceParameterHook func([]string)
 	SliceReturnHook    func() []string
 
-	ArrayParameterCalls []*ArrayParameterInvocation
-	ArrayReturnCalls    []*ArrayReturnInvocation
-	SliceParameterCalls []*SliceParameterInvocation
-	SliceReturnCalls    []*SliceReturnInvocation
+	ArrayParameterCalls []*ArrayArrayParameterInvocation
+	ArrayReturnCalls    []*ArrayArrayReturnInvocation
+	SliceParameterCalls []*ArraySliceParameterInvocation
+	SliceReturnCalls    []*ArraySliceReturnInvocation
 }
 
 // NewFakeArrayDefaultPanic returns an instance of FakeArray with all hooks configured to panic
@@ -134,14 +134,14 @@ func NewFakeArrayDefaultError(t *testing.T) *FakeArray {
 }
 
 func (f *FakeArray) Reset() {
-	f.ArrayParameterCalls = []*ArrayParameterInvocation{}
-	f.ArrayReturnCalls = []*ArrayReturnInvocation{}
-	f.SliceParameterCalls = []*SliceParameterInvocation{}
-	f.SliceReturnCalls = []*SliceReturnInvocation{}
+	f.ArrayParameterCalls = []*ArrayArrayParameterInvocation{}
+	f.ArrayReturnCalls = []*ArrayArrayReturnInvocation{}
+	f.SliceParameterCalls = []*ArraySliceParameterInvocation{}
+	f.SliceReturnCalls = []*ArraySliceReturnInvocation{}
 }
 
 func (_f1 *FakeArray) ArrayParameter(ident1 [3]string) {
-	invocation := new(ArrayParameterInvocation)
+	invocation := new(ArrayArrayParameterInvocation)
 
 	invocation.Parameters.Ident1 = ident1
 
@@ -260,7 +260,7 @@ func (_f5 *FakeArray) AssertArrayParameterCalledOnceWith(t *testing.T, ident1 [3
 }
 
 func (_f6 *FakeArray) ArrayReturn() (ident1 [3]string) {
-	invocation := new(ArrayReturnInvocation)
+	invocation := new(ArrayArrayReturnInvocation)
 
 	ident1 = _f6.ArrayReturnHook()
 
@@ -324,7 +324,7 @@ func (f *FakeArray) AssertArrayReturnCalledN(t *testing.T, n int) {
 }
 
 func (_f7 *FakeArray) SliceParameter(ident1 []string) {
-	invocation := new(SliceParameterInvocation)
+	invocation := new(ArraySliceParameterInvocation)
 
 	invocation.Parameters.Ident1 = ident1
 
@@ -443,7 +443,7 @@ func (_f11 *FakeArray) AssertSliceParameterCalledOnceWith(t *testing.T, ident1 [
 }
 
 func (_f12 *FakeArray) SliceReturn() (ident1 []string) {
-	invocation := new(SliceReturnInvocation)
+	invocation := new(ArraySliceReturnInvocation)
 
 	ident1 = _f12.SliceReturnHook()
 

@@ -6,8 +6,8 @@ import (
 	"testing"
 )
 
-// VoidMethodInvocation represents a single call of FakeVoider.VoidMethod
-type VoidMethodInvocation struct {
+// VoiderVoidMethodInvocation represents a single call of FakeVoider.VoidMethod
+type VoiderVoidMethodInvocation struct {
 }
 
 /*
@@ -37,7 +37,7 @@ unexpected calls are made to FakeVoidMethod.
 type FakeVoider struct {
 	VoidMethodHook func()
 
-	VoidMethodCalls []*VoidMethodInvocation
+	VoidMethodCalls []*VoiderVoidMethodInvocation
 }
 
 // NewFakeVoiderDefaultPanic returns an instance of FakeVoider with all hooks configured to panic
@@ -70,11 +70,11 @@ func NewFakeVoiderDefaultError(t *testing.T) *FakeVoider {
 }
 
 func (f *FakeVoider) Reset() {
-	f.VoidMethodCalls = []*VoidMethodInvocation{}
+	f.VoidMethodCalls = []*VoiderVoidMethodInvocation{}
 }
 
 func (_f1 *FakeVoider) VoidMethod() {
-	invocation := new(VoidMethodInvocation)
+	invocation := new(VoiderVoidMethodInvocation)
 
 	_f1.VoidMethodHook()
 

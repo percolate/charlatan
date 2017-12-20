@@ -7,8 +7,8 @@ import (
 	"testing"
 )
 
-// ChannelInvocation represents a single call of FakeChanneler.Channel
-type ChannelInvocation struct {
+// ChannelerChannelInvocation represents a single call of FakeChanneler.Channel
+type ChannelerChannelInvocation struct {
 	Parameters struct {
 		Ident1 chan int
 	}
@@ -17,8 +17,8 @@ type ChannelInvocation struct {
 	}
 }
 
-// ChannelReceiveInvocation represents a single call of FakeChanneler.ChannelReceive
-type ChannelReceiveInvocation struct {
+// ChannelerChannelReceiveInvocation represents a single call of FakeChanneler.ChannelReceive
+type ChannelerChannelReceiveInvocation struct {
 	Parameters struct {
 		Ident1 <-chan int
 	}
@@ -27,8 +27,8 @@ type ChannelReceiveInvocation struct {
 	}
 }
 
-// ChannelSendInvocation represents a single call of FakeChanneler.ChannelSend
-type ChannelSendInvocation struct {
+// ChannelerChannelSendInvocation represents a single call of FakeChanneler.ChannelSend
+type ChannelerChannelSendInvocation struct {
 	Parameters struct {
 		Ident1 chan<- int
 	}
@@ -37,8 +37,8 @@ type ChannelSendInvocation struct {
 	}
 }
 
-// ChannelPointerInvocation represents a single call of FakeChanneler.ChannelPointer
-type ChannelPointerInvocation struct {
+// ChannelerChannelPointerInvocation represents a single call of FakeChanneler.ChannelPointer
+type ChannelerChannelPointerInvocation struct {
 	Parameters struct {
 		Ident1 *chan int
 	}
@@ -47,8 +47,8 @@ type ChannelPointerInvocation struct {
 	}
 }
 
-// ChannelInterfaceInvocation represents a single call of FakeChanneler.ChannelInterface
-type ChannelInterfaceInvocation struct {
+// ChannelerChannelInterfaceInvocation represents a single call of FakeChanneler.ChannelInterface
+type ChannelerChannelInterfaceInvocation struct {
 	Parameters struct {
 		Ident1 chan interface{}
 	}
@@ -88,11 +88,11 @@ type FakeChanneler struct {
 	ChannelPointerHook   func(*chan int) *chan int
 	ChannelInterfaceHook func(chan interface{}) chan interface{}
 
-	ChannelCalls          []*ChannelInvocation
-	ChannelReceiveCalls   []*ChannelReceiveInvocation
-	ChannelSendCalls      []*ChannelSendInvocation
-	ChannelPointerCalls   []*ChannelPointerInvocation
-	ChannelInterfaceCalls []*ChannelInterfaceInvocation
+	ChannelCalls          []*ChannelerChannelInvocation
+	ChannelReceiveCalls   []*ChannelerChannelReceiveInvocation
+	ChannelSendCalls      []*ChannelerChannelSendInvocation
+	ChannelPointerCalls   []*ChannelerChannelPointerInvocation
+	ChannelInterfaceCalls []*ChannelerChannelInterfaceInvocation
 }
 
 // NewFakeChannelerDefaultPanic returns an instance of FakeChanneler with all hooks configured to panic
@@ -169,15 +169,15 @@ func NewFakeChannelerDefaultError(t *testing.T) *FakeChanneler {
 }
 
 func (f *FakeChanneler) Reset() {
-	f.ChannelCalls = []*ChannelInvocation{}
-	f.ChannelReceiveCalls = []*ChannelReceiveInvocation{}
-	f.ChannelSendCalls = []*ChannelSendInvocation{}
-	f.ChannelPointerCalls = []*ChannelPointerInvocation{}
-	f.ChannelInterfaceCalls = []*ChannelInterfaceInvocation{}
+	f.ChannelCalls = []*ChannelerChannelInvocation{}
+	f.ChannelReceiveCalls = []*ChannelerChannelReceiveInvocation{}
+	f.ChannelSendCalls = []*ChannelerChannelSendInvocation{}
+	f.ChannelPointerCalls = []*ChannelerChannelPointerInvocation{}
+	f.ChannelInterfaceCalls = []*ChannelerChannelInterfaceInvocation{}
 }
 
 func (_f1 *FakeChanneler) Channel(ident1 chan int) (ident2 chan int) {
-	invocation := new(ChannelInvocation)
+	invocation := new(ChannelerChannelInvocation)
 
 	invocation.Parameters.Ident1 = ident1
 
@@ -311,7 +311,7 @@ func (_f6 *FakeChanneler) ChannelResultsForCall(ident1 chan int) (ident2 chan in
 }
 
 func (_f7 *FakeChanneler) ChannelReceive(ident1 <-chan int) (ident2 <-chan int) {
-	invocation := new(ChannelReceiveInvocation)
+	invocation := new(ChannelerChannelReceiveInvocation)
 
 	invocation.Parameters.Ident1 = ident1
 
@@ -445,7 +445,7 @@ func (_f12 *FakeChanneler) ChannelReceiveResultsForCall(ident1 <-chan int) (iden
 }
 
 func (_f13 *FakeChanneler) ChannelSend(ident1 chan<- int) (ident2 chan<- int) {
-	invocation := new(ChannelSendInvocation)
+	invocation := new(ChannelerChannelSendInvocation)
 
 	invocation.Parameters.Ident1 = ident1
 
@@ -579,7 +579,7 @@ func (_f18 *FakeChanneler) ChannelSendResultsForCall(ident1 chan<- int) (ident2 
 }
 
 func (_f19 *FakeChanneler) ChannelPointer(ident1 *chan int) (ident2 *chan int) {
-	invocation := new(ChannelPointerInvocation)
+	invocation := new(ChannelerChannelPointerInvocation)
 
 	invocation.Parameters.Ident1 = ident1
 
@@ -713,7 +713,7 @@ func (_f24 *FakeChanneler) ChannelPointerResultsForCall(ident1 *chan int) (ident
 }
 
 func (_f25 *FakeChanneler) ChannelInterface(ident1 chan interface{}) (ident2 chan interface{}) {
-	invocation := new(ChannelInterfaceInvocation)
+	invocation := new(ChannelerChannelInterfaceInvocation)
 
 	invocation.Parameters.Ident1 = ident1
 

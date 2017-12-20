@@ -19,8 +19,8 @@ import (
 {{end}}
 )
 {{range .Interfaces}}{{range .Methods}}
-// {{.Name}}Invocation represents a single call of Fake{{.Interface}}.{{.Name}}
-type {{.Name}}Invocation struct {
+// {{.Interface}}{{.Name}}Invocation represents a single call of Fake{{.Interface}}.{{.Name}}
+type {{.Interface}}{{.Name}}Invocation struct {
 {{if .Parameters}}	Parameters struct {
 {{range .Parameters}}	{{.FieldFormat}}
 {{end}}
@@ -59,7 +59,7 @@ unexpected calls are made to Fake{{.Name}}.
 type Fake{{.Name}} struct {
 {{range .Methods}} {{.Name}}Hook func({{.ParametersSignature}}) ({{.ResultsSignature}})
 {{end}}
-{{range .Methods}} {{.Name}}Calls []*{{.Name}}Invocation
+{{range .Methods}} {{.Name}}Calls []*{{.Interface}}{{.Name}}Invocation
 {{end}}}
 
 // NewFake{{.Name}}DefaultPanic returns an instance of Fake{{.Name}} with all hooks configured to panic
@@ -95,12 +95,12 @@ func NewFake{{.Name}}DefaultError(t *testing.T) *Fake{{.Name}} {
 }
 
 func (f *Fake{{.Name}}) Reset() {
-{{range .Methods}} f.{{.Name}}Calls = []*{{.Name}}Invocation{}
+{{range .Methods}} f.{{.Name}}Calls = []*{{.Interface}}{{.Name}}Invocation{}
 {{end}}}
 
 {{range $m := .Methods}}
 {{with $f := gensym}}func ({{$f}} *Fake{{$m.Interface}}) {{$m.Name}}({{$m.ParametersDeclaration}}) ({{$m.ResultsDeclaration}}) {
-	invocation := new({{$m.Name}}Invocation)
+	invocation := new({{$m.Interface}}{{$m.Name}}Invocation)
 
 {{if $m.Parameters}}{{range $m.Parameters}} invocation.Parameters.{{.TitleCase}} = {{.Name}}
 {{end}}{{end}}

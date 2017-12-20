@@ -7,15 +7,15 @@ import (
 	"testing"
 )
 
-// StringInvocation represents a single call of FakeEmbedder.String
-type StringInvocation struct {
+// EmbedderStringInvocation represents a single call of FakeEmbedder.String
+type EmbedderStringInvocation struct {
 	Results struct {
 		Ident5 string
 	}
 }
 
-// EmbedInvocation represents a single call of FakeEmbedder.Embed
-type EmbedInvocation struct {
+// EmbedderEmbedInvocation represents a single call of FakeEmbedder.Embed
+type EmbedderEmbedInvocation struct {
 	Parameters struct {
 		Ident1 string
 	}
@@ -24,8 +24,8 @@ type EmbedInvocation struct {
 	}
 }
 
-// OtherInvocation represents a single call of FakeEmbedder.Other
-type OtherInvocation struct {
+// EmbedderOtherInvocation represents a single call of FakeEmbedder.Other
+type EmbedderOtherInvocation struct {
 	Parameters struct {
 		Ident1 string
 	}
@@ -63,9 +63,9 @@ type FakeEmbedder struct {
 	EmbedHook  func(string) string
 	OtherHook  func(string) string
 
-	StringCalls []*StringInvocation
-	EmbedCalls  []*EmbedInvocation
-	OtherCalls  []*OtherInvocation
+	StringCalls []*EmbedderStringInvocation
+	EmbedCalls  []*EmbedderEmbedInvocation
+	OtherCalls  []*EmbedderOtherInvocation
 }
 
 // NewFakeEmbedderDefaultPanic returns an instance of FakeEmbedder with all hooks configured to panic
@@ -120,13 +120,13 @@ func NewFakeEmbedderDefaultError(t *testing.T) *FakeEmbedder {
 }
 
 func (f *FakeEmbedder) Reset() {
-	f.StringCalls = []*StringInvocation{}
-	f.EmbedCalls = []*EmbedInvocation{}
-	f.OtherCalls = []*OtherInvocation{}
+	f.StringCalls = []*EmbedderStringInvocation{}
+	f.EmbedCalls = []*EmbedderEmbedInvocation{}
+	f.OtherCalls = []*EmbedderOtherInvocation{}
 }
 
 func (_f1 *FakeEmbedder) String() (ident5 string) {
-	invocation := new(StringInvocation)
+	invocation := new(EmbedderStringInvocation)
 
 	ident5 = _f1.StringHook()
 
@@ -190,7 +190,7 @@ func (f *FakeEmbedder) AssertStringCalledN(t *testing.T, n int) {
 }
 
 func (_f2 *FakeEmbedder) Embed(ident1 string) (ident2 string) {
-	invocation := new(EmbedInvocation)
+	invocation := new(EmbedderEmbedInvocation)
 
 	invocation.Parameters.Ident1 = ident1
 
@@ -324,7 +324,7 @@ func (_f7 *FakeEmbedder) EmbedResultsForCall(ident1 string) (ident2 string, foun
 }
 
 func (_f8 *FakeEmbedder) Other(ident1 string) (ident2 string) {
-	invocation := new(OtherInvocation)
+	invocation := new(EmbedderOtherInvocation)
 
 	invocation.Parameters.Ident1 = ident1
 

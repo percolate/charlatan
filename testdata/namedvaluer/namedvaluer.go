@@ -7,8 +7,8 @@ import (
 	"testing"
 )
 
-// ManyNamedInvocation represents a single call of FakeNamedvaluer.ManyNamed
-type ManyNamedInvocation struct {
+// NamedvaluerManyNamedInvocation represents a single call of FakeNamedvaluer.ManyNamed
+type NamedvaluerManyNamedInvocation struct {
 	Parameters struct {
 		A string
 		B string
@@ -20,8 +20,8 @@ type ManyNamedInvocation struct {
 	}
 }
 
-// NamedInvocation represents a single call of FakeNamedvaluer.Named
-type NamedInvocation struct {
+// NamedvaluerNamedInvocation represents a single call of FakeNamedvaluer.Named
+type NamedvaluerNamedInvocation struct {
 	Parameters struct {
 		A int
 		B string
@@ -59,8 +59,8 @@ type FakeNamedvaluer struct {
 	ManyNamedHook func(string, string, int, int) bool
 	NamedHook     func(int, string) bool
 
-	ManyNamedCalls []*ManyNamedInvocation
-	NamedCalls     []*NamedInvocation
+	ManyNamedCalls []*NamedvaluerManyNamedInvocation
+	NamedCalls     []*NamedvaluerNamedInvocation
 }
 
 // NewFakeNamedvaluerDefaultPanic returns an instance of FakeNamedvaluer with all hooks configured to panic
@@ -104,12 +104,12 @@ func NewFakeNamedvaluerDefaultError(t *testing.T) *FakeNamedvaluer {
 }
 
 func (f *FakeNamedvaluer) Reset() {
-	f.ManyNamedCalls = []*ManyNamedInvocation{}
-	f.NamedCalls = []*NamedInvocation{}
+	f.ManyNamedCalls = []*NamedvaluerManyNamedInvocation{}
+	f.NamedCalls = []*NamedvaluerNamedInvocation{}
 }
 
 func (_f1 *FakeNamedvaluer) ManyNamed(a string, b string, f int, g int) (ret bool) {
-	invocation := new(ManyNamedInvocation)
+	invocation := new(NamedvaluerManyNamedInvocation)
 
 	invocation.Parameters.A = a
 	invocation.Parameters.B = b
@@ -246,7 +246,7 @@ func (_f6 *FakeNamedvaluer) ManyNamedResultsForCall(a string, b string, f int, g
 }
 
 func (_f7 *FakeNamedvaluer) Named(a int, b string) (ret bool) {
-	invocation := new(NamedInvocation)
+	invocation := new(NamedvaluerNamedInvocation)
 
 	invocation.Parameters.A = a
 	invocation.Parameters.B = b

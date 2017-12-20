@@ -7,15 +7,15 @@ import (
 	"testing"
 )
 
-// MapParameterInvocation represents a single call of FakeMapper.MapParameter
-type MapParameterInvocation struct {
+// MapperMapParameterInvocation represents a single call of FakeMapper.MapParameter
+type MapperMapParameterInvocation struct {
 	Parameters struct {
 		Ident1 map[string]string
 	}
 }
 
-// MapReturnInvocation represents a single call of FakeMapper.MapReturn
-type MapReturnInvocation struct {
+// MapperMapReturnInvocation represents a single call of FakeMapper.MapReturn
+type MapperMapReturnInvocation struct {
 	Results struct {
 		Ident1 map[string]string
 	}
@@ -49,8 +49,8 @@ type FakeMapper struct {
 	MapParameterHook func(map[string]string)
 	MapReturnHook    func() map[string]string
 
-	MapParameterCalls []*MapParameterInvocation
-	MapReturnCalls    []*MapReturnInvocation
+	MapParameterCalls []*MapperMapParameterInvocation
+	MapReturnCalls    []*MapperMapReturnInvocation
 }
 
 // NewFakeMapperDefaultPanic returns an instance of FakeMapper with all hooks configured to panic
@@ -94,12 +94,12 @@ func NewFakeMapperDefaultError(t *testing.T) *FakeMapper {
 }
 
 func (f *FakeMapper) Reset() {
-	f.MapParameterCalls = []*MapParameterInvocation{}
-	f.MapReturnCalls = []*MapReturnInvocation{}
+	f.MapParameterCalls = []*MapperMapParameterInvocation{}
+	f.MapReturnCalls = []*MapperMapReturnInvocation{}
 }
 
 func (_f1 *FakeMapper) MapParameter(ident1 map[string]string) {
-	invocation := new(MapParameterInvocation)
+	invocation := new(MapperMapParameterInvocation)
 
 	invocation.Parameters.Ident1 = ident1
 
@@ -218,7 +218,7 @@ func (_f5 *FakeMapper) AssertMapParameterCalledOnceWith(t *testing.T, ident1 map
 }
 
 func (_f6 *FakeMapper) MapReturn() (ident1 map[string]string) {
-	invocation := new(MapReturnInvocation)
+	invocation := new(MapperMapReturnInvocation)
 
 	ident1 = _f6.MapReturnHook()
 

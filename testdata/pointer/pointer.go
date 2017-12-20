@@ -7,8 +7,8 @@ import (
 	"testing"
 )
 
-// PointInvocation represents a single call of FakePointer.Point
-type PointInvocation struct {
+// PointerPointInvocation represents a single call of FakePointer.Point
+type PointerPointInvocation struct {
 	Parameters struct {
 		Ident1 *string
 	}
@@ -44,7 +44,7 @@ unexpected calls are made to FakePoint.
 type FakePointer struct {
 	PointHook func(*string) int
 
-	PointCalls []*PointInvocation
+	PointCalls []*PointerPointInvocation
 }
 
 // NewFakePointerDefaultPanic returns an instance of FakePointer with all hooks configured to panic
@@ -77,11 +77,11 @@ func NewFakePointerDefaultError(t *testing.T) *FakePointer {
 }
 
 func (f *FakePointer) Reset() {
-	f.PointCalls = []*PointInvocation{}
+	f.PointCalls = []*PointerPointInvocation{}
 }
 
 func (_f1 *FakePointer) Point(ident1 *string) (ident2 int) {
-	invocation := new(PointInvocation)
+	invocation := new(PointerPointInvocation)
 
 	invocation.Parameters.Ident1 = ident1
 

@@ -9,8 +9,8 @@ import (
 	"testing"
 )
 
-// ScanInvocation represents a single call of FakeImporter.Scan
-type ScanInvocation struct {
+// ImporterScanInvocation represents a single call of FakeImporter.Scan
+type ImporterScanInvocation struct {
 	Parameters struct {
 		Ident1 *Scanner
 	}
@@ -46,7 +46,7 @@ unexpected calls are made to FakeScan.
 type FakeImporter struct {
 	ScanHook func(*Scanner) z.Reader
 
-	ScanCalls []*ScanInvocation
+	ScanCalls []*ImporterScanInvocation
 }
 
 // NewFakeImporterDefaultPanic returns an instance of FakeImporter with all hooks configured to panic
@@ -79,11 +79,11 @@ func NewFakeImporterDefaultError(t *testing.T) *FakeImporter {
 }
 
 func (f *FakeImporter) Reset() {
-	f.ScanCalls = []*ScanInvocation{}
+	f.ScanCalls = []*ImporterScanInvocation{}
 }
 
 func (_f1 *FakeImporter) Scan(ident1 *Scanner) (ident2 z.Reader) {
-	invocation := new(ScanInvocation)
+	invocation := new(ImporterScanInvocation)
 
 	invocation.Parameters.Ident1 = ident1
 
