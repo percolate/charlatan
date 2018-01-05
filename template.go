@@ -273,12 +273,23 @@ func (t *Template) Execute() ([]byte, error) {
 }
 
 func (t *Template) NeedsReflect() bool {
+	var needed bool
 	for _, intf := range t.Interfaces {
 		for _, mthd := range intf.Methods {
 			if len(mthd.Parameters) > 0 {
-				return true
+				needed = true
 			}
 		}
 	}
-	return false
+
+	if needed {
+		for _, imp := range t.Imports {
+			if "reflect" == imp.Name {
+				needed = false
+				break
+			}
+		}
+	}
+
+	return needed
 }
