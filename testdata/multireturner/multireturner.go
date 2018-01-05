@@ -2,10 +2,6 @@
 
 package main
 
-import (
-	"testing"
-)
-
 // MultireturnerMultiReturnInvocation represents a single call of FakeMultireturner.MultiReturn
 type MultireturnerMultiReturnInvocation struct {
 	Results struct {
@@ -22,6 +18,14 @@ type MultireturnerNamedReturnInvocation struct {
 		C int
 		D int
 	}
+}
+
+// MultireturnerTestingT represents the methods of "testing".T used by charlatan Fakes.  It avoids importing the testing package.
+type MultireturnerTestingT interface {
+	Error(...interface{})
+	Errorf(string, ...interface{})
+	Fatal(...interface{})
+	Helper()
 }
 
 /*
@@ -69,7 +73,7 @@ func NewFakeMultireturnerDefaultPanic() *FakeMultireturner {
 }
 
 // NewFakeMultireturnerDefaultFatal returns an instance of FakeMultireturner with all hooks configured to call t.Fatal
-func NewFakeMultireturnerDefaultFatal(t *testing.T) *FakeMultireturner {
+func NewFakeMultireturnerDefaultFatal(t MultireturnerTestingT) *FakeMultireturner {
 	return &FakeMultireturner{
 		MultiReturnHook: func() (ident1 string, ident2 int) {
 			t.Fatal("Unexpected call to Multireturner.MultiReturn")
@@ -83,7 +87,7 @@ func NewFakeMultireturnerDefaultFatal(t *testing.T) *FakeMultireturner {
 }
 
 // NewFakeMultireturnerDefaultError returns an instance of FakeMultireturner with all hooks configured to call t.Error
-func NewFakeMultireturnerDefaultError(t *testing.T) *FakeMultireturner {
+func NewFakeMultireturnerDefaultError(t MultireturnerTestingT) *FakeMultireturner {
 	return &FakeMultireturner{
 		MultiReturnHook: func() (ident1 string, ident2 int) {
 			t.Error("Unexpected call to Multireturner.MultiReturn")
@@ -120,7 +124,7 @@ func (f *FakeMultireturner) MultiReturnCalled() bool {
 }
 
 // AssertMultiReturnCalled calls t.Error if FakeMultireturner.MultiReturn was not called
-func (f *FakeMultireturner) AssertMultiReturnCalled(t *testing.T) {
+func (f *FakeMultireturner) AssertMultiReturnCalled(t MultireturnerTestingT) {
 	t.Helper()
 	if len(f.MultiReturnCalls) == 0 {
 		t.Error("FakeMultireturner.MultiReturn not called, expected at least one")
@@ -133,7 +137,7 @@ func (f *FakeMultireturner) MultiReturnNotCalled() bool {
 }
 
 // AssertMultiReturnNotCalled calls t.Error if FakeMultireturner.MultiReturn was called
-func (f *FakeMultireturner) AssertMultiReturnNotCalled(t *testing.T) {
+func (f *FakeMultireturner) AssertMultiReturnNotCalled(t MultireturnerTestingT) {
 	t.Helper()
 	if len(f.MultiReturnCalls) != 0 {
 		t.Error("FakeMultireturner.MultiReturn called, expected none")
@@ -146,7 +150,7 @@ func (f *FakeMultireturner) MultiReturnCalledOnce() bool {
 }
 
 // AssertMultiReturnCalledOnce calls t.Error if FakeMultireturner.MultiReturn was not called exactly once
-func (f *FakeMultireturner) AssertMultiReturnCalledOnce(t *testing.T) {
+func (f *FakeMultireturner) AssertMultiReturnCalledOnce(t MultireturnerTestingT) {
 	t.Helper()
 	if len(f.MultiReturnCalls) != 1 {
 		t.Errorf("FakeMultireturner.MultiReturn called %d times, expected 1", len(f.MultiReturnCalls))
@@ -159,7 +163,7 @@ func (f *FakeMultireturner) MultiReturnCalledN(n int) bool {
 }
 
 // AssertMultiReturnCalledN calls t.Error if FakeMultireturner.MultiReturn was called less than n times
-func (f *FakeMultireturner) AssertMultiReturnCalledN(t *testing.T, n int) {
+func (f *FakeMultireturner) AssertMultiReturnCalledN(t MultireturnerTestingT, n int) {
 	t.Helper()
 	if len(f.MultiReturnCalls) < n {
 		t.Errorf("FakeMultireturner.MultiReturn called %d times, expected >= %d", len(f.MultiReturnCalls), n)
@@ -187,7 +191,7 @@ func (f *FakeMultireturner) NamedReturnCalled() bool {
 }
 
 // AssertNamedReturnCalled calls t.Error if FakeMultireturner.NamedReturn was not called
-func (f *FakeMultireturner) AssertNamedReturnCalled(t *testing.T) {
+func (f *FakeMultireturner) AssertNamedReturnCalled(t MultireturnerTestingT) {
 	t.Helper()
 	if len(f.NamedReturnCalls) == 0 {
 		t.Error("FakeMultireturner.NamedReturn not called, expected at least one")
@@ -200,7 +204,7 @@ func (f *FakeMultireturner) NamedReturnNotCalled() bool {
 }
 
 // AssertNamedReturnNotCalled calls t.Error if FakeMultireturner.NamedReturn was called
-func (f *FakeMultireturner) AssertNamedReturnNotCalled(t *testing.T) {
+func (f *FakeMultireturner) AssertNamedReturnNotCalled(t MultireturnerTestingT) {
 	t.Helper()
 	if len(f.NamedReturnCalls) != 0 {
 		t.Error("FakeMultireturner.NamedReturn called, expected none")
@@ -213,7 +217,7 @@ func (f *FakeMultireturner) NamedReturnCalledOnce() bool {
 }
 
 // AssertNamedReturnCalledOnce calls t.Error if FakeMultireturner.NamedReturn was not called exactly once
-func (f *FakeMultireturner) AssertNamedReturnCalledOnce(t *testing.T) {
+func (f *FakeMultireturner) AssertNamedReturnCalledOnce(t MultireturnerTestingT) {
 	t.Helper()
 	if len(f.NamedReturnCalls) != 1 {
 		t.Errorf("FakeMultireturner.NamedReturn called %d times, expected 1", len(f.NamedReturnCalls))
@@ -226,7 +230,7 @@ func (f *FakeMultireturner) NamedReturnCalledN(n int) bool {
 }
 
 // AssertNamedReturnCalledN calls t.Error if FakeMultireturner.NamedReturn was called less than n times
-func (f *FakeMultireturner) AssertNamedReturnCalledN(t *testing.T, n int) {
+func (f *FakeMultireturner) AssertNamedReturnCalledN(t MultireturnerTestingT, n int) {
 	t.Helper()
 	if len(f.NamedReturnCalls) < n {
 		t.Errorf("FakeMultireturner.NamedReturn called %d times, expected >= %d", len(f.NamedReturnCalls), n)

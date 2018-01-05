@@ -2,10 +2,7 @@
 
 package main
 
-import (
-	"reflect"
-	"testing"
-)
+import "reflect"
 
 // NamedvaluerManyNamedInvocation represents a single call of FakeNamedvaluer.ManyNamed
 type NamedvaluerManyNamedInvocation struct {
@@ -29,6 +26,14 @@ type NamedvaluerNamedInvocation struct {
 	Results struct {
 		Ret bool
 	}
+}
+
+// NamedvaluerTestingT represents the methods of "testing".T used by charlatan Fakes.  It avoids importing the testing package.
+type NamedvaluerTestingT interface {
+	Error(...interface{})
+	Errorf(string, ...interface{})
+	Fatal(...interface{})
+	Helper()
 }
 
 /*
@@ -76,7 +81,7 @@ func NewFakeNamedvaluerDefaultPanic() *FakeNamedvaluer {
 }
 
 // NewFakeNamedvaluerDefaultFatal returns an instance of FakeNamedvaluer with all hooks configured to call t.Fatal
-func NewFakeNamedvaluerDefaultFatal(t *testing.T) *FakeNamedvaluer {
+func NewFakeNamedvaluerDefaultFatal(t NamedvaluerTestingT) *FakeNamedvaluer {
 	return &FakeNamedvaluer{
 		ManyNamedHook: func(string, string, int, int) (ret bool) {
 			t.Fatal("Unexpected call to Namedvaluer.ManyNamed")
@@ -90,7 +95,7 @@ func NewFakeNamedvaluerDefaultFatal(t *testing.T) *FakeNamedvaluer {
 }
 
 // NewFakeNamedvaluerDefaultError returns an instance of FakeNamedvaluer with all hooks configured to call t.Error
-func NewFakeNamedvaluerDefaultError(t *testing.T) *FakeNamedvaluer {
+func NewFakeNamedvaluerDefaultError(t NamedvaluerTestingT) *FakeNamedvaluer {
 	return &FakeNamedvaluer{
 		ManyNamedHook: func(string, string, int, int) (ret bool) {
 			t.Error("Unexpected call to Namedvaluer.ManyNamed")
@@ -131,7 +136,7 @@ func (f *FakeNamedvaluer) ManyNamedCalled() bool {
 }
 
 // AssertManyNamedCalled calls t.Error if FakeNamedvaluer.ManyNamed was not called
-func (f *FakeNamedvaluer) AssertManyNamedCalled(t *testing.T) {
+func (f *FakeNamedvaluer) AssertManyNamedCalled(t NamedvaluerTestingT) {
 	t.Helper()
 	if len(f.ManyNamedCalls) == 0 {
 		t.Error("FakeNamedvaluer.ManyNamed not called, expected at least one")
@@ -144,7 +149,7 @@ func (f *FakeNamedvaluer) ManyNamedNotCalled() bool {
 }
 
 // AssertManyNamedNotCalled calls t.Error if FakeNamedvaluer.ManyNamed was called
-func (f *FakeNamedvaluer) AssertManyNamedNotCalled(t *testing.T) {
+func (f *FakeNamedvaluer) AssertManyNamedNotCalled(t NamedvaluerTestingT) {
 	t.Helper()
 	if len(f.ManyNamedCalls) != 0 {
 		t.Error("FakeNamedvaluer.ManyNamed called, expected none")
@@ -157,7 +162,7 @@ func (f *FakeNamedvaluer) ManyNamedCalledOnce() bool {
 }
 
 // AssertManyNamedCalledOnce calls t.Error if FakeNamedvaluer.ManyNamed was not called exactly once
-func (f *FakeNamedvaluer) AssertManyNamedCalledOnce(t *testing.T) {
+func (f *FakeNamedvaluer) AssertManyNamedCalledOnce(t NamedvaluerTestingT) {
 	t.Helper()
 	if len(f.ManyNamedCalls) != 1 {
 		t.Errorf("FakeNamedvaluer.ManyNamed called %d times, expected 1", len(f.ManyNamedCalls))
@@ -170,7 +175,7 @@ func (f *FakeNamedvaluer) ManyNamedCalledN(n int) bool {
 }
 
 // AssertManyNamedCalledN calls t.Error if FakeNamedvaluer.ManyNamed was called less than n times
-func (f *FakeNamedvaluer) AssertManyNamedCalledN(t *testing.T, n int) {
+func (f *FakeNamedvaluer) AssertManyNamedCalledN(t NamedvaluerTestingT, n int) {
 	t.Helper()
 	if len(f.ManyNamedCalls) < n {
 		t.Errorf("FakeNamedvaluer.ManyNamed called %d times, expected >= %d", len(f.ManyNamedCalls), n)
@@ -190,7 +195,7 @@ func (_f2 *FakeNamedvaluer) ManyNamedCalledWith(a string, b string, f int, g int
 }
 
 // AssertManyNamedCalledWith calls t.Error if FakeNamedvaluer.ManyNamed was not called with the given values
-func (_f3 *FakeNamedvaluer) AssertManyNamedCalledWith(t *testing.T, a string, b string, f int, g int) {
+func (_f3 *FakeNamedvaluer) AssertManyNamedCalledWith(t NamedvaluerTestingT, a string, b string, f int, g int) {
 	t.Helper()
 	var found bool
 	for _, call := range _f3.ManyNamedCalls {
@@ -218,7 +223,7 @@ func (_f4 *FakeNamedvaluer) ManyNamedCalledOnceWith(a string, b string, f int, g
 }
 
 // AssertManyNamedCalledOnceWith calls t.Error if FakeNamedvaluer.ManyNamed was not called exactly once with the given values
-func (_f5 *FakeNamedvaluer) AssertManyNamedCalledOnceWith(t *testing.T, a string, b string, f int, g int) {
+func (_f5 *FakeNamedvaluer) AssertManyNamedCalledOnceWith(t NamedvaluerTestingT, a string, b string, f int, g int) {
 	t.Helper()
 	var count int
 	for _, call := range _f5.ManyNamedCalls {
@@ -266,7 +271,7 @@ func (f *FakeNamedvaluer) NamedCalled() bool {
 }
 
 // AssertNamedCalled calls t.Error if FakeNamedvaluer.Named was not called
-func (f *FakeNamedvaluer) AssertNamedCalled(t *testing.T) {
+func (f *FakeNamedvaluer) AssertNamedCalled(t NamedvaluerTestingT) {
 	t.Helper()
 	if len(f.NamedCalls) == 0 {
 		t.Error("FakeNamedvaluer.Named not called, expected at least one")
@@ -279,7 +284,7 @@ func (f *FakeNamedvaluer) NamedNotCalled() bool {
 }
 
 // AssertNamedNotCalled calls t.Error if FakeNamedvaluer.Named was called
-func (f *FakeNamedvaluer) AssertNamedNotCalled(t *testing.T) {
+func (f *FakeNamedvaluer) AssertNamedNotCalled(t NamedvaluerTestingT) {
 	t.Helper()
 	if len(f.NamedCalls) != 0 {
 		t.Error("FakeNamedvaluer.Named called, expected none")
@@ -292,7 +297,7 @@ func (f *FakeNamedvaluer) NamedCalledOnce() bool {
 }
 
 // AssertNamedCalledOnce calls t.Error if FakeNamedvaluer.Named was not called exactly once
-func (f *FakeNamedvaluer) AssertNamedCalledOnce(t *testing.T) {
+func (f *FakeNamedvaluer) AssertNamedCalledOnce(t NamedvaluerTestingT) {
 	t.Helper()
 	if len(f.NamedCalls) != 1 {
 		t.Errorf("FakeNamedvaluer.Named called %d times, expected 1", len(f.NamedCalls))
@@ -305,7 +310,7 @@ func (f *FakeNamedvaluer) NamedCalledN(n int) bool {
 }
 
 // AssertNamedCalledN calls t.Error if FakeNamedvaluer.Named was called less than n times
-func (f *FakeNamedvaluer) AssertNamedCalledN(t *testing.T, n int) {
+func (f *FakeNamedvaluer) AssertNamedCalledN(t NamedvaluerTestingT, n int) {
 	t.Helper()
 	if len(f.NamedCalls) < n {
 		t.Errorf("FakeNamedvaluer.Named called %d times, expected >= %d", len(f.NamedCalls), n)
@@ -325,7 +330,7 @@ func (_f8 *FakeNamedvaluer) NamedCalledWith(a int, b string) (found bool) {
 }
 
 // AssertNamedCalledWith calls t.Error if FakeNamedvaluer.Named was not called with the given values
-func (_f9 *FakeNamedvaluer) AssertNamedCalledWith(t *testing.T, a int, b string) {
+func (_f9 *FakeNamedvaluer) AssertNamedCalledWith(t NamedvaluerTestingT, a int, b string) {
 	t.Helper()
 	var found bool
 	for _, call := range _f9.NamedCalls {
@@ -353,7 +358,7 @@ func (_f10 *FakeNamedvaluer) NamedCalledOnceWith(a int, b string) bool {
 }
 
 // AssertNamedCalledOnceWith calls t.Error if FakeNamedvaluer.Named was not called exactly once with the given values
-func (_f11 *FakeNamedvaluer) AssertNamedCalledOnceWith(t *testing.T, a int, b string) {
+func (_f11 *FakeNamedvaluer) AssertNamedCalledOnceWith(t NamedvaluerTestingT, a int, b string) {
 	t.Helper()
 	var count int
 	for _, call := range _f11.NamedCalls {

@@ -2,12 +2,9 @@
 
 package main
 
-import (
-	. "fmt"
-	"reflect"
-	z "strings"
-	"testing"
-)
+import "reflect"
+import . "fmt"
+import z "strings"
 
 // ImporterScanInvocation represents a single call of FakeImporter.Scan
 type ImporterScanInvocation struct {
@@ -17,6 +14,14 @@ type ImporterScanInvocation struct {
 	Results struct {
 		Ident2 z.Reader
 	}
+}
+
+// ImporterTestingT represents the methods of "testing".T used by charlatan Fakes.  It avoids importing the testing package.
+type ImporterTestingT interface {
+	Error(...interface{})
+	Errorf(string, ...interface{})
+	Fatal(...interface{})
+	Helper()
 }
 
 /*
@@ -59,7 +64,7 @@ func NewFakeImporterDefaultPanic() *FakeImporter {
 }
 
 // NewFakeImporterDefaultFatal returns an instance of FakeImporter with all hooks configured to call t.Fatal
-func NewFakeImporterDefaultFatal(t *testing.T) *FakeImporter {
+func NewFakeImporterDefaultFatal(t ImporterTestingT) *FakeImporter {
 	return &FakeImporter{
 		ScanHook: func(*Scanner) (ident2 z.Reader) {
 			t.Fatal("Unexpected call to Importer.Scan")
@@ -69,7 +74,7 @@ func NewFakeImporterDefaultFatal(t *testing.T) *FakeImporter {
 }
 
 // NewFakeImporterDefaultError returns an instance of FakeImporter with all hooks configured to call t.Error
-func NewFakeImporterDefaultError(t *testing.T) *FakeImporter {
+func NewFakeImporterDefaultError(t ImporterTestingT) *FakeImporter {
 	return &FakeImporter{
 		ScanHook: func(*Scanner) (ident2 z.Reader) {
 			t.Error("Unexpected call to Importer.Scan")
@@ -102,7 +107,7 @@ func (f *FakeImporter) ScanCalled() bool {
 }
 
 // AssertScanCalled calls t.Error if FakeImporter.Scan was not called
-func (f *FakeImporter) AssertScanCalled(t *testing.T) {
+func (f *FakeImporter) AssertScanCalled(t ImporterTestingT) {
 	t.Helper()
 	if len(f.ScanCalls) == 0 {
 		t.Error("FakeImporter.Scan not called, expected at least one")
@@ -115,7 +120,7 @@ func (f *FakeImporter) ScanNotCalled() bool {
 }
 
 // AssertScanNotCalled calls t.Error if FakeImporter.Scan was called
-func (f *FakeImporter) AssertScanNotCalled(t *testing.T) {
+func (f *FakeImporter) AssertScanNotCalled(t ImporterTestingT) {
 	t.Helper()
 	if len(f.ScanCalls) != 0 {
 		t.Error("FakeImporter.Scan called, expected none")
@@ -128,7 +133,7 @@ func (f *FakeImporter) ScanCalledOnce() bool {
 }
 
 // AssertScanCalledOnce calls t.Error if FakeImporter.Scan was not called exactly once
-func (f *FakeImporter) AssertScanCalledOnce(t *testing.T) {
+func (f *FakeImporter) AssertScanCalledOnce(t ImporterTestingT) {
 	t.Helper()
 	if len(f.ScanCalls) != 1 {
 		t.Errorf("FakeImporter.Scan called %d times, expected 1", len(f.ScanCalls))
@@ -141,7 +146,7 @@ func (f *FakeImporter) ScanCalledN(n int) bool {
 }
 
 // AssertScanCalledN calls t.Error if FakeImporter.Scan was called less than n times
-func (f *FakeImporter) AssertScanCalledN(t *testing.T, n int) {
+func (f *FakeImporter) AssertScanCalledN(t ImporterTestingT, n int) {
 	t.Helper()
 	if len(f.ScanCalls) < n {
 		t.Errorf("FakeImporter.Scan called %d times, expected >= %d", len(f.ScanCalls), n)
@@ -161,7 +166,7 @@ func (_f2 *FakeImporter) ScanCalledWith(ident1 *Scanner) (found bool) {
 }
 
 // AssertScanCalledWith calls t.Error if FakeImporter.Scan was not called with the given values
-func (_f3 *FakeImporter) AssertScanCalledWith(t *testing.T, ident1 *Scanner) {
+func (_f3 *FakeImporter) AssertScanCalledWith(t ImporterTestingT, ident1 *Scanner) {
 	t.Helper()
 	var found bool
 	for _, call := range _f3.ScanCalls {
@@ -189,7 +194,7 @@ func (_f4 *FakeImporter) ScanCalledOnceWith(ident1 *Scanner) bool {
 }
 
 // AssertScanCalledOnceWith calls t.Error if FakeImporter.Scan was not called exactly once with the given values
-func (_f5 *FakeImporter) AssertScanCalledOnceWith(t *testing.T, ident1 *Scanner) {
+func (_f5 *FakeImporter) AssertScanCalledOnceWith(t ImporterTestingT, ident1 *Scanner) {
 	t.Helper()
 	var count int
 	for _, call := range _f5.ScanCalls {

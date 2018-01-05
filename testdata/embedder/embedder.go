@@ -2,10 +2,7 @@
 
 package main
 
-import (
-	"reflect"
-	"testing"
-)
+import "reflect"
 
 // EmbedderStringInvocation represents a single call of FakeEmbedder.String
 type EmbedderStringInvocation struct {
@@ -32,6 +29,14 @@ type EmbedderOtherInvocation struct {
 	Results struct {
 		Ident2 string
 	}
+}
+
+// EmbedderTestingT represents the methods of "testing".T used by charlatan Fakes.  It avoids importing the testing package.
+type EmbedderTestingT interface {
+	Error(...interface{})
+	Errorf(string, ...interface{})
+	Fatal(...interface{})
+	Helper()
 }
 
 /*
@@ -84,7 +89,7 @@ func NewFakeEmbedderDefaultPanic() *FakeEmbedder {
 }
 
 // NewFakeEmbedderDefaultFatal returns an instance of FakeEmbedder with all hooks configured to call t.Fatal
-func NewFakeEmbedderDefaultFatal(t *testing.T) *FakeEmbedder {
+func NewFakeEmbedderDefaultFatal(t EmbedderTestingT) *FakeEmbedder {
 	return &FakeEmbedder{
 		StringHook: func() (ident5 string) {
 			t.Fatal("Unexpected call to Embedder.String")
@@ -102,7 +107,7 @@ func NewFakeEmbedderDefaultFatal(t *testing.T) *FakeEmbedder {
 }
 
 // NewFakeEmbedderDefaultError returns an instance of FakeEmbedder with all hooks configured to call t.Error
-func NewFakeEmbedderDefaultError(t *testing.T) *FakeEmbedder {
+func NewFakeEmbedderDefaultError(t EmbedderTestingT) *FakeEmbedder {
 	return &FakeEmbedder{
 		StringHook: func() (ident5 string) {
 			t.Error("Unexpected call to Embedder.String")
@@ -143,7 +148,7 @@ func (f *FakeEmbedder) StringCalled() bool {
 }
 
 // AssertStringCalled calls t.Error if FakeEmbedder.String was not called
-func (f *FakeEmbedder) AssertStringCalled(t *testing.T) {
+func (f *FakeEmbedder) AssertStringCalled(t EmbedderTestingT) {
 	t.Helper()
 	if len(f.StringCalls) == 0 {
 		t.Error("FakeEmbedder.String not called, expected at least one")
@@ -156,7 +161,7 @@ func (f *FakeEmbedder) StringNotCalled() bool {
 }
 
 // AssertStringNotCalled calls t.Error if FakeEmbedder.String was called
-func (f *FakeEmbedder) AssertStringNotCalled(t *testing.T) {
+func (f *FakeEmbedder) AssertStringNotCalled(t EmbedderTestingT) {
 	t.Helper()
 	if len(f.StringCalls) != 0 {
 		t.Error("FakeEmbedder.String called, expected none")
@@ -169,7 +174,7 @@ func (f *FakeEmbedder) StringCalledOnce() bool {
 }
 
 // AssertStringCalledOnce calls t.Error if FakeEmbedder.String was not called exactly once
-func (f *FakeEmbedder) AssertStringCalledOnce(t *testing.T) {
+func (f *FakeEmbedder) AssertStringCalledOnce(t EmbedderTestingT) {
 	t.Helper()
 	if len(f.StringCalls) != 1 {
 		t.Errorf("FakeEmbedder.String called %d times, expected 1", len(f.StringCalls))
@@ -182,7 +187,7 @@ func (f *FakeEmbedder) StringCalledN(n int) bool {
 }
 
 // AssertStringCalledN calls t.Error if FakeEmbedder.String was called less than n times
-func (f *FakeEmbedder) AssertStringCalledN(t *testing.T, n int) {
+func (f *FakeEmbedder) AssertStringCalledN(t EmbedderTestingT, n int) {
 	t.Helper()
 	if len(f.StringCalls) < n {
 		t.Errorf("FakeEmbedder.String called %d times, expected >= %d", len(f.StringCalls), n)
@@ -209,7 +214,7 @@ func (f *FakeEmbedder) EmbedCalled() bool {
 }
 
 // AssertEmbedCalled calls t.Error if FakeEmbedder.Embed was not called
-func (f *FakeEmbedder) AssertEmbedCalled(t *testing.T) {
+func (f *FakeEmbedder) AssertEmbedCalled(t EmbedderTestingT) {
 	t.Helper()
 	if len(f.EmbedCalls) == 0 {
 		t.Error("FakeEmbedder.Embed not called, expected at least one")
@@ -222,7 +227,7 @@ func (f *FakeEmbedder) EmbedNotCalled() bool {
 }
 
 // AssertEmbedNotCalled calls t.Error if FakeEmbedder.Embed was called
-func (f *FakeEmbedder) AssertEmbedNotCalled(t *testing.T) {
+func (f *FakeEmbedder) AssertEmbedNotCalled(t EmbedderTestingT) {
 	t.Helper()
 	if len(f.EmbedCalls) != 0 {
 		t.Error("FakeEmbedder.Embed called, expected none")
@@ -235,7 +240,7 @@ func (f *FakeEmbedder) EmbedCalledOnce() bool {
 }
 
 // AssertEmbedCalledOnce calls t.Error if FakeEmbedder.Embed was not called exactly once
-func (f *FakeEmbedder) AssertEmbedCalledOnce(t *testing.T) {
+func (f *FakeEmbedder) AssertEmbedCalledOnce(t EmbedderTestingT) {
 	t.Helper()
 	if len(f.EmbedCalls) != 1 {
 		t.Errorf("FakeEmbedder.Embed called %d times, expected 1", len(f.EmbedCalls))
@@ -248,7 +253,7 @@ func (f *FakeEmbedder) EmbedCalledN(n int) bool {
 }
 
 // AssertEmbedCalledN calls t.Error if FakeEmbedder.Embed was called less than n times
-func (f *FakeEmbedder) AssertEmbedCalledN(t *testing.T, n int) {
+func (f *FakeEmbedder) AssertEmbedCalledN(t EmbedderTestingT, n int) {
 	t.Helper()
 	if len(f.EmbedCalls) < n {
 		t.Errorf("FakeEmbedder.Embed called %d times, expected >= %d", len(f.EmbedCalls), n)
@@ -268,7 +273,7 @@ func (_f3 *FakeEmbedder) EmbedCalledWith(ident1 string) (found bool) {
 }
 
 // AssertEmbedCalledWith calls t.Error if FakeEmbedder.Embed was not called with the given values
-func (_f4 *FakeEmbedder) AssertEmbedCalledWith(t *testing.T, ident1 string) {
+func (_f4 *FakeEmbedder) AssertEmbedCalledWith(t EmbedderTestingT, ident1 string) {
 	t.Helper()
 	var found bool
 	for _, call := range _f4.EmbedCalls {
@@ -296,7 +301,7 @@ func (_f5 *FakeEmbedder) EmbedCalledOnceWith(ident1 string) bool {
 }
 
 // AssertEmbedCalledOnceWith calls t.Error if FakeEmbedder.Embed was not called exactly once with the given values
-func (_f6 *FakeEmbedder) AssertEmbedCalledOnceWith(t *testing.T, ident1 string) {
+func (_f6 *FakeEmbedder) AssertEmbedCalledOnceWith(t EmbedderTestingT, ident1 string) {
 	t.Helper()
 	var count int
 	for _, call := range _f6.EmbedCalls {
@@ -343,7 +348,7 @@ func (f *FakeEmbedder) OtherCalled() bool {
 }
 
 // AssertOtherCalled calls t.Error if FakeEmbedder.Other was not called
-func (f *FakeEmbedder) AssertOtherCalled(t *testing.T) {
+func (f *FakeEmbedder) AssertOtherCalled(t EmbedderTestingT) {
 	t.Helper()
 	if len(f.OtherCalls) == 0 {
 		t.Error("FakeEmbedder.Other not called, expected at least one")
@@ -356,7 +361,7 @@ func (f *FakeEmbedder) OtherNotCalled() bool {
 }
 
 // AssertOtherNotCalled calls t.Error if FakeEmbedder.Other was called
-func (f *FakeEmbedder) AssertOtherNotCalled(t *testing.T) {
+func (f *FakeEmbedder) AssertOtherNotCalled(t EmbedderTestingT) {
 	t.Helper()
 	if len(f.OtherCalls) != 0 {
 		t.Error("FakeEmbedder.Other called, expected none")
@@ -369,7 +374,7 @@ func (f *FakeEmbedder) OtherCalledOnce() bool {
 }
 
 // AssertOtherCalledOnce calls t.Error if FakeEmbedder.Other was not called exactly once
-func (f *FakeEmbedder) AssertOtherCalledOnce(t *testing.T) {
+func (f *FakeEmbedder) AssertOtherCalledOnce(t EmbedderTestingT) {
 	t.Helper()
 	if len(f.OtherCalls) != 1 {
 		t.Errorf("FakeEmbedder.Other called %d times, expected 1", len(f.OtherCalls))
@@ -382,7 +387,7 @@ func (f *FakeEmbedder) OtherCalledN(n int) bool {
 }
 
 // AssertOtherCalledN calls t.Error if FakeEmbedder.Other was called less than n times
-func (f *FakeEmbedder) AssertOtherCalledN(t *testing.T, n int) {
+func (f *FakeEmbedder) AssertOtherCalledN(t EmbedderTestingT, n int) {
 	t.Helper()
 	if len(f.OtherCalls) < n {
 		t.Errorf("FakeEmbedder.Other called %d times, expected >= %d", len(f.OtherCalls), n)
@@ -402,7 +407,7 @@ func (_f9 *FakeEmbedder) OtherCalledWith(ident1 string) (found bool) {
 }
 
 // AssertOtherCalledWith calls t.Error if FakeEmbedder.Other was not called with the given values
-func (_f10 *FakeEmbedder) AssertOtherCalledWith(t *testing.T, ident1 string) {
+func (_f10 *FakeEmbedder) AssertOtherCalledWith(t EmbedderTestingT, ident1 string) {
 	t.Helper()
 	var found bool
 	for _, call := range _f10.OtherCalls {
@@ -430,7 +435,7 @@ func (_f11 *FakeEmbedder) OtherCalledOnceWith(ident1 string) bool {
 }
 
 // AssertOtherCalledOnceWith calls t.Error if FakeEmbedder.Other was not called exactly once with the given values
-func (_f12 *FakeEmbedder) AssertOtherCalledOnceWith(t *testing.T, ident1 string) {
+func (_f12 *FakeEmbedder) AssertOtherCalledOnceWith(t EmbedderTestingT, ident1 string) {
 	t.Helper()
 	var count int
 	for _, call := range _f12.OtherCalls {

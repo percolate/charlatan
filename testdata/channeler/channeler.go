@@ -2,10 +2,7 @@
 
 package main
 
-import (
-	"reflect"
-	"testing"
-)
+import "reflect"
 
 // ChannelerChannelInvocation represents a single call of FakeChanneler.Channel
 type ChannelerChannelInvocation struct {
@@ -55,6 +52,14 @@ type ChannelerChannelInterfaceInvocation struct {
 	Results struct {
 		Ident2 chan interface{}
 	}
+}
+
+// ChannelerTestingT represents the methods of "testing".T used by charlatan Fakes.  It avoids importing the testing package.
+type ChannelerTestingT interface {
+	Error(...interface{})
+	Errorf(string, ...interface{})
+	Fatal(...interface{})
+	Helper()
 }
 
 /*
@@ -117,7 +122,7 @@ func NewFakeChannelerDefaultPanic() *FakeChanneler {
 }
 
 // NewFakeChannelerDefaultFatal returns an instance of FakeChanneler with all hooks configured to call t.Fatal
-func NewFakeChannelerDefaultFatal(t *testing.T) *FakeChanneler {
+func NewFakeChannelerDefaultFatal(t ChannelerTestingT) *FakeChanneler {
 	return &FakeChanneler{
 		ChannelHook: func(chan int) (ident2 chan int) {
 			t.Fatal("Unexpected call to Channeler.Channel")
@@ -143,7 +148,7 @@ func NewFakeChannelerDefaultFatal(t *testing.T) *FakeChanneler {
 }
 
 // NewFakeChannelerDefaultError returns an instance of FakeChanneler with all hooks configured to call t.Error
-func NewFakeChannelerDefaultError(t *testing.T) *FakeChanneler {
+func NewFakeChannelerDefaultError(t ChannelerTestingT) *FakeChanneler {
 	return &FakeChanneler{
 		ChannelHook: func(chan int) (ident2 chan int) {
 			t.Error("Unexpected call to Channeler.Channel")
@@ -196,7 +201,7 @@ func (f *FakeChanneler) ChannelCalled() bool {
 }
 
 // AssertChannelCalled calls t.Error if FakeChanneler.Channel was not called
-func (f *FakeChanneler) AssertChannelCalled(t *testing.T) {
+func (f *FakeChanneler) AssertChannelCalled(t ChannelerTestingT) {
 	t.Helper()
 	if len(f.ChannelCalls) == 0 {
 		t.Error("FakeChanneler.Channel not called, expected at least one")
@@ -209,7 +214,7 @@ func (f *FakeChanneler) ChannelNotCalled() bool {
 }
 
 // AssertChannelNotCalled calls t.Error if FakeChanneler.Channel was called
-func (f *FakeChanneler) AssertChannelNotCalled(t *testing.T) {
+func (f *FakeChanneler) AssertChannelNotCalled(t ChannelerTestingT) {
 	t.Helper()
 	if len(f.ChannelCalls) != 0 {
 		t.Error("FakeChanneler.Channel called, expected none")
@@ -222,7 +227,7 @@ func (f *FakeChanneler) ChannelCalledOnce() bool {
 }
 
 // AssertChannelCalledOnce calls t.Error if FakeChanneler.Channel was not called exactly once
-func (f *FakeChanneler) AssertChannelCalledOnce(t *testing.T) {
+func (f *FakeChanneler) AssertChannelCalledOnce(t ChannelerTestingT) {
 	t.Helper()
 	if len(f.ChannelCalls) != 1 {
 		t.Errorf("FakeChanneler.Channel called %d times, expected 1", len(f.ChannelCalls))
@@ -235,7 +240,7 @@ func (f *FakeChanneler) ChannelCalledN(n int) bool {
 }
 
 // AssertChannelCalledN calls t.Error if FakeChanneler.Channel was called less than n times
-func (f *FakeChanneler) AssertChannelCalledN(t *testing.T, n int) {
+func (f *FakeChanneler) AssertChannelCalledN(t ChannelerTestingT, n int) {
 	t.Helper()
 	if len(f.ChannelCalls) < n {
 		t.Errorf("FakeChanneler.Channel called %d times, expected >= %d", len(f.ChannelCalls), n)
@@ -255,7 +260,7 @@ func (_f2 *FakeChanneler) ChannelCalledWith(ident1 chan int) (found bool) {
 }
 
 // AssertChannelCalledWith calls t.Error if FakeChanneler.Channel was not called with the given values
-func (_f3 *FakeChanneler) AssertChannelCalledWith(t *testing.T, ident1 chan int) {
+func (_f3 *FakeChanneler) AssertChannelCalledWith(t ChannelerTestingT, ident1 chan int) {
 	t.Helper()
 	var found bool
 	for _, call := range _f3.ChannelCalls {
@@ -283,7 +288,7 @@ func (_f4 *FakeChanneler) ChannelCalledOnceWith(ident1 chan int) bool {
 }
 
 // AssertChannelCalledOnceWith calls t.Error if FakeChanneler.Channel was not called exactly once with the given values
-func (_f5 *FakeChanneler) AssertChannelCalledOnceWith(t *testing.T, ident1 chan int) {
+func (_f5 *FakeChanneler) AssertChannelCalledOnceWith(t ChannelerTestingT, ident1 chan int) {
 	t.Helper()
 	var count int
 	for _, call := range _f5.ChannelCalls {
@@ -330,7 +335,7 @@ func (f *FakeChanneler) ChannelReceiveCalled() bool {
 }
 
 // AssertChannelReceiveCalled calls t.Error if FakeChanneler.ChannelReceive was not called
-func (f *FakeChanneler) AssertChannelReceiveCalled(t *testing.T) {
+func (f *FakeChanneler) AssertChannelReceiveCalled(t ChannelerTestingT) {
 	t.Helper()
 	if len(f.ChannelReceiveCalls) == 0 {
 		t.Error("FakeChanneler.ChannelReceive not called, expected at least one")
@@ -343,7 +348,7 @@ func (f *FakeChanneler) ChannelReceiveNotCalled() bool {
 }
 
 // AssertChannelReceiveNotCalled calls t.Error if FakeChanneler.ChannelReceive was called
-func (f *FakeChanneler) AssertChannelReceiveNotCalled(t *testing.T) {
+func (f *FakeChanneler) AssertChannelReceiveNotCalled(t ChannelerTestingT) {
 	t.Helper()
 	if len(f.ChannelReceiveCalls) != 0 {
 		t.Error("FakeChanneler.ChannelReceive called, expected none")
@@ -356,7 +361,7 @@ func (f *FakeChanneler) ChannelReceiveCalledOnce() bool {
 }
 
 // AssertChannelReceiveCalledOnce calls t.Error if FakeChanneler.ChannelReceive was not called exactly once
-func (f *FakeChanneler) AssertChannelReceiveCalledOnce(t *testing.T) {
+func (f *FakeChanneler) AssertChannelReceiveCalledOnce(t ChannelerTestingT) {
 	t.Helper()
 	if len(f.ChannelReceiveCalls) != 1 {
 		t.Errorf("FakeChanneler.ChannelReceive called %d times, expected 1", len(f.ChannelReceiveCalls))
@@ -369,7 +374,7 @@ func (f *FakeChanneler) ChannelReceiveCalledN(n int) bool {
 }
 
 // AssertChannelReceiveCalledN calls t.Error if FakeChanneler.ChannelReceive was called less than n times
-func (f *FakeChanneler) AssertChannelReceiveCalledN(t *testing.T, n int) {
+func (f *FakeChanneler) AssertChannelReceiveCalledN(t ChannelerTestingT, n int) {
 	t.Helper()
 	if len(f.ChannelReceiveCalls) < n {
 		t.Errorf("FakeChanneler.ChannelReceive called %d times, expected >= %d", len(f.ChannelReceiveCalls), n)
@@ -389,7 +394,7 @@ func (_f8 *FakeChanneler) ChannelReceiveCalledWith(ident1 <-chan int) (found boo
 }
 
 // AssertChannelReceiveCalledWith calls t.Error if FakeChanneler.ChannelReceive was not called with the given values
-func (_f9 *FakeChanneler) AssertChannelReceiveCalledWith(t *testing.T, ident1 <-chan int) {
+func (_f9 *FakeChanneler) AssertChannelReceiveCalledWith(t ChannelerTestingT, ident1 <-chan int) {
 	t.Helper()
 	var found bool
 	for _, call := range _f9.ChannelReceiveCalls {
@@ -417,7 +422,7 @@ func (_f10 *FakeChanneler) ChannelReceiveCalledOnceWith(ident1 <-chan int) bool 
 }
 
 // AssertChannelReceiveCalledOnceWith calls t.Error if FakeChanneler.ChannelReceive was not called exactly once with the given values
-func (_f11 *FakeChanneler) AssertChannelReceiveCalledOnceWith(t *testing.T, ident1 <-chan int) {
+func (_f11 *FakeChanneler) AssertChannelReceiveCalledOnceWith(t ChannelerTestingT, ident1 <-chan int) {
 	t.Helper()
 	var count int
 	for _, call := range _f11.ChannelReceiveCalls {
@@ -464,7 +469,7 @@ func (f *FakeChanneler) ChannelSendCalled() bool {
 }
 
 // AssertChannelSendCalled calls t.Error if FakeChanneler.ChannelSend was not called
-func (f *FakeChanneler) AssertChannelSendCalled(t *testing.T) {
+func (f *FakeChanneler) AssertChannelSendCalled(t ChannelerTestingT) {
 	t.Helper()
 	if len(f.ChannelSendCalls) == 0 {
 		t.Error("FakeChanneler.ChannelSend not called, expected at least one")
@@ -477,7 +482,7 @@ func (f *FakeChanneler) ChannelSendNotCalled() bool {
 }
 
 // AssertChannelSendNotCalled calls t.Error if FakeChanneler.ChannelSend was called
-func (f *FakeChanneler) AssertChannelSendNotCalled(t *testing.T) {
+func (f *FakeChanneler) AssertChannelSendNotCalled(t ChannelerTestingT) {
 	t.Helper()
 	if len(f.ChannelSendCalls) != 0 {
 		t.Error("FakeChanneler.ChannelSend called, expected none")
@@ -490,7 +495,7 @@ func (f *FakeChanneler) ChannelSendCalledOnce() bool {
 }
 
 // AssertChannelSendCalledOnce calls t.Error if FakeChanneler.ChannelSend was not called exactly once
-func (f *FakeChanneler) AssertChannelSendCalledOnce(t *testing.T) {
+func (f *FakeChanneler) AssertChannelSendCalledOnce(t ChannelerTestingT) {
 	t.Helper()
 	if len(f.ChannelSendCalls) != 1 {
 		t.Errorf("FakeChanneler.ChannelSend called %d times, expected 1", len(f.ChannelSendCalls))
@@ -503,7 +508,7 @@ func (f *FakeChanneler) ChannelSendCalledN(n int) bool {
 }
 
 // AssertChannelSendCalledN calls t.Error if FakeChanneler.ChannelSend was called less than n times
-func (f *FakeChanneler) AssertChannelSendCalledN(t *testing.T, n int) {
+func (f *FakeChanneler) AssertChannelSendCalledN(t ChannelerTestingT, n int) {
 	t.Helper()
 	if len(f.ChannelSendCalls) < n {
 		t.Errorf("FakeChanneler.ChannelSend called %d times, expected >= %d", len(f.ChannelSendCalls), n)
@@ -523,7 +528,7 @@ func (_f14 *FakeChanneler) ChannelSendCalledWith(ident1 chan<- int) (found bool)
 }
 
 // AssertChannelSendCalledWith calls t.Error if FakeChanneler.ChannelSend was not called with the given values
-func (_f15 *FakeChanneler) AssertChannelSendCalledWith(t *testing.T, ident1 chan<- int) {
+func (_f15 *FakeChanneler) AssertChannelSendCalledWith(t ChannelerTestingT, ident1 chan<- int) {
 	t.Helper()
 	var found bool
 	for _, call := range _f15.ChannelSendCalls {
@@ -551,7 +556,7 @@ func (_f16 *FakeChanneler) ChannelSendCalledOnceWith(ident1 chan<- int) bool {
 }
 
 // AssertChannelSendCalledOnceWith calls t.Error if FakeChanneler.ChannelSend was not called exactly once with the given values
-func (_f17 *FakeChanneler) AssertChannelSendCalledOnceWith(t *testing.T, ident1 chan<- int) {
+func (_f17 *FakeChanneler) AssertChannelSendCalledOnceWith(t ChannelerTestingT, ident1 chan<- int) {
 	t.Helper()
 	var count int
 	for _, call := range _f17.ChannelSendCalls {
@@ -598,7 +603,7 @@ func (f *FakeChanneler) ChannelPointerCalled() bool {
 }
 
 // AssertChannelPointerCalled calls t.Error if FakeChanneler.ChannelPointer was not called
-func (f *FakeChanneler) AssertChannelPointerCalled(t *testing.T) {
+func (f *FakeChanneler) AssertChannelPointerCalled(t ChannelerTestingT) {
 	t.Helper()
 	if len(f.ChannelPointerCalls) == 0 {
 		t.Error("FakeChanneler.ChannelPointer not called, expected at least one")
@@ -611,7 +616,7 @@ func (f *FakeChanneler) ChannelPointerNotCalled() bool {
 }
 
 // AssertChannelPointerNotCalled calls t.Error if FakeChanneler.ChannelPointer was called
-func (f *FakeChanneler) AssertChannelPointerNotCalled(t *testing.T) {
+func (f *FakeChanneler) AssertChannelPointerNotCalled(t ChannelerTestingT) {
 	t.Helper()
 	if len(f.ChannelPointerCalls) != 0 {
 		t.Error("FakeChanneler.ChannelPointer called, expected none")
@@ -624,7 +629,7 @@ func (f *FakeChanneler) ChannelPointerCalledOnce() bool {
 }
 
 // AssertChannelPointerCalledOnce calls t.Error if FakeChanneler.ChannelPointer was not called exactly once
-func (f *FakeChanneler) AssertChannelPointerCalledOnce(t *testing.T) {
+func (f *FakeChanneler) AssertChannelPointerCalledOnce(t ChannelerTestingT) {
 	t.Helper()
 	if len(f.ChannelPointerCalls) != 1 {
 		t.Errorf("FakeChanneler.ChannelPointer called %d times, expected 1", len(f.ChannelPointerCalls))
@@ -637,7 +642,7 @@ func (f *FakeChanneler) ChannelPointerCalledN(n int) bool {
 }
 
 // AssertChannelPointerCalledN calls t.Error if FakeChanneler.ChannelPointer was called less than n times
-func (f *FakeChanneler) AssertChannelPointerCalledN(t *testing.T, n int) {
+func (f *FakeChanneler) AssertChannelPointerCalledN(t ChannelerTestingT, n int) {
 	t.Helper()
 	if len(f.ChannelPointerCalls) < n {
 		t.Errorf("FakeChanneler.ChannelPointer called %d times, expected >= %d", len(f.ChannelPointerCalls), n)
@@ -657,7 +662,7 @@ func (_f20 *FakeChanneler) ChannelPointerCalledWith(ident1 *chan int) (found boo
 }
 
 // AssertChannelPointerCalledWith calls t.Error if FakeChanneler.ChannelPointer was not called with the given values
-func (_f21 *FakeChanneler) AssertChannelPointerCalledWith(t *testing.T, ident1 *chan int) {
+func (_f21 *FakeChanneler) AssertChannelPointerCalledWith(t ChannelerTestingT, ident1 *chan int) {
 	t.Helper()
 	var found bool
 	for _, call := range _f21.ChannelPointerCalls {
@@ -685,7 +690,7 @@ func (_f22 *FakeChanneler) ChannelPointerCalledOnceWith(ident1 *chan int) bool {
 }
 
 // AssertChannelPointerCalledOnceWith calls t.Error if FakeChanneler.ChannelPointer was not called exactly once with the given values
-func (_f23 *FakeChanneler) AssertChannelPointerCalledOnceWith(t *testing.T, ident1 *chan int) {
+func (_f23 *FakeChanneler) AssertChannelPointerCalledOnceWith(t ChannelerTestingT, ident1 *chan int) {
 	t.Helper()
 	var count int
 	for _, call := range _f23.ChannelPointerCalls {
@@ -732,7 +737,7 @@ func (f *FakeChanneler) ChannelInterfaceCalled() bool {
 }
 
 // AssertChannelInterfaceCalled calls t.Error if FakeChanneler.ChannelInterface was not called
-func (f *FakeChanneler) AssertChannelInterfaceCalled(t *testing.T) {
+func (f *FakeChanneler) AssertChannelInterfaceCalled(t ChannelerTestingT) {
 	t.Helper()
 	if len(f.ChannelInterfaceCalls) == 0 {
 		t.Error("FakeChanneler.ChannelInterface not called, expected at least one")
@@ -745,7 +750,7 @@ func (f *FakeChanneler) ChannelInterfaceNotCalled() bool {
 }
 
 // AssertChannelInterfaceNotCalled calls t.Error if FakeChanneler.ChannelInterface was called
-func (f *FakeChanneler) AssertChannelInterfaceNotCalled(t *testing.T) {
+func (f *FakeChanneler) AssertChannelInterfaceNotCalled(t ChannelerTestingT) {
 	t.Helper()
 	if len(f.ChannelInterfaceCalls) != 0 {
 		t.Error("FakeChanneler.ChannelInterface called, expected none")
@@ -758,7 +763,7 @@ func (f *FakeChanneler) ChannelInterfaceCalledOnce() bool {
 }
 
 // AssertChannelInterfaceCalledOnce calls t.Error if FakeChanneler.ChannelInterface was not called exactly once
-func (f *FakeChanneler) AssertChannelInterfaceCalledOnce(t *testing.T) {
+func (f *FakeChanneler) AssertChannelInterfaceCalledOnce(t ChannelerTestingT) {
 	t.Helper()
 	if len(f.ChannelInterfaceCalls) != 1 {
 		t.Errorf("FakeChanneler.ChannelInterface called %d times, expected 1", len(f.ChannelInterfaceCalls))
@@ -771,7 +776,7 @@ func (f *FakeChanneler) ChannelInterfaceCalledN(n int) bool {
 }
 
 // AssertChannelInterfaceCalledN calls t.Error if FakeChanneler.ChannelInterface was called less than n times
-func (f *FakeChanneler) AssertChannelInterfaceCalledN(t *testing.T, n int) {
+func (f *FakeChanneler) AssertChannelInterfaceCalledN(t ChannelerTestingT, n int) {
 	t.Helper()
 	if len(f.ChannelInterfaceCalls) < n {
 		t.Errorf("FakeChanneler.ChannelInterface called %d times, expected >= %d", len(f.ChannelInterfaceCalls), n)
@@ -791,7 +796,7 @@ func (_f26 *FakeChanneler) ChannelInterfaceCalledWith(ident1 chan interface{}) (
 }
 
 // AssertChannelInterfaceCalledWith calls t.Error if FakeChanneler.ChannelInterface was not called with the given values
-func (_f27 *FakeChanneler) AssertChannelInterfaceCalledWith(t *testing.T, ident1 chan interface{}) {
+func (_f27 *FakeChanneler) AssertChannelInterfaceCalledWith(t ChannelerTestingT, ident1 chan interface{}) {
 	t.Helper()
 	var found bool
 	for _, call := range _f27.ChannelInterfaceCalls {
@@ -819,7 +824,7 @@ func (_f28 *FakeChanneler) ChannelInterfaceCalledOnceWith(ident1 chan interface{
 }
 
 // AssertChannelInterfaceCalledOnceWith calls t.Error if FakeChanneler.ChannelInterface was not called exactly once with the given values
-func (_f29 *FakeChanneler) AssertChannelInterfaceCalledOnceWith(t *testing.T, ident1 chan interface{}) {
+func (_f29 *FakeChanneler) AssertChannelInterfaceCalledOnceWith(t ChannelerTestingT, ident1 chan interface{}) {
 	t.Helper()
 	var count int
 	for _, call := range _f29.ChannelInterfaceCalls {

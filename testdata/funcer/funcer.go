@@ -2,10 +2,7 @@
 
 package main
 
-import (
-	"reflect"
-	"testing"
-)
+import "reflect"
 
 // FuncerFuncParameterInvocation represents a single call of FakeFuncer.FuncParameter
 type FuncerFuncParameterInvocation struct {
@@ -19,6 +16,14 @@ type FuncerFuncReturnInvocation struct {
 	Results struct {
 		Ident1 func(string) string
 	}
+}
+
+// FuncerTestingT represents the methods of "testing".T used by charlatan Fakes.  It avoids importing the testing package.
+type FuncerTestingT interface {
+	Error(...interface{})
+	Errorf(string, ...interface{})
+	Fatal(...interface{})
+	Helper()
 }
 
 /*
@@ -66,7 +71,7 @@ func NewFakeFuncerDefaultPanic() *FakeFuncer {
 }
 
 // NewFakeFuncerDefaultFatal returns an instance of FakeFuncer with all hooks configured to call t.Fatal
-func NewFakeFuncerDefaultFatal(t *testing.T) *FakeFuncer {
+func NewFakeFuncerDefaultFatal(t FuncerTestingT) *FakeFuncer {
 	return &FakeFuncer{
 		FuncParameterHook: func(func(string) string) {
 			t.Fatal("Unexpected call to Funcer.FuncParameter")
@@ -80,7 +85,7 @@ func NewFakeFuncerDefaultFatal(t *testing.T) *FakeFuncer {
 }
 
 // NewFakeFuncerDefaultError returns an instance of FakeFuncer with all hooks configured to call t.Error
-func NewFakeFuncerDefaultError(t *testing.T) *FakeFuncer {
+func NewFakeFuncerDefaultError(t FuncerTestingT) *FakeFuncer {
 	return &FakeFuncer{
 		FuncParameterHook: func(func(string) string) {
 			t.Error("Unexpected call to Funcer.FuncParameter")
@@ -116,7 +121,7 @@ func (f *FakeFuncer) FuncParameterCalled() bool {
 }
 
 // AssertFuncParameterCalled calls t.Error if FakeFuncer.FuncParameter was not called
-func (f *FakeFuncer) AssertFuncParameterCalled(t *testing.T) {
+func (f *FakeFuncer) AssertFuncParameterCalled(t FuncerTestingT) {
 	t.Helper()
 	if len(f.FuncParameterCalls) == 0 {
 		t.Error("FakeFuncer.FuncParameter not called, expected at least one")
@@ -129,7 +134,7 @@ func (f *FakeFuncer) FuncParameterNotCalled() bool {
 }
 
 // AssertFuncParameterNotCalled calls t.Error if FakeFuncer.FuncParameter was called
-func (f *FakeFuncer) AssertFuncParameterNotCalled(t *testing.T) {
+func (f *FakeFuncer) AssertFuncParameterNotCalled(t FuncerTestingT) {
 	t.Helper()
 	if len(f.FuncParameterCalls) != 0 {
 		t.Error("FakeFuncer.FuncParameter called, expected none")
@@ -142,7 +147,7 @@ func (f *FakeFuncer) FuncParameterCalledOnce() bool {
 }
 
 // AssertFuncParameterCalledOnce calls t.Error if FakeFuncer.FuncParameter was not called exactly once
-func (f *FakeFuncer) AssertFuncParameterCalledOnce(t *testing.T) {
+func (f *FakeFuncer) AssertFuncParameterCalledOnce(t FuncerTestingT) {
 	t.Helper()
 	if len(f.FuncParameterCalls) != 1 {
 		t.Errorf("FakeFuncer.FuncParameter called %d times, expected 1", len(f.FuncParameterCalls))
@@ -155,7 +160,7 @@ func (f *FakeFuncer) FuncParameterCalledN(n int) bool {
 }
 
 // AssertFuncParameterCalledN calls t.Error if FakeFuncer.FuncParameter was called less than n times
-func (f *FakeFuncer) AssertFuncParameterCalledN(t *testing.T, n int) {
+func (f *FakeFuncer) AssertFuncParameterCalledN(t FuncerTestingT, n int) {
 	t.Helper()
 	if len(f.FuncParameterCalls) < n {
 		t.Errorf("FakeFuncer.FuncParameter called %d times, expected >= %d", len(f.FuncParameterCalls), n)
@@ -175,7 +180,7 @@ func (_f2 *FakeFuncer) FuncParameterCalledWith(ident1 func(string) string) (foun
 }
 
 // AssertFuncParameterCalledWith calls t.Error if FakeFuncer.FuncParameter was not called with the given values
-func (_f3 *FakeFuncer) AssertFuncParameterCalledWith(t *testing.T, ident1 func(string) string) {
+func (_f3 *FakeFuncer) AssertFuncParameterCalledWith(t FuncerTestingT, ident1 func(string) string) {
 	t.Helper()
 	var found bool
 	for _, call := range _f3.FuncParameterCalls {
@@ -203,7 +208,7 @@ func (_f4 *FakeFuncer) FuncParameterCalledOnceWith(ident1 func(string) string) b
 }
 
 // AssertFuncParameterCalledOnceWith calls t.Error if FakeFuncer.FuncParameter was not called exactly once with the given values
-func (_f5 *FakeFuncer) AssertFuncParameterCalledOnceWith(t *testing.T, ident1 func(string) string) {
+func (_f5 *FakeFuncer) AssertFuncParameterCalledOnceWith(t FuncerTestingT, ident1 func(string) string) {
 	t.Helper()
 	var count int
 	for _, call := range _f5.FuncParameterCalls {
@@ -235,7 +240,7 @@ func (f *FakeFuncer) FuncReturnCalled() bool {
 }
 
 // AssertFuncReturnCalled calls t.Error if FakeFuncer.FuncReturn was not called
-func (f *FakeFuncer) AssertFuncReturnCalled(t *testing.T) {
+func (f *FakeFuncer) AssertFuncReturnCalled(t FuncerTestingT) {
 	t.Helper()
 	if len(f.FuncReturnCalls) == 0 {
 		t.Error("FakeFuncer.FuncReturn not called, expected at least one")
@@ -248,7 +253,7 @@ func (f *FakeFuncer) FuncReturnNotCalled() bool {
 }
 
 // AssertFuncReturnNotCalled calls t.Error if FakeFuncer.FuncReturn was called
-func (f *FakeFuncer) AssertFuncReturnNotCalled(t *testing.T) {
+func (f *FakeFuncer) AssertFuncReturnNotCalled(t FuncerTestingT) {
 	t.Helper()
 	if len(f.FuncReturnCalls) != 0 {
 		t.Error("FakeFuncer.FuncReturn called, expected none")
@@ -261,7 +266,7 @@ func (f *FakeFuncer) FuncReturnCalledOnce() bool {
 }
 
 // AssertFuncReturnCalledOnce calls t.Error if FakeFuncer.FuncReturn was not called exactly once
-func (f *FakeFuncer) AssertFuncReturnCalledOnce(t *testing.T) {
+func (f *FakeFuncer) AssertFuncReturnCalledOnce(t FuncerTestingT) {
 	t.Helper()
 	if len(f.FuncReturnCalls) != 1 {
 		t.Errorf("FakeFuncer.FuncReturn called %d times, expected 1", len(f.FuncReturnCalls))
@@ -274,7 +279,7 @@ func (f *FakeFuncer) FuncReturnCalledN(n int) bool {
 }
 
 // AssertFuncReturnCalledN calls t.Error if FakeFuncer.FuncReturn was called less than n times
-func (f *FakeFuncer) AssertFuncReturnCalledN(t *testing.T, n int) {
+func (f *FakeFuncer) AssertFuncReturnCalledN(t FuncerTestingT, n int) {
 	t.Helper()
 	if len(f.FuncReturnCalls) < n {
 		t.Errorf("FakeFuncer.FuncReturn called %d times, expected >= %d", len(f.FuncReturnCalls), n)

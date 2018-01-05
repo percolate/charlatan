@@ -2,12 +2,16 @@
 
 package main
 
-import (
-	"testing"
-)
-
 // VoiderVoidMethodInvocation represents a single call of FakeVoider.VoidMethod
 type VoiderVoidMethodInvocation struct {
+}
+
+// VoiderTestingT represents the methods of "testing".T used by charlatan Fakes.  It avoids importing the testing package.
+type VoiderTestingT interface {
+	Error(...interface{})
+	Errorf(string, ...interface{})
+	Fatal(...interface{})
+	Helper()
 }
 
 /*
@@ -50,7 +54,7 @@ func NewFakeVoiderDefaultPanic() *FakeVoider {
 }
 
 // NewFakeVoiderDefaultFatal returns an instance of FakeVoider with all hooks configured to call t.Fatal
-func NewFakeVoiderDefaultFatal(t *testing.T) *FakeVoider {
+func NewFakeVoiderDefaultFatal(t VoiderTestingT) *FakeVoider {
 	return &FakeVoider{
 		VoidMethodHook: func() {
 			t.Fatal("Unexpected call to Voider.VoidMethod")
@@ -60,7 +64,7 @@ func NewFakeVoiderDefaultFatal(t *testing.T) *FakeVoider {
 }
 
 // NewFakeVoiderDefaultError returns an instance of FakeVoider with all hooks configured to call t.Error
-func NewFakeVoiderDefaultError(t *testing.T) *FakeVoider {
+func NewFakeVoiderDefaultError(t VoiderTestingT) *FakeVoider {
 	return &FakeVoider{
 		VoidMethodHook: func() {
 			t.Error("Unexpected call to Voider.VoidMethod")
@@ -89,7 +93,7 @@ func (f *FakeVoider) VoidMethodCalled() bool {
 }
 
 // AssertVoidMethodCalled calls t.Error if FakeVoider.VoidMethod was not called
-func (f *FakeVoider) AssertVoidMethodCalled(t *testing.T) {
+func (f *FakeVoider) AssertVoidMethodCalled(t VoiderTestingT) {
 	t.Helper()
 	if len(f.VoidMethodCalls) == 0 {
 		t.Error("FakeVoider.VoidMethod not called, expected at least one")
@@ -102,7 +106,7 @@ func (f *FakeVoider) VoidMethodNotCalled() bool {
 }
 
 // AssertVoidMethodNotCalled calls t.Error if FakeVoider.VoidMethod was called
-func (f *FakeVoider) AssertVoidMethodNotCalled(t *testing.T) {
+func (f *FakeVoider) AssertVoidMethodNotCalled(t VoiderTestingT) {
 	t.Helper()
 	if len(f.VoidMethodCalls) != 0 {
 		t.Error("FakeVoider.VoidMethod called, expected none")
@@ -115,7 +119,7 @@ func (f *FakeVoider) VoidMethodCalledOnce() bool {
 }
 
 // AssertVoidMethodCalledOnce calls t.Error if FakeVoider.VoidMethod was not called exactly once
-func (f *FakeVoider) AssertVoidMethodCalledOnce(t *testing.T) {
+func (f *FakeVoider) AssertVoidMethodCalledOnce(t VoiderTestingT) {
 	t.Helper()
 	if len(f.VoidMethodCalls) != 1 {
 		t.Errorf("FakeVoider.VoidMethod called %d times, expected 1", len(f.VoidMethodCalls))
@@ -128,7 +132,7 @@ func (f *FakeVoider) VoidMethodCalledN(n int) bool {
 }
 
 // AssertVoidMethodCalledN calls t.Error if FakeVoider.VoidMethod was called less than n times
-func (f *FakeVoider) AssertVoidMethodCalledN(t *testing.T, n int) {
+func (f *FakeVoider) AssertVoidMethodCalledN(t VoiderTestingT, n int) {
 	t.Helper()
 	if len(f.VoidMethodCalls) < n {
 		t.Errorf("FakeVoider.VoidMethod called %d times, expected >= %d", len(f.VoidMethodCalls), n)

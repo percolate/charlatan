@@ -2,11 +2,8 @@
 
 package main
 
-import (
-	"fmt"
-	"reflect"
-	"testing"
-)
+import "reflect"
+import "fmt"
 
 // QualifierQualifyInvocation represents a single call of FakeQualifier.Qualify
 type QualifierQualifyInvocation struct {
@@ -28,6 +25,14 @@ type QualifierNamedQualifyInvocation struct {
 	Results struct {
 		D fmt.Scanner
 	}
+}
+
+// QualifierTestingT represents the methods of "testing".T used by charlatan Fakes.  It avoids importing the testing package.
+type QualifierTestingT interface {
+	Error(...interface{})
+	Errorf(string, ...interface{})
+	Fatal(...interface{})
+	Helper()
 }
 
 /*
@@ -75,7 +80,7 @@ func NewFakeQualifierDefaultPanic() *FakeQualifier {
 }
 
 // NewFakeQualifierDefaultFatal returns an instance of FakeQualifier with all hooks configured to call t.Fatal
-func NewFakeQualifierDefaultFatal(t *testing.T) *FakeQualifier {
+func NewFakeQualifierDefaultFatal(t QualifierTestingT) *FakeQualifier {
 	return &FakeQualifier{
 		QualifyHook: func(fmt.Scanner) (ident2 fmt.Scanner) {
 			t.Fatal("Unexpected call to Qualifier.Qualify")
@@ -89,7 +94,7 @@ func NewFakeQualifierDefaultFatal(t *testing.T) *FakeQualifier {
 }
 
 // NewFakeQualifierDefaultError returns an instance of FakeQualifier with all hooks configured to call t.Error
-func NewFakeQualifierDefaultError(t *testing.T) *FakeQualifier {
+func NewFakeQualifierDefaultError(t QualifierTestingT) *FakeQualifier {
 	return &FakeQualifier{
 		QualifyHook: func(fmt.Scanner) (ident2 fmt.Scanner) {
 			t.Error("Unexpected call to Qualifier.Qualify")
@@ -127,7 +132,7 @@ func (f *FakeQualifier) QualifyCalled() bool {
 }
 
 // AssertQualifyCalled calls t.Error if FakeQualifier.Qualify was not called
-func (f *FakeQualifier) AssertQualifyCalled(t *testing.T) {
+func (f *FakeQualifier) AssertQualifyCalled(t QualifierTestingT) {
 	t.Helper()
 	if len(f.QualifyCalls) == 0 {
 		t.Error("FakeQualifier.Qualify not called, expected at least one")
@@ -140,7 +145,7 @@ func (f *FakeQualifier) QualifyNotCalled() bool {
 }
 
 // AssertQualifyNotCalled calls t.Error if FakeQualifier.Qualify was called
-func (f *FakeQualifier) AssertQualifyNotCalled(t *testing.T) {
+func (f *FakeQualifier) AssertQualifyNotCalled(t QualifierTestingT) {
 	t.Helper()
 	if len(f.QualifyCalls) != 0 {
 		t.Error("FakeQualifier.Qualify called, expected none")
@@ -153,7 +158,7 @@ func (f *FakeQualifier) QualifyCalledOnce() bool {
 }
 
 // AssertQualifyCalledOnce calls t.Error if FakeQualifier.Qualify was not called exactly once
-func (f *FakeQualifier) AssertQualifyCalledOnce(t *testing.T) {
+func (f *FakeQualifier) AssertQualifyCalledOnce(t QualifierTestingT) {
 	t.Helper()
 	if len(f.QualifyCalls) != 1 {
 		t.Errorf("FakeQualifier.Qualify called %d times, expected 1", len(f.QualifyCalls))
@@ -166,7 +171,7 @@ func (f *FakeQualifier) QualifyCalledN(n int) bool {
 }
 
 // AssertQualifyCalledN calls t.Error if FakeQualifier.Qualify was called less than n times
-func (f *FakeQualifier) AssertQualifyCalledN(t *testing.T, n int) {
+func (f *FakeQualifier) AssertQualifyCalledN(t QualifierTestingT, n int) {
 	t.Helper()
 	if len(f.QualifyCalls) < n {
 		t.Errorf("FakeQualifier.Qualify called %d times, expected >= %d", len(f.QualifyCalls), n)
@@ -186,7 +191,7 @@ func (_f2 *FakeQualifier) QualifyCalledWith(ident1 fmt.Scanner) (found bool) {
 }
 
 // AssertQualifyCalledWith calls t.Error if FakeQualifier.Qualify was not called with the given values
-func (_f3 *FakeQualifier) AssertQualifyCalledWith(t *testing.T, ident1 fmt.Scanner) {
+func (_f3 *FakeQualifier) AssertQualifyCalledWith(t QualifierTestingT, ident1 fmt.Scanner) {
 	t.Helper()
 	var found bool
 	for _, call := range _f3.QualifyCalls {
@@ -214,7 +219,7 @@ func (_f4 *FakeQualifier) QualifyCalledOnceWith(ident1 fmt.Scanner) bool {
 }
 
 // AssertQualifyCalledOnceWith calls t.Error if FakeQualifier.Qualify was not called exactly once with the given values
-func (_f5 *FakeQualifier) AssertQualifyCalledOnceWith(t *testing.T, ident1 fmt.Scanner) {
+func (_f5 *FakeQualifier) AssertQualifyCalledOnceWith(t QualifierTestingT, ident1 fmt.Scanner) {
 	t.Helper()
 	var count int
 	for _, call := range _f5.QualifyCalls {
@@ -263,7 +268,7 @@ func (f *FakeQualifier) NamedQualifyCalled() bool {
 }
 
 // AssertNamedQualifyCalled calls t.Error if FakeQualifier.NamedQualify was not called
-func (f *FakeQualifier) AssertNamedQualifyCalled(t *testing.T) {
+func (f *FakeQualifier) AssertNamedQualifyCalled(t QualifierTestingT) {
 	t.Helper()
 	if len(f.NamedQualifyCalls) == 0 {
 		t.Error("FakeQualifier.NamedQualify not called, expected at least one")
@@ -276,7 +281,7 @@ func (f *FakeQualifier) NamedQualifyNotCalled() bool {
 }
 
 // AssertNamedQualifyNotCalled calls t.Error if FakeQualifier.NamedQualify was called
-func (f *FakeQualifier) AssertNamedQualifyNotCalled(t *testing.T) {
+func (f *FakeQualifier) AssertNamedQualifyNotCalled(t QualifierTestingT) {
 	t.Helper()
 	if len(f.NamedQualifyCalls) != 0 {
 		t.Error("FakeQualifier.NamedQualify called, expected none")
@@ -289,7 +294,7 @@ func (f *FakeQualifier) NamedQualifyCalledOnce() bool {
 }
 
 // AssertNamedQualifyCalledOnce calls t.Error if FakeQualifier.NamedQualify was not called exactly once
-func (f *FakeQualifier) AssertNamedQualifyCalledOnce(t *testing.T) {
+func (f *FakeQualifier) AssertNamedQualifyCalledOnce(t QualifierTestingT) {
 	t.Helper()
 	if len(f.NamedQualifyCalls) != 1 {
 		t.Errorf("FakeQualifier.NamedQualify called %d times, expected 1", len(f.NamedQualifyCalls))
@@ -302,7 +307,7 @@ func (f *FakeQualifier) NamedQualifyCalledN(n int) bool {
 }
 
 // AssertNamedQualifyCalledN calls t.Error if FakeQualifier.NamedQualify was called less than n times
-func (f *FakeQualifier) AssertNamedQualifyCalledN(t *testing.T, n int) {
+func (f *FakeQualifier) AssertNamedQualifyCalledN(t QualifierTestingT, n int) {
 	t.Helper()
 	if len(f.NamedQualifyCalls) < n {
 		t.Errorf("FakeQualifier.NamedQualify called %d times, expected >= %d", len(f.NamedQualifyCalls), n)
@@ -322,7 +327,7 @@ func (_f8 *FakeQualifier) NamedQualifyCalledWith(a fmt.Scanner, b fmt.Scanner, c
 }
 
 // AssertNamedQualifyCalledWith calls t.Error if FakeQualifier.NamedQualify was not called with the given values
-func (_f9 *FakeQualifier) AssertNamedQualifyCalledWith(t *testing.T, a fmt.Scanner, b fmt.Scanner, c fmt.Scanner) {
+func (_f9 *FakeQualifier) AssertNamedQualifyCalledWith(t QualifierTestingT, a fmt.Scanner, b fmt.Scanner, c fmt.Scanner) {
 	t.Helper()
 	var found bool
 	for _, call := range _f9.NamedQualifyCalls {
@@ -350,7 +355,7 @@ func (_f10 *FakeQualifier) NamedQualifyCalledOnceWith(a fmt.Scanner, b fmt.Scann
 }
 
 // AssertNamedQualifyCalledOnceWith calls t.Error if FakeQualifier.NamedQualify was not called exactly once with the given values
-func (_f11 *FakeQualifier) AssertNamedQualifyCalledOnceWith(t *testing.T, a fmt.Scanner, b fmt.Scanner, c fmt.Scanner) {
+func (_f11 *FakeQualifier) AssertNamedQualifyCalledOnceWith(t QualifierTestingT, a fmt.Scanner, b fmt.Scanner, c fmt.Scanner) {
 	t.Helper()
 	var count int
 	for _, call := range _f11.NamedQualifyCalls {
