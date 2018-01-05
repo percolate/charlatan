@@ -2,10 +2,7 @@
 
 package main
 
-import (
-	"reflect"
-	"testing"
-)
+import "reflect"
 
 // InterfacerInterfaceInvocation represents a single call of FakeInterfacer.Interface
 type InterfacerInterfaceInvocation struct {
@@ -25,6 +22,14 @@ type InterfacerNamedInterfaceInvocation struct {
 	Results struct {
 		Z interface{}
 	}
+}
+
+// InterfacerTestingT represents the methods of "testing".T used by charlatan Fakes.  It avoids importing the testing package.
+type InterfacerTestingT interface {
+	Error(...interface{})
+	Errorf(string, ...interface{})
+	Fatal(...interface{})
+	Helper()
 }
 
 /*
@@ -72,7 +77,7 @@ func NewFakeInterfacerDefaultPanic() *FakeInterfacer {
 }
 
 // NewFakeInterfacerDefaultFatal returns an instance of FakeInterfacer with all hooks configured to call t.Fatal
-func NewFakeInterfacerDefaultFatal(t *testing.T) *FakeInterfacer {
+func NewFakeInterfacerDefaultFatal(t InterfacerTestingT) *FakeInterfacer {
 	return &FakeInterfacer{
 		InterfaceHook: func(interface{}) (ident2 interface{}) {
 			t.Fatal("Unexpected call to Interfacer.Interface")
@@ -86,7 +91,7 @@ func NewFakeInterfacerDefaultFatal(t *testing.T) *FakeInterfacer {
 }
 
 // NewFakeInterfacerDefaultError returns an instance of FakeInterfacer with all hooks configured to call t.Error
-func NewFakeInterfacerDefaultError(t *testing.T) *FakeInterfacer {
+func NewFakeInterfacerDefaultError(t InterfacerTestingT) *FakeInterfacer {
 	return &FakeInterfacer{
 		InterfaceHook: func(interface{}) (ident2 interface{}) {
 			t.Error("Unexpected call to Interfacer.Interface")
@@ -124,7 +129,7 @@ func (f *FakeInterfacer) InterfaceCalled() bool {
 }
 
 // AssertInterfaceCalled calls t.Error if FakeInterfacer.Interface was not called
-func (f *FakeInterfacer) AssertInterfaceCalled(t *testing.T) {
+func (f *FakeInterfacer) AssertInterfaceCalled(t InterfacerTestingT) {
 	t.Helper()
 	if len(f.InterfaceCalls) == 0 {
 		t.Error("FakeInterfacer.Interface not called, expected at least one")
@@ -137,7 +142,7 @@ func (f *FakeInterfacer) InterfaceNotCalled() bool {
 }
 
 // AssertInterfaceNotCalled calls t.Error if FakeInterfacer.Interface was called
-func (f *FakeInterfacer) AssertInterfaceNotCalled(t *testing.T) {
+func (f *FakeInterfacer) AssertInterfaceNotCalled(t InterfacerTestingT) {
 	t.Helper()
 	if len(f.InterfaceCalls) != 0 {
 		t.Error("FakeInterfacer.Interface called, expected none")
@@ -150,7 +155,7 @@ func (f *FakeInterfacer) InterfaceCalledOnce() bool {
 }
 
 // AssertInterfaceCalledOnce calls t.Error if FakeInterfacer.Interface was not called exactly once
-func (f *FakeInterfacer) AssertInterfaceCalledOnce(t *testing.T) {
+func (f *FakeInterfacer) AssertInterfaceCalledOnce(t InterfacerTestingT) {
 	t.Helper()
 	if len(f.InterfaceCalls) != 1 {
 		t.Errorf("FakeInterfacer.Interface called %d times, expected 1", len(f.InterfaceCalls))
@@ -163,7 +168,7 @@ func (f *FakeInterfacer) InterfaceCalledN(n int) bool {
 }
 
 // AssertInterfaceCalledN calls t.Error if FakeInterfacer.Interface was called less than n times
-func (f *FakeInterfacer) AssertInterfaceCalledN(t *testing.T, n int) {
+func (f *FakeInterfacer) AssertInterfaceCalledN(t InterfacerTestingT, n int) {
 	t.Helper()
 	if len(f.InterfaceCalls) < n {
 		t.Errorf("FakeInterfacer.Interface called %d times, expected >= %d", len(f.InterfaceCalls), n)
@@ -183,7 +188,7 @@ func (_f2 *FakeInterfacer) InterfaceCalledWith(ident1 interface{}) (found bool) 
 }
 
 // AssertInterfaceCalledWith calls t.Error if FakeInterfacer.Interface was not called with the given values
-func (_f3 *FakeInterfacer) AssertInterfaceCalledWith(t *testing.T, ident1 interface{}) {
+func (_f3 *FakeInterfacer) AssertInterfaceCalledWith(t InterfacerTestingT, ident1 interface{}) {
 	t.Helper()
 	var found bool
 	for _, call := range _f3.InterfaceCalls {
@@ -211,7 +216,7 @@ func (_f4 *FakeInterfacer) InterfaceCalledOnceWith(ident1 interface{}) bool {
 }
 
 // AssertInterfaceCalledOnceWith calls t.Error if FakeInterfacer.Interface was not called exactly once with the given values
-func (_f5 *FakeInterfacer) AssertInterfaceCalledOnceWith(t *testing.T, ident1 interface{}) {
+func (_f5 *FakeInterfacer) AssertInterfaceCalledOnceWith(t InterfacerTestingT, ident1 interface{}) {
 	t.Helper()
 	var count int
 	for _, call := range _f5.InterfaceCalls {
@@ -258,7 +263,7 @@ func (f *FakeInterfacer) NamedInterfaceCalled() bool {
 }
 
 // AssertNamedInterfaceCalled calls t.Error if FakeInterfacer.NamedInterface was not called
-func (f *FakeInterfacer) AssertNamedInterfaceCalled(t *testing.T) {
+func (f *FakeInterfacer) AssertNamedInterfaceCalled(t InterfacerTestingT) {
 	t.Helper()
 	if len(f.NamedInterfaceCalls) == 0 {
 		t.Error("FakeInterfacer.NamedInterface not called, expected at least one")
@@ -271,7 +276,7 @@ func (f *FakeInterfacer) NamedInterfaceNotCalled() bool {
 }
 
 // AssertNamedInterfaceNotCalled calls t.Error if FakeInterfacer.NamedInterface was called
-func (f *FakeInterfacer) AssertNamedInterfaceNotCalled(t *testing.T) {
+func (f *FakeInterfacer) AssertNamedInterfaceNotCalled(t InterfacerTestingT) {
 	t.Helper()
 	if len(f.NamedInterfaceCalls) != 0 {
 		t.Error("FakeInterfacer.NamedInterface called, expected none")
@@ -284,7 +289,7 @@ func (f *FakeInterfacer) NamedInterfaceCalledOnce() bool {
 }
 
 // AssertNamedInterfaceCalledOnce calls t.Error if FakeInterfacer.NamedInterface was not called exactly once
-func (f *FakeInterfacer) AssertNamedInterfaceCalledOnce(t *testing.T) {
+func (f *FakeInterfacer) AssertNamedInterfaceCalledOnce(t InterfacerTestingT) {
 	t.Helper()
 	if len(f.NamedInterfaceCalls) != 1 {
 		t.Errorf("FakeInterfacer.NamedInterface called %d times, expected 1", len(f.NamedInterfaceCalls))
@@ -297,7 +302,7 @@ func (f *FakeInterfacer) NamedInterfaceCalledN(n int) bool {
 }
 
 // AssertNamedInterfaceCalledN calls t.Error if FakeInterfacer.NamedInterface was called less than n times
-func (f *FakeInterfacer) AssertNamedInterfaceCalledN(t *testing.T, n int) {
+func (f *FakeInterfacer) AssertNamedInterfaceCalledN(t InterfacerTestingT, n int) {
 	t.Helper()
 	if len(f.NamedInterfaceCalls) < n {
 		t.Errorf("FakeInterfacer.NamedInterface called %d times, expected >= %d", len(f.NamedInterfaceCalls), n)
@@ -317,7 +322,7 @@ func (_f8 *FakeInterfacer) NamedInterfaceCalledWith(a interface{}) (found bool) 
 }
 
 // AssertNamedInterfaceCalledWith calls t.Error if FakeInterfacer.NamedInterface was not called with the given values
-func (_f9 *FakeInterfacer) AssertNamedInterfaceCalledWith(t *testing.T, a interface{}) {
+func (_f9 *FakeInterfacer) AssertNamedInterfaceCalledWith(t InterfacerTestingT, a interface{}) {
 	t.Helper()
 	var found bool
 	for _, call := range _f9.NamedInterfaceCalls {
@@ -345,7 +350,7 @@ func (_f10 *FakeInterfacer) NamedInterfaceCalledOnceWith(a interface{}) bool {
 }
 
 // AssertNamedInterfaceCalledOnceWith calls t.Error if FakeInterfacer.NamedInterface was not called exactly once with the given values
-func (_f11 *FakeInterfacer) AssertNamedInterfaceCalledOnceWith(t *testing.T, a interface{}) {
+func (_f11 *FakeInterfacer) AssertNamedInterfaceCalledOnceWith(t InterfacerTestingT, a interface{}) {
 	t.Helper()
 	var count int
 	for _, call := range _f11.NamedInterfaceCalls {

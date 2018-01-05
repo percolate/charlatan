@@ -2,10 +2,7 @@
 
 package main
 
-import (
-	"reflect"
-	"testing"
-)
+import "reflect"
 
 // MapperMapParameterInvocation represents a single call of FakeMapper.MapParameter
 type MapperMapParameterInvocation struct {
@@ -19,6 +16,14 @@ type MapperMapReturnInvocation struct {
 	Results struct {
 		Ident1 map[string]string
 	}
+}
+
+// MapperTestingT represents the methods of "testing".T used by charlatan Fakes.  It avoids importing the testing package.
+type MapperTestingT interface {
+	Error(...interface{})
+	Errorf(string, ...interface{})
+	Fatal(...interface{})
+	Helper()
 }
 
 /*
@@ -66,7 +71,7 @@ func NewFakeMapperDefaultPanic() *FakeMapper {
 }
 
 // NewFakeMapperDefaultFatal returns an instance of FakeMapper with all hooks configured to call t.Fatal
-func NewFakeMapperDefaultFatal(t *testing.T) *FakeMapper {
+func NewFakeMapperDefaultFatal(t MapperTestingT) *FakeMapper {
 	return &FakeMapper{
 		MapParameterHook: func(map[string]string) {
 			t.Fatal("Unexpected call to Mapper.MapParameter")
@@ -80,7 +85,7 @@ func NewFakeMapperDefaultFatal(t *testing.T) *FakeMapper {
 }
 
 // NewFakeMapperDefaultError returns an instance of FakeMapper with all hooks configured to call t.Error
-func NewFakeMapperDefaultError(t *testing.T) *FakeMapper {
+func NewFakeMapperDefaultError(t MapperTestingT) *FakeMapper {
 	return &FakeMapper{
 		MapParameterHook: func(map[string]string) {
 			t.Error("Unexpected call to Mapper.MapParameter")
@@ -116,7 +121,7 @@ func (f *FakeMapper) MapParameterCalled() bool {
 }
 
 // AssertMapParameterCalled calls t.Error if FakeMapper.MapParameter was not called
-func (f *FakeMapper) AssertMapParameterCalled(t *testing.T) {
+func (f *FakeMapper) AssertMapParameterCalled(t MapperTestingT) {
 	t.Helper()
 	if len(f.MapParameterCalls) == 0 {
 		t.Error("FakeMapper.MapParameter not called, expected at least one")
@@ -129,7 +134,7 @@ func (f *FakeMapper) MapParameterNotCalled() bool {
 }
 
 // AssertMapParameterNotCalled calls t.Error if FakeMapper.MapParameter was called
-func (f *FakeMapper) AssertMapParameterNotCalled(t *testing.T) {
+func (f *FakeMapper) AssertMapParameterNotCalled(t MapperTestingT) {
 	t.Helper()
 	if len(f.MapParameterCalls) != 0 {
 		t.Error("FakeMapper.MapParameter called, expected none")
@@ -142,7 +147,7 @@ func (f *FakeMapper) MapParameterCalledOnce() bool {
 }
 
 // AssertMapParameterCalledOnce calls t.Error if FakeMapper.MapParameter was not called exactly once
-func (f *FakeMapper) AssertMapParameterCalledOnce(t *testing.T) {
+func (f *FakeMapper) AssertMapParameterCalledOnce(t MapperTestingT) {
 	t.Helper()
 	if len(f.MapParameterCalls) != 1 {
 		t.Errorf("FakeMapper.MapParameter called %d times, expected 1", len(f.MapParameterCalls))
@@ -155,7 +160,7 @@ func (f *FakeMapper) MapParameterCalledN(n int) bool {
 }
 
 // AssertMapParameterCalledN calls t.Error if FakeMapper.MapParameter was called less than n times
-func (f *FakeMapper) AssertMapParameterCalledN(t *testing.T, n int) {
+func (f *FakeMapper) AssertMapParameterCalledN(t MapperTestingT, n int) {
 	t.Helper()
 	if len(f.MapParameterCalls) < n {
 		t.Errorf("FakeMapper.MapParameter called %d times, expected >= %d", len(f.MapParameterCalls), n)
@@ -175,7 +180,7 @@ func (_f2 *FakeMapper) MapParameterCalledWith(ident1 map[string]string) (found b
 }
 
 // AssertMapParameterCalledWith calls t.Error if FakeMapper.MapParameter was not called with the given values
-func (_f3 *FakeMapper) AssertMapParameterCalledWith(t *testing.T, ident1 map[string]string) {
+func (_f3 *FakeMapper) AssertMapParameterCalledWith(t MapperTestingT, ident1 map[string]string) {
 	t.Helper()
 	var found bool
 	for _, call := range _f3.MapParameterCalls {
@@ -203,7 +208,7 @@ func (_f4 *FakeMapper) MapParameterCalledOnceWith(ident1 map[string]string) bool
 }
 
 // AssertMapParameterCalledOnceWith calls t.Error if FakeMapper.MapParameter was not called exactly once with the given values
-func (_f5 *FakeMapper) AssertMapParameterCalledOnceWith(t *testing.T, ident1 map[string]string) {
+func (_f5 *FakeMapper) AssertMapParameterCalledOnceWith(t MapperTestingT, ident1 map[string]string) {
 	t.Helper()
 	var count int
 	for _, call := range _f5.MapParameterCalls {
@@ -235,7 +240,7 @@ func (f *FakeMapper) MapReturnCalled() bool {
 }
 
 // AssertMapReturnCalled calls t.Error if FakeMapper.MapReturn was not called
-func (f *FakeMapper) AssertMapReturnCalled(t *testing.T) {
+func (f *FakeMapper) AssertMapReturnCalled(t MapperTestingT) {
 	t.Helper()
 	if len(f.MapReturnCalls) == 0 {
 		t.Error("FakeMapper.MapReturn not called, expected at least one")
@@ -248,7 +253,7 @@ func (f *FakeMapper) MapReturnNotCalled() bool {
 }
 
 // AssertMapReturnNotCalled calls t.Error if FakeMapper.MapReturn was called
-func (f *FakeMapper) AssertMapReturnNotCalled(t *testing.T) {
+func (f *FakeMapper) AssertMapReturnNotCalled(t MapperTestingT) {
 	t.Helper()
 	if len(f.MapReturnCalls) != 0 {
 		t.Error("FakeMapper.MapReturn called, expected none")
@@ -261,7 +266,7 @@ func (f *FakeMapper) MapReturnCalledOnce() bool {
 }
 
 // AssertMapReturnCalledOnce calls t.Error if FakeMapper.MapReturn was not called exactly once
-func (f *FakeMapper) AssertMapReturnCalledOnce(t *testing.T) {
+func (f *FakeMapper) AssertMapReturnCalledOnce(t MapperTestingT) {
 	t.Helper()
 	if len(f.MapReturnCalls) != 1 {
 		t.Errorf("FakeMapper.MapReturn called %d times, expected 1", len(f.MapReturnCalls))
@@ -274,7 +279,7 @@ func (f *FakeMapper) MapReturnCalledN(n int) bool {
 }
 
 // AssertMapReturnCalledN calls t.Error if FakeMapper.MapReturn was called less than n times
-func (f *FakeMapper) AssertMapReturnCalledN(t *testing.T, n int) {
+func (f *FakeMapper) AssertMapReturnCalledN(t MapperTestingT, n int) {
 	t.Helper()
 	if len(f.MapReturnCalls) < n {
 		t.Errorf("FakeMapper.MapReturn called %d times, expected >= %d", len(f.MapReturnCalls), n)

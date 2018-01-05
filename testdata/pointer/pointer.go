@@ -2,10 +2,7 @@
 
 package main
 
-import (
-	"reflect"
-	"testing"
-)
+import "reflect"
 
 // PointerPointInvocation represents a single call of FakePointer.Point
 type PointerPointInvocation struct {
@@ -15,6 +12,14 @@ type PointerPointInvocation struct {
 	Results struct {
 		Ident2 int
 	}
+}
+
+// PointerTestingT represents the methods of "testing".T used by charlatan Fakes.  It avoids importing the testing package.
+type PointerTestingT interface {
+	Error(...interface{})
+	Errorf(string, ...interface{})
+	Fatal(...interface{})
+	Helper()
 }
 
 /*
@@ -57,7 +62,7 @@ func NewFakePointerDefaultPanic() *FakePointer {
 }
 
 // NewFakePointerDefaultFatal returns an instance of FakePointer with all hooks configured to call t.Fatal
-func NewFakePointerDefaultFatal(t *testing.T) *FakePointer {
+func NewFakePointerDefaultFatal(t PointerTestingT) *FakePointer {
 	return &FakePointer{
 		PointHook: func(*string) (ident2 int) {
 			t.Fatal("Unexpected call to Pointer.Point")
@@ -67,7 +72,7 @@ func NewFakePointerDefaultFatal(t *testing.T) *FakePointer {
 }
 
 // NewFakePointerDefaultError returns an instance of FakePointer with all hooks configured to call t.Error
-func NewFakePointerDefaultError(t *testing.T) *FakePointer {
+func NewFakePointerDefaultError(t PointerTestingT) *FakePointer {
 	return &FakePointer{
 		PointHook: func(*string) (ident2 int) {
 			t.Error("Unexpected call to Pointer.Point")
@@ -100,7 +105,7 @@ func (f *FakePointer) PointCalled() bool {
 }
 
 // AssertPointCalled calls t.Error if FakePointer.Point was not called
-func (f *FakePointer) AssertPointCalled(t *testing.T) {
+func (f *FakePointer) AssertPointCalled(t PointerTestingT) {
 	t.Helper()
 	if len(f.PointCalls) == 0 {
 		t.Error("FakePointer.Point not called, expected at least one")
@@ -113,7 +118,7 @@ func (f *FakePointer) PointNotCalled() bool {
 }
 
 // AssertPointNotCalled calls t.Error if FakePointer.Point was called
-func (f *FakePointer) AssertPointNotCalled(t *testing.T) {
+func (f *FakePointer) AssertPointNotCalled(t PointerTestingT) {
 	t.Helper()
 	if len(f.PointCalls) != 0 {
 		t.Error("FakePointer.Point called, expected none")
@@ -126,7 +131,7 @@ func (f *FakePointer) PointCalledOnce() bool {
 }
 
 // AssertPointCalledOnce calls t.Error if FakePointer.Point was not called exactly once
-func (f *FakePointer) AssertPointCalledOnce(t *testing.T) {
+func (f *FakePointer) AssertPointCalledOnce(t PointerTestingT) {
 	t.Helper()
 	if len(f.PointCalls) != 1 {
 		t.Errorf("FakePointer.Point called %d times, expected 1", len(f.PointCalls))
@@ -139,7 +144,7 @@ func (f *FakePointer) PointCalledN(n int) bool {
 }
 
 // AssertPointCalledN calls t.Error if FakePointer.Point was called less than n times
-func (f *FakePointer) AssertPointCalledN(t *testing.T, n int) {
+func (f *FakePointer) AssertPointCalledN(t PointerTestingT, n int) {
 	t.Helper()
 	if len(f.PointCalls) < n {
 		t.Errorf("FakePointer.Point called %d times, expected >= %d", len(f.PointCalls), n)
@@ -159,7 +164,7 @@ func (_f2 *FakePointer) PointCalledWith(ident1 *string) (found bool) {
 }
 
 // AssertPointCalledWith calls t.Error if FakePointer.Point was not called with the given values
-func (_f3 *FakePointer) AssertPointCalledWith(t *testing.T, ident1 *string) {
+func (_f3 *FakePointer) AssertPointCalledWith(t PointerTestingT, ident1 *string) {
 	t.Helper()
 	var found bool
 	for _, call := range _f3.PointCalls {
@@ -187,7 +192,7 @@ func (_f4 *FakePointer) PointCalledOnceWith(ident1 *string) bool {
 }
 
 // AssertPointCalledOnceWith calls t.Error if FakePointer.Point was not called exactly once with the given values
-func (_f5 *FakePointer) AssertPointCalledOnceWith(t *testing.T, ident1 *string) {
+func (_f5 *FakePointer) AssertPointCalledOnceWith(t PointerTestingT, ident1 *string) {
 	t.Helper()
 	var count int
 	for _, call := range _f5.PointCalls {

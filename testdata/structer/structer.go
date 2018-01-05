@@ -2,10 +2,7 @@
 
 package main
 
-import (
-	"reflect"
-	"testing"
-)
+import "reflect"
 
 // StructerStructInvocation represents a single call of FakeStructer.Struct
 type StructerStructInvocation struct {
@@ -37,6 +34,14 @@ type StructerNamedStructInvocation struct {
 			d string
 		}
 	}
+}
+
+// StructerTestingT represents the methods of "testing".T used by charlatan Fakes.  It avoids importing the testing package.
+type StructerTestingT interface {
+	Error(...interface{})
+	Errorf(string, ...interface{})
+	Fatal(...interface{})
+	Helper()
 }
 
 /*
@@ -114,7 +119,7 @@ func NewFakeStructerDefaultPanic() *FakeStructer {
 }
 
 // NewFakeStructerDefaultFatal returns an instance of FakeStructer with all hooks configured to call t.Fatal
-func NewFakeStructerDefaultFatal(t *testing.T) *FakeStructer {
+func NewFakeStructerDefaultFatal(t StructerTestingT) *FakeStructer {
 	return &FakeStructer{
 		StructHook: func(struct {
 			a string
@@ -140,7 +145,7 @@ func NewFakeStructerDefaultFatal(t *testing.T) *FakeStructer {
 }
 
 // NewFakeStructerDefaultError returns an instance of FakeStructer with all hooks configured to call t.Error
-func NewFakeStructerDefaultError(t *testing.T) *FakeStructer {
+func NewFakeStructerDefaultError(t StructerTestingT) *FakeStructer {
 	return &FakeStructer{
 		StructHook: func(struct {
 			a string
@@ -196,7 +201,7 @@ func (f *FakeStructer) StructCalled() bool {
 }
 
 // AssertStructCalled calls t.Error if FakeStructer.Struct was not called
-func (f *FakeStructer) AssertStructCalled(t *testing.T) {
+func (f *FakeStructer) AssertStructCalled(t StructerTestingT) {
 	t.Helper()
 	if len(f.StructCalls) == 0 {
 		t.Error("FakeStructer.Struct not called, expected at least one")
@@ -209,7 +214,7 @@ func (f *FakeStructer) StructNotCalled() bool {
 }
 
 // AssertStructNotCalled calls t.Error if FakeStructer.Struct was called
-func (f *FakeStructer) AssertStructNotCalled(t *testing.T) {
+func (f *FakeStructer) AssertStructNotCalled(t StructerTestingT) {
 	t.Helper()
 	if len(f.StructCalls) != 0 {
 		t.Error("FakeStructer.Struct called, expected none")
@@ -222,7 +227,7 @@ func (f *FakeStructer) StructCalledOnce() bool {
 }
 
 // AssertStructCalledOnce calls t.Error if FakeStructer.Struct was not called exactly once
-func (f *FakeStructer) AssertStructCalledOnce(t *testing.T) {
+func (f *FakeStructer) AssertStructCalledOnce(t StructerTestingT) {
 	t.Helper()
 	if len(f.StructCalls) != 1 {
 		t.Errorf("FakeStructer.Struct called %d times, expected 1", len(f.StructCalls))
@@ -235,7 +240,7 @@ func (f *FakeStructer) StructCalledN(n int) bool {
 }
 
 // AssertStructCalledN calls t.Error if FakeStructer.Struct was called less than n times
-func (f *FakeStructer) AssertStructCalledN(t *testing.T, n int) {
+func (f *FakeStructer) AssertStructCalledN(t StructerTestingT, n int) {
 	t.Helper()
 	if len(f.StructCalls) < n {
 		t.Errorf("FakeStructer.Struct called %d times, expected >= %d", len(f.StructCalls), n)
@@ -258,7 +263,7 @@ func (_f2 *FakeStructer) StructCalledWith(ident1 struct {
 }
 
 // AssertStructCalledWith calls t.Error if FakeStructer.Struct was not called with the given values
-func (_f3 *FakeStructer) AssertStructCalledWith(t *testing.T, ident1 struct {
+func (_f3 *FakeStructer) AssertStructCalledWith(t StructerTestingT, ident1 struct {
 	a string
 	b string
 }) {
@@ -292,7 +297,7 @@ func (_f4 *FakeStructer) StructCalledOnceWith(ident1 struct {
 }
 
 // AssertStructCalledOnceWith calls t.Error if FakeStructer.Struct was not called exactly once with the given values
-func (_f5 *FakeStructer) AssertStructCalledOnceWith(t *testing.T, ident1 struct {
+func (_f5 *FakeStructer) AssertStructCalledOnceWith(t StructerTestingT, ident1 struct {
 	a string
 	b string
 }) {
@@ -354,7 +359,7 @@ func (f *FakeStructer) NamedStructCalled() bool {
 }
 
 // AssertNamedStructCalled calls t.Error if FakeStructer.NamedStruct was not called
-func (f *FakeStructer) AssertNamedStructCalled(t *testing.T) {
+func (f *FakeStructer) AssertNamedStructCalled(t StructerTestingT) {
 	t.Helper()
 	if len(f.NamedStructCalls) == 0 {
 		t.Error("FakeStructer.NamedStruct not called, expected at least one")
@@ -367,7 +372,7 @@ func (f *FakeStructer) NamedStructNotCalled() bool {
 }
 
 // AssertNamedStructNotCalled calls t.Error if FakeStructer.NamedStruct was called
-func (f *FakeStructer) AssertNamedStructNotCalled(t *testing.T) {
+func (f *FakeStructer) AssertNamedStructNotCalled(t StructerTestingT) {
 	t.Helper()
 	if len(f.NamedStructCalls) != 0 {
 		t.Error("FakeStructer.NamedStruct called, expected none")
@@ -380,7 +385,7 @@ func (f *FakeStructer) NamedStructCalledOnce() bool {
 }
 
 // AssertNamedStructCalledOnce calls t.Error if FakeStructer.NamedStruct was not called exactly once
-func (f *FakeStructer) AssertNamedStructCalledOnce(t *testing.T) {
+func (f *FakeStructer) AssertNamedStructCalledOnce(t StructerTestingT) {
 	t.Helper()
 	if len(f.NamedStructCalls) != 1 {
 		t.Errorf("FakeStructer.NamedStruct called %d times, expected 1", len(f.NamedStructCalls))
@@ -393,7 +398,7 @@ func (f *FakeStructer) NamedStructCalledN(n int) bool {
 }
 
 // AssertNamedStructCalledN calls t.Error if FakeStructer.NamedStruct was called less than n times
-func (f *FakeStructer) AssertNamedStructCalledN(t *testing.T, n int) {
+func (f *FakeStructer) AssertNamedStructCalledN(t StructerTestingT, n int) {
 	t.Helper()
 	if len(f.NamedStructCalls) < n {
 		t.Errorf("FakeStructer.NamedStruct called %d times, expected >= %d", len(f.NamedStructCalls), n)
@@ -416,7 +421,7 @@ func (_f8 *FakeStructer) NamedStructCalledWith(a struct {
 }
 
 // AssertNamedStructCalledWith calls t.Error if FakeStructer.NamedStruct was not called with the given values
-func (_f9 *FakeStructer) AssertNamedStructCalledWith(t *testing.T, a struct {
+func (_f9 *FakeStructer) AssertNamedStructCalledWith(t StructerTestingT, a struct {
 	a string
 	b string
 }) {
@@ -450,7 +455,7 @@ func (_f10 *FakeStructer) NamedStructCalledOnceWith(a struct {
 }
 
 // AssertNamedStructCalledOnceWith calls t.Error if FakeStructer.NamedStruct was not called exactly once with the given values
-func (_f11 *FakeStructer) AssertNamedStructCalledOnceWith(t *testing.T, a struct {
+func (_f11 *FakeStructer) AssertNamedStructCalledOnceWith(t StructerTestingT, a struct {
 	a string
 	b string
 }) {
