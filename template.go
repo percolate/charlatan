@@ -106,6 +106,7 @@ func (f *Fake{{.Name}}) Reset() {
 {{range $m := .Methods}}
 {{with $f := gensym}}func ({{$f}} *Fake{{$m.Interface}}) {{$m.Name}}({{$m.ParametersDeclaration}}) ({{$m.ResultsDeclaration}}) {
 	invocation := new({{$m.Interface}}{{$m.Name}}Invocation)
+	{{$f}}.{{$m.Name}}Calls = append({{$f}}.{{$m.Name}}Calls, invocation)
 
 {{if $m.Parameters}}{{range $m.Parameters}} invocation.Parameters.{{.TitleCase}} = {{.Name}}
 {{end}}{{end}}
@@ -114,7 +115,6 @@ func (f *Fake{{.Name}}) Reset() {
 {{end}}
 {{if $m.Results}}{{range $m.Results}}invocation.Results.{{.TitleCase}} = {{.Name}}
 {{end}}{{end}}
-	{{$f}}.{{$m.Name}}Calls = append({{$f}}.{{$m.Name}}Calls, invocation)
 
 	return
 }{{end}}
