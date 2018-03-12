@@ -111,14 +111,13 @@ func (f *FakeInterfacer) Reset() {
 
 func (_f1 *FakeInterfacer) Interface(ident1 interface{}) (ident2 interface{}) {
 	invocation := new(InterfacerInterfaceInvocation)
+	_f1.InterfaceCalls = append(_f1.InterfaceCalls, invocation)
 
 	invocation.Parameters.Ident1 = ident1
 
 	ident2 = _f1.InterfaceHook(ident1)
 
 	invocation.Results.Ident2 = ident2
-
-	_f1.InterfaceCalls = append(_f1.InterfaceCalls, invocation)
 
 	return
 }
@@ -245,14 +244,13 @@ func (_f6 *FakeInterfacer) InterfaceResultsForCall(ident1 interface{}) (ident2 i
 
 func (_f7 *FakeInterfacer) NamedInterface(a interface{}) (z interface{}) {
 	invocation := new(InterfacerNamedInterfaceInvocation)
+	_f7.NamedInterfaceCalls = append(_f7.NamedInterfaceCalls, invocation)
 
 	invocation.Parameters.A = a
 
 	z = _f7.NamedInterfaceHook(a)
 
 	invocation.Results.Z = z
-
-	_f7.NamedInterfaceCalls = append(_f7.NamedInterfaceCalls, invocation)
 
 	return
 }

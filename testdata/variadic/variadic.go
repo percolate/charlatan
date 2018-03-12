@@ -108,12 +108,11 @@ func (f *FakeVariadic) Reset() {
 
 func (_f1 *FakeVariadic) SingleVariadic(a ...string) {
 	invocation := new(VariadicSingleVariadicInvocation)
+	_f1.SingleVariadicCalls = append(_f1.SingleVariadicCalls, invocation)
 
 	invocation.Parameters.A = a
 
 	_f1.SingleVariadicHook(a...)
-
-	_f1.SingleVariadicCalls = append(_f1.SingleVariadicCalls, invocation)
 
 	return
 }
@@ -227,6 +226,7 @@ func (_f5 *FakeVariadic) AssertSingleVariadicCalledOnceWith(t VariadicTestingT, 
 
 func (_f6 *FakeVariadic) MixedVariadic(a int, b int, c int, d ...string) {
 	invocation := new(VariadicMixedVariadicInvocation)
+	_f6.MixedVariadicCalls = append(_f6.MixedVariadicCalls, invocation)
 
 	invocation.Parameters.A = a
 	invocation.Parameters.B = b
@@ -234,8 +234,6 @@ func (_f6 *FakeVariadic) MixedVariadic(a int, b int, c int, d ...string) {
 	invocation.Parameters.D = d
 
 	_f6.MixedVariadicHook(a, b, c, d...)
-
-	_f6.MixedVariadicCalls = append(_f6.MixedVariadicCalls, invocation)
 
 	return
 }

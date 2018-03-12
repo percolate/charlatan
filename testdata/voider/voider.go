@@ -79,10 +79,9 @@ func (f *FakeVoider) Reset() {
 
 func (_f1 *FakeVoider) VoidMethod() {
 	invocation := new(VoiderVoidMethodInvocation)
+	_f1.VoidMethodCalls = append(_f1.VoidMethodCalls, invocation)
 
 	_f1.VoidMethodHook()
-
-	_f1.VoidMethodCalls = append(_f1.VoidMethodCalls, invocation)
 
 	return
 }
