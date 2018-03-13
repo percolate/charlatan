@@ -107,13 +107,12 @@ func (f *FakeMultireturner) Reset() {
 
 func (_f1 *FakeMultireturner) MultiReturn() (ident1 string, ident2 int) {
 	invocation := new(MultireturnerMultiReturnInvocation)
+	_f1.MultiReturnCalls = append(_f1.MultiReturnCalls, invocation)
 
 	ident1, ident2 = _f1.MultiReturnHook()
 
 	invocation.Results.Ident1 = ident1
 	invocation.Results.Ident2 = ident2
-
-	_f1.MultiReturnCalls = append(_f1.MultiReturnCalls, invocation)
 
 	return
 }
@@ -172,6 +171,7 @@ func (f *FakeMultireturner) AssertMultiReturnCalledN(t MultireturnerTestingT, n 
 
 func (_f2 *FakeMultireturner) NamedReturn() (a int, b int, c int, d int) {
 	invocation := new(MultireturnerNamedReturnInvocation)
+	_f2.NamedReturnCalls = append(_f2.NamedReturnCalls, invocation)
 
 	a, b, c, d = _f2.NamedReturnHook()
 
@@ -179,8 +179,6 @@ func (_f2 *FakeMultireturner) NamedReturn() (a int, b int, c int, d int) {
 	invocation.Results.B = b
 	invocation.Results.C = c
 	invocation.Results.D = d
-
-	_f2.NamedReturnCalls = append(_f2.NamedReturnCalls, invocation)
 
 	return
 }

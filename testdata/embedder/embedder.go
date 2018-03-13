@@ -132,12 +132,11 @@ func (f *FakeEmbedder) Reset() {
 
 func (_f1 *FakeEmbedder) String() (ident5 string) {
 	invocation := new(EmbedderStringInvocation)
+	_f1.StringCalls = append(_f1.StringCalls, invocation)
 
 	ident5 = _f1.StringHook()
 
 	invocation.Results.Ident5 = ident5
-
-	_f1.StringCalls = append(_f1.StringCalls, invocation)
 
 	return
 }
@@ -196,14 +195,13 @@ func (f *FakeEmbedder) AssertStringCalledN(t EmbedderTestingT, n int) {
 
 func (_f2 *FakeEmbedder) Embed(ident1 string) (ident2 string) {
 	invocation := new(EmbedderEmbedInvocation)
+	_f2.EmbedCalls = append(_f2.EmbedCalls, invocation)
 
 	invocation.Parameters.Ident1 = ident1
 
 	ident2 = _f2.EmbedHook(ident1)
 
 	invocation.Results.Ident2 = ident2
-
-	_f2.EmbedCalls = append(_f2.EmbedCalls, invocation)
 
 	return
 }
@@ -330,14 +328,13 @@ func (_f7 *FakeEmbedder) EmbedResultsForCall(ident1 string) (ident2 string, foun
 
 func (_f8 *FakeEmbedder) Other(ident1 string) (ident2 string) {
 	invocation := new(EmbedderOtherInvocation)
+	_f8.OtherCalls = append(_f8.OtherCalls, invocation)
 
 	invocation.Parameters.Ident1 = ident1
 
 	ident2 = _f8.OtherHook(ident1)
 
 	invocation.Results.Ident2 = ident2
-
-	_f8.OtherCalls = append(_f8.OtherCalls, invocation)
 
 	return
 }

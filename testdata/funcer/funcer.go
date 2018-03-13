@@ -105,12 +105,11 @@ func (f *FakeFuncer) Reset() {
 
 func (_f1 *FakeFuncer) FuncParameter(ident1 func(string) string) {
 	invocation := new(FuncerFuncParameterInvocation)
+	_f1.FuncParameterCalls = append(_f1.FuncParameterCalls, invocation)
 
 	invocation.Parameters.Ident1 = ident1
 
 	_f1.FuncParameterHook(ident1)
-
-	_f1.FuncParameterCalls = append(_f1.FuncParameterCalls, invocation)
 
 	return
 }
@@ -224,12 +223,11 @@ func (_f5 *FakeFuncer) AssertFuncParameterCalledOnceWith(t FuncerTestingT, ident
 
 func (_f6 *FakeFuncer) FuncReturn() (ident1 func(string) string) {
 	invocation := new(FuncerFuncReturnInvocation)
+	_f6.FuncReturnCalls = append(_f6.FuncReturnCalls, invocation)
 
 	ident1 = _f6.FuncReturnHook()
 
 	invocation.Results.Ident1 = ident1
-
-	_f6.FuncReturnCalls = append(_f6.FuncReturnCalls, invocation)
 
 	return
 }

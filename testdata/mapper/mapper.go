@@ -105,12 +105,11 @@ func (f *FakeMapper) Reset() {
 
 func (_f1 *FakeMapper) MapParameter(ident1 map[string]string) {
 	invocation := new(MapperMapParameterInvocation)
+	_f1.MapParameterCalls = append(_f1.MapParameterCalls, invocation)
 
 	invocation.Parameters.Ident1 = ident1
 
 	_f1.MapParameterHook(ident1)
-
-	_f1.MapParameterCalls = append(_f1.MapParameterCalls, invocation)
 
 	return
 }
@@ -224,12 +223,11 @@ func (_f5 *FakeMapper) AssertMapParameterCalledOnceWith(t MapperTestingT, ident1
 
 func (_f6 *FakeMapper) MapReturn() (ident1 map[string]string) {
 	invocation := new(MapperMapReturnInvocation)
+	_f6.MapReturnCalls = append(_f6.MapReturnCalls, invocation)
 
 	ident1 = _f6.MapReturnHook()
 
 	invocation.Results.Ident1 = ident1
-
-	_f6.MapReturnCalls = append(_f6.MapReturnCalls, invocation)
 
 	return
 }

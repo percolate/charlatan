@@ -147,12 +147,11 @@ func (f *FakeArray) Reset() {
 
 func (_f1 *FakeArray) ArrayParameter(ident1 [3]string) {
 	invocation := new(ArrayArrayParameterInvocation)
+	_f1.ArrayParameterCalls = append(_f1.ArrayParameterCalls, invocation)
 
 	invocation.Parameters.Ident1 = ident1
 
 	_f1.ArrayParameterHook(ident1)
-
-	_f1.ArrayParameterCalls = append(_f1.ArrayParameterCalls, invocation)
 
 	return
 }
@@ -266,12 +265,11 @@ func (_f5 *FakeArray) AssertArrayParameterCalledOnceWith(t ArrayTestingT, ident1
 
 func (_f6 *FakeArray) ArrayReturn() (ident1 [3]string) {
 	invocation := new(ArrayArrayReturnInvocation)
+	_f6.ArrayReturnCalls = append(_f6.ArrayReturnCalls, invocation)
 
 	ident1 = _f6.ArrayReturnHook()
 
 	invocation.Results.Ident1 = ident1
-
-	_f6.ArrayReturnCalls = append(_f6.ArrayReturnCalls, invocation)
 
 	return
 }
@@ -330,12 +328,11 @@ func (f *FakeArray) AssertArrayReturnCalledN(t ArrayTestingT, n int) {
 
 func (_f7 *FakeArray) SliceParameter(ident1 []string) {
 	invocation := new(ArraySliceParameterInvocation)
+	_f7.SliceParameterCalls = append(_f7.SliceParameterCalls, invocation)
 
 	invocation.Parameters.Ident1 = ident1
 
 	_f7.SliceParameterHook(ident1)
-
-	_f7.SliceParameterCalls = append(_f7.SliceParameterCalls, invocation)
 
 	return
 }
@@ -449,12 +446,11 @@ func (_f11 *FakeArray) AssertSliceParameterCalledOnceWith(t ArrayTestingT, ident
 
 func (_f12 *FakeArray) SliceReturn() (ident1 []string) {
 	invocation := new(ArraySliceReturnInvocation)
+	_f12.SliceReturnCalls = append(_f12.SliceReturnCalls, invocation)
 
 	ident1 = _f12.SliceReturnHook()
 
 	invocation.Results.Ident1 = ident1
-
-	_f12.SliceReturnCalls = append(_f12.SliceReturnCalls, invocation)
 
 	return
 }

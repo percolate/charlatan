@@ -87,14 +87,13 @@ func (f *FakePointer) Reset() {
 
 func (_f1 *FakePointer) Point(ident1 *string) (ident2 int) {
 	invocation := new(PointerPointInvocation)
+	_f1.PointCalls = append(_f1.PointCalls, invocation)
 
 	invocation.Parameters.Ident1 = ident1
 
 	ident2 = _f1.PointHook(ident1)
 
 	invocation.Results.Ident2 = ident2
-
-	_f1.PointCalls = append(_f1.PointCalls, invocation)
 
 	return
 }

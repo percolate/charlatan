@@ -115,6 +115,7 @@ func (f *FakeNamedvaluer) Reset() {
 
 func (_f1 *FakeNamedvaluer) ManyNamed(a string, b string, f int, g int) (ret bool) {
 	invocation := new(NamedvaluerManyNamedInvocation)
+	_f1.ManyNamedCalls = append(_f1.ManyNamedCalls, invocation)
 
 	invocation.Parameters.A = a
 	invocation.Parameters.B = b
@@ -124,8 +125,6 @@ func (_f1 *FakeNamedvaluer) ManyNamed(a string, b string, f int, g int) (ret boo
 	ret = _f1.ManyNamedHook(a, b, f, g)
 
 	invocation.Results.Ret = ret
-
-	_f1.ManyNamedCalls = append(_f1.ManyNamedCalls, invocation)
 
 	return
 }
@@ -252,6 +251,7 @@ func (_f6 *FakeNamedvaluer) ManyNamedResultsForCall(a string, b string, f int, g
 
 func (_f7 *FakeNamedvaluer) Named(a int, b string) (ret bool) {
 	invocation := new(NamedvaluerNamedInvocation)
+	_f7.NamedCalls = append(_f7.NamedCalls, invocation)
 
 	invocation.Parameters.A = a
 	invocation.Parameters.B = b
@@ -259,8 +259,6 @@ func (_f7 *FakeNamedvaluer) Named(a int, b string) (ret bool) {
 	ret = _f7.NamedHook(a, b)
 
 	invocation.Results.Ret = ret
-
-	_f7.NamedCalls = append(_f7.NamedCalls, invocation)
 
 	return
 }

@@ -114,14 +114,13 @@ func (f *FakeQualifier) Reset() {
 
 func (_f1 *FakeQualifier) Qualify(ident1 fmt.Scanner) (ident2 fmt.Scanner) {
 	invocation := new(QualifierQualifyInvocation)
+	_f1.QualifyCalls = append(_f1.QualifyCalls, invocation)
 
 	invocation.Parameters.Ident1 = ident1
 
 	ident2 = _f1.QualifyHook(ident1)
 
 	invocation.Results.Ident2 = ident2
-
-	_f1.QualifyCalls = append(_f1.QualifyCalls, invocation)
 
 	return
 }
@@ -248,6 +247,7 @@ func (_f6 *FakeQualifier) QualifyResultsForCall(ident1 fmt.Scanner) (ident2 fmt.
 
 func (_f7 *FakeQualifier) NamedQualify(a fmt.Scanner, b fmt.Scanner, c fmt.Scanner) (d fmt.Scanner) {
 	invocation := new(QualifierNamedQualifyInvocation)
+	_f7.NamedQualifyCalls = append(_f7.NamedQualifyCalls, invocation)
 
 	invocation.Parameters.A = a
 	invocation.Parameters.B = b
@@ -256,8 +256,6 @@ func (_f7 *FakeQualifier) NamedQualify(a fmt.Scanner, b fmt.Scanner, c fmt.Scann
 	d = _f7.NamedQualifyHook(a, b, c)
 
 	invocation.Results.D = d
-
-	_f7.NamedQualifyCalls = append(_f7.NamedQualifyCalls, invocation)
 
 	return
 }

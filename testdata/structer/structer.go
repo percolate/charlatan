@@ -183,14 +183,13 @@ func (_f1 *FakeStructer) Struct(ident1 struct {
 	d string
 }) {
 	invocation := new(StructerStructInvocation)
+	_f1.StructCalls = append(_f1.StructCalls, invocation)
 
 	invocation.Parameters.Ident1 = ident1
 
 	ident2 = _f1.StructHook(ident1)
 
 	invocation.Results.Ident2 = ident2
-
-	_f1.StructCalls = append(_f1.StructCalls, invocation)
 
 	return
 }
@@ -341,14 +340,13 @@ func (_f7 *FakeStructer) NamedStruct(a struct {
 	d string
 }) {
 	invocation := new(StructerNamedStructInvocation)
+	_f7.NamedStructCalls = append(_f7.NamedStructCalls, invocation)
 
 	invocation.Parameters.A = a
 
 	z = _f7.NamedStructHook(a)
 
 	invocation.Results.Z = z
-
-	_f7.NamedStructCalls = append(_f7.NamedStructCalls, invocation)
 
 	return
 }
