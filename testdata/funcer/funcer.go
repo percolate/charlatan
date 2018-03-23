@@ -104,6 +104,10 @@ func (f *FakeFuncer) Reset() {
 }
 
 func (_f1 *FakeFuncer) FuncParameter(ident1 func(string) string) {
+	if _f1.FuncParameterHook == nil {
+		panic("Funcer.FuncParameter() called but FakeFuncer.FuncParameterHook is nil")
+	}
+
 	invocation := new(FuncerFuncParameterInvocation)
 	_f1.FuncParameterCalls = append(_f1.FuncParameterCalls, invocation)
 
@@ -222,6 +226,10 @@ func (_f5 *FakeFuncer) AssertFuncParameterCalledOnceWith(t FuncerTestingT, ident
 }
 
 func (_f6 *FakeFuncer) FuncReturn() (ident1 func(string) string) {
+	if _f6.FuncReturnHook == nil {
+		panic("Funcer.FuncReturn() called but FakeFuncer.FuncReturnHook is nil")
+	}
+
 	invocation := new(FuncerFuncReturnInvocation)
 	_f6.FuncReturnCalls = append(_f6.FuncReturnCalls, invocation)
 

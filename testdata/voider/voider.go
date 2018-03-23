@@ -78,6 +78,10 @@ func (f *FakeVoider) Reset() {
 }
 
 func (_f1 *FakeVoider) VoidMethod() {
+	if _f1.VoidMethodHook == nil {
+		panic("Voider.VoidMethod() called but FakeVoider.VoidMethodHook is nil")
+	}
+
 	invocation := new(VoiderVoidMethodInvocation)
 	_f1.VoidMethodCalls = append(_f1.VoidMethodCalls, invocation)
 

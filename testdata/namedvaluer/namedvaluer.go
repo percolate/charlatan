@@ -114,6 +114,10 @@ func (f *FakeNamedvaluer) Reset() {
 }
 
 func (_f1 *FakeNamedvaluer) ManyNamed(a string, b string, f int, g int) (ret bool) {
+	if _f1.ManyNamedHook == nil {
+		panic("Namedvaluer.ManyNamed() called but FakeNamedvaluer.ManyNamedHook is nil")
+	}
+
 	invocation := new(NamedvaluerManyNamedInvocation)
 	_f1.ManyNamedCalls = append(_f1.ManyNamedCalls, invocation)
 
@@ -250,6 +254,10 @@ func (_f6 *FakeNamedvaluer) ManyNamedResultsForCall(a string, b string, f int, g
 }
 
 func (_f7 *FakeNamedvaluer) Named(a int, b string) (ret bool) {
+	if _f7.NamedHook == nil {
+		panic("Namedvaluer.Named() called but FakeNamedvaluer.NamedHook is nil")
+	}
+
 	invocation := new(NamedvaluerNamedInvocation)
 	_f7.NamedCalls = append(_f7.NamedCalls, invocation)
 

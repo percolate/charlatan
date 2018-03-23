@@ -106,6 +106,10 @@ func (f *FakeMultireturner) Reset() {
 }
 
 func (_f1 *FakeMultireturner) MultiReturn() (ident1 string, ident2 int) {
+	if _f1.MultiReturnHook == nil {
+		panic("Multireturner.MultiReturn() called but FakeMultireturner.MultiReturnHook is nil")
+	}
+
 	invocation := new(MultireturnerMultiReturnInvocation)
 	_f1.MultiReturnCalls = append(_f1.MultiReturnCalls, invocation)
 
@@ -170,6 +174,10 @@ func (f *FakeMultireturner) AssertMultiReturnCalledN(t MultireturnerTestingT, n 
 }
 
 func (_f2 *FakeMultireturner) NamedReturn() (a int, b int, c int, d int) {
+	if _f2.NamedReturnHook == nil {
+		panic("Multireturner.NamedReturn() called but FakeMultireturner.NamedReturnHook is nil")
+	}
+
 	invocation := new(MultireturnerNamedReturnInvocation)
 	_f2.NamedReturnCalls = append(_f2.NamedReturnCalls, invocation)
 

@@ -107,6 +107,10 @@ func (f *FakeVariadic) Reset() {
 }
 
 func (_f1 *FakeVariadic) SingleVariadic(a ...string) {
+	if _f1.SingleVariadicHook == nil {
+		panic("Variadic.SingleVariadic() called but FakeVariadic.SingleVariadicHook is nil")
+	}
+
 	invocation := new(VariadicSingleVariadicInvocation)
 	_f1.SingleVariadicCalls = append(_f1.SingleVariadicCalls, invocation)
 
@@ -225,6 +229,10 @@ func (_f5 *FakeVariadic) AssertSingleVariadicCalledOnceWith(t VariadicTestingT, 
 }
 
 func (_f6 *FakeVariadic) MixedVariadic(a int, b int, c int, d ...string) {
+	if _f6.MixedVariadicHook == nil {
+		panic("Variadic.MixedVariadic() called but FakeVariadic.MixedVariadicHook is nil")
+	}
+
 	invocation := new(VariadicMixedVariadicInvocation)
 	_f6.MixedVariadicCalls = append(_f6.MixedVariadicCalls, invocation)
 

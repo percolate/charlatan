@@ -110,6 +110,10 @@ func (f *FakeInterfacer) Reset() {
 }
 
 func (_f1 *FakeInterfacer) Interface(ident1 interface{}) (ident2 interface{}) {
+	if _f1.InterfaceHook == nil {
+		panic("Interfacer.Interface() called but FakeInterfacer.InterfaceHook is nil")
+	}
+
 	invocation := new(InterfacerInterfaceInvocation)
 	_f1.InterfaceCalls = append(_f1.InterfaceCalls, invocation)
 
@@ -243,6 +247,10 @@ func (_f6 *FakeInterfacer) InterfaceResultsForCall(ident1 interface{}) (ident2 i
 }
 
 func (_f7 *FakeInterfacer) NamedInterface(a interface{}) (z interface{}) {
+	if _f7.NamedInterfaceHook == nil {
+		panic("Interfacer.NamedInterface() called but FakeInterfacer.NamedInterfaceHook is nil")
+	}
+
 	invocation := new(InterfacerNamedInterfaceInvocation)
 	_f7.NamedInterfaceCalls = append(_f7.NamedInterfaceCalls, invocation)
 

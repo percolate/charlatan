@@ -146,6 +146,10 @@ func (f *FakeArray) Reset() {
 }
 
 func (_f1 *FakeArray) ArrayParameter(ident1 [3]string) {
+	if _f1.ArrayParameterHook == nil {
+		panic("Array.ArrayParameter() called but FakeArray.ArrayParameterHook is nil")
+	}
+
 	invocation := new(ArrayArrayParameterInvocation)
 	_f1.ArrayParameterCalls = append(_f1.ArrayParameterCalls, invocation)
 
@@ -264,6 +268,10 @@ func (_f5 *FakeArray) AssertArrayParameterCalledOnceWith(t ArrayTestingT, ident1
 }
 
 func (_f6 *FakeArray) ArrayReturn() (ident1 [3]string) {
+	if _f6.ArrayReturnHook == nil {
+		panic("Array.ArrayReturn() called but FakeArray.ArrayReturnHook is nil")
+	}
+
 	invocation := new(ArrayArrayReturnInvocation)
 	_f6.ArrayReturnCalls = append(_f6.ArrayReturnCalls, invocation)
 
@@ -327,6 +335,10 @@ func (f *FakeArray) AssertArrayReturnCalledN(t ArrayTestingT, n int) {
 }
 
 func (_f7 *FakeArray) SliceParameter(ident1 []string) {
+	if _f7.SliceParameterHook == nil {
+		panic("Array.SliceParameter() called but FakeArray.SliceParameterHook is nil")
+	}
+
 	invocation := new(ArraySliceParameterInvocation)
 	_f7.SliceParameterCalls = append(_f7.SliceParameterCalls, invocation)
 
@@ -445,6 +457,10 @@ func (_f11 *FakeArray) AssertSliceParameterCalledOnceWith(t ArrayTestingT, ident
 }
 
 func (_f12 *FakeArray) SliceReturn() (ident1 []string) {
+	if _f12.SliceReturnHook == nil {
+		panic("Array.SliceReturn() called but FakeArray.SliceReturnHook is nil")
+	}
+
 	invocation := new(ArraySliceReturnInvocation)
 	_f12.SliceReturnCalls = append(_f12.SliceReturnCalls, invocation)
 

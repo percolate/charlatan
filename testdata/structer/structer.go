@@ -182,6 +182,10 @@ func (_f1 *FakeStructer) Struct(ident1 struct {
 	c string
 	d string
 }) {
+	if _f1.StructHook == nil {
+		panic("Structer.Struct() called but FakeStructer.StructHook is nil")
+	}
+
 	invocation := new(StructerStructInvocation)
 	_f1.StructCalls = append(_f1.StructCalls, invocation)
 
@@ -339,6 +343,10 @@ func (_f7 *FakeStructer) NamedStruct(a struct {
 	c string
 	d string
 }) {
+	if _f7.NamedStructHook == nil {
+		panic("Structer.NamedStruct() called but FakeStructer.NamedStructHook is nil")
+	}
+
 	invocation := new(StructerNamedStructInvocation)
 	_f7.NamedStructCalls = append(_f7.NamedStructCalls, invocation)
 

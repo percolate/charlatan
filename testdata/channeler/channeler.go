@@ -182,6 +182,10 @@ func (f *FakeChanneler) Reset() {
 }
 
 func (_f1 *FakeChanneler) Channel(ident1 chan int) (ident2 chan int) {
+	if _f1.ChannelHook == nil {
+		panic("Channeler.Channel() called but FakeChanneler.ChannelHook is nil")
+	}
+
 	invocation := new(ChannelerChannelInvocation)
 	_f1.ChannelCalls = append(_f1.ChannelCalls, invocation)
 
@@ -315,6 +319,10 @@ func (_f6 *FakeChanneler) ChannelResultsForCall(ident1 chan int) (ident2 chan in
 }
 
 func (_f7 *FakeChanneler) ChannelReceive(ident1 <-chan int) (ident2 <-chan int) {
+	if _f7.ChannelReceiveHook == nil {
+		panic("Channeler.ChannelReceive() called but FakeChanneler.ChannelReceiveHook is nil")
+	}
+
 	invocation := new(ChannelerChannelReceiveInvocation)
 	_f7.ChannelReceiveCalls = append(_f7.ChannelReceiveCalls, invocation)
 
@@ -448,6 +456,10 @@ func (_f12 *FakeChanneler) ChannelReceiveResultsForCall(ident1 <-chan int) (iden
 }
 
 func (_f13 *FakeChanneler) ChannelSend(ident1 chan<- int) (ident2 chan<- int) {
+	if _f13.ChannelSendHook == nil {
+		panic("Channeler.ChannelSend() called but FakeChanneler.ChannelSendHook is nil")
+	}
+
 	invocation := new(ChannelerChannelSendInvocation)
 	_f13.ChannelSendCalls = append(_f13.ChannelSendCalls, invocation)
 
@@ -581,6 +593,10 @@ func (_f18 *FakeChanneler) ChannelSendResultsForCall(ident1 chan<- int) (ident2 
 }
 
 func (_f19 *FakeChanneler) ChannelPointer(ident1 *chan int) (ident2 *chan int) {
+	if _f19.ChannelPointerHook == nil {
+		panic("Channeler.ChannelPointer() called but FakeChanneler.ChannelPointerHook is nil")
+	}
+
 	invocation := new(ChannelerChannelPointerInvocation)
 	_f19.ChannelPointerCalls = append(_f19.ChannelPointerCalls, invocation)
 
@@ -714,6 +730,10 @@ func (_f24 *FakeChanneler) ChannelPointerResultsForCall(ident1 *chan int) (ident
 }
 
 func (_f25 *FakeChanneler) ChannelInterface(ident1 chan interface{}) (ident2 chan interface{}) {
+	if _f25.ChannelInterfaceHook == nil {
+		panic("Channeler.ChannelInterface() called but FakeChanneler.ChannelInterfaceHook is nil")
+	}
+
 	invocation := new(ChannelerChannelInterfaceInvocation)
 	_f25.ChannelInterfaceCalls = append(_f25.ChannelInterfaceCalls, invocation)
 
