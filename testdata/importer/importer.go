@@ -88,6 +88,10 @@ func (f *FakeImporter) Reset() {
 }
 
 func (_f1 *FakeImporter) Scan(ident1 *Scanner) (ident2 z.Reader) {
+	if _f1.ScanHook == nil {
+		panic("Importer.Scan() called but FakeImporter.ScanHook is nil")
+	}
+
 	invocation := new(ImporterScanInvocation)
 	_f1.ScanCalls = append(_f1.ScanCalls, invocation)
 

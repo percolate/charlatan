@@ -113,6 +113,10 @@ func (f *FakeQualifier) Reset() {
 }
 
 func (_f1 *FakeQualifier) Qualify(ident1 fmt.Scanner) (ident2 fmt.Scanner) {
+	if _f1.QualifyHook == nil {
+		panic("Qualifier.Qualify() called but FakeQualifier.QualifyHook is nil")
+	}
+
 	invocation := new(QualifierQualifyInvocation)
 	_f1.QualifyCalls = append(_f1.QualifyCalls, invocation)
 
@@ -246,6 +250,10 @@ func (_f6 *FakeQualifier) QualifyResultsForCall(ident1 fmt.Scanner) (ident2 fmt.
 }
 
 func (_f7 *FakeQualifier) NamedQualify(a fmt.Scanner, b fmt.Scanner, c fmt.Scanner) (d fmt.Scanner) {
+	if _f7.NamedQualifyHook == nil {
+		panic("Qualifier.NamedQualify() called but FakeQualifier.NamedQualifyHook is nil")
+	}
+
 	invocation := new(QualifierNamedQualifyInvocation)
 	_f7.NamedQualifyCalls = append(_f7.NamedQualifyCalls, invocation)
 

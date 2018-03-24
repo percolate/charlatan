@@ -131,6 +131,10 @@ func (f *FakeEmbedder) Reset() {
 }
 
 func (_f1 *FakeEmbedder) String() (ident5 string) {
+	if _f1.StringHook == nil {
+		panic("Embedder.String() called but FakeEmbedder.StringHook is nil")
+	}
+
 	invocation := new(EmbedderStringInvocation)
 	_f1.StringCalls = append(_f1.StringCalls, invocation)
 
@@ -194,6 +198,10 @@ func (f *FakeEmbedder) AssertStringCalledN(t EmbedderTestingT, n int) {
 }
 
 func (_f2 *FakeEmbedder) Embed(ident1 string) (ident2 string) {
+	if _f2.EmbedHook == nil {
+		panic("Embedder.Embed() called but FakeEmbedder.EmbedHook is nil")
+	}
+
 	invocation := new(EmbedderEmbedInvocation)
 	_f2.EmbedCalls = append(_f2.EmbedCalls, invocation)
 
@@ -327,6 +335,10 @@ func (_f7 *FakeEmbedder) EmbedResultsForCall(ident1 string) (ident2 string, foun
 }
 
 func (_f8 *FakeEmbedder) Other(ident1 string) (ident2 string) {
+	if _f8.OtherHook == nil {
+		panic("Embedder.Other() called but FakeEmbedder.OtherHook is nil")
+	}
+
 	invocation := new(EmbedderOtherInvocation)
 	_f8.OtherCalls = append(_f8.OtherCalls, invocation)
 

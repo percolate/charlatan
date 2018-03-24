@@ -105,6 +105,10 @@ func (f *Fake{{.Name}}) Reset() {
 
 {{range $m := .Methods}}
 {{with $f := gensym}}func ({{$f}} *Fake{{$m.Interface}}) {{$m.Name}}({{$m.ParametersDeclaration}}) ({{$m.ResultsDeclaration}}) {
+	if {{$f}}.{{$m.Name}}Hook == nil {
+		panic("{{$m.Interface}}.{{$m.Name}}() called but Fake{{$m.Interface}}.{{$m.Name}}Hook is nil")
+	}
+
 	invocation := new({{$m.Interface}}{{$m.Name}}Invocation)
 	{{$f}}.{{$m.Name}}Calls = append({{$f}}.{{$m.Name}}Calls, invocation)
 

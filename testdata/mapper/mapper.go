@@ -104,6 +104,10 @@ func (f *FakeMapper) Reset() {
 }
 
 func (_f1 *FakeMapper) MapParameter(ident1 map[string]string) {
+	if _f1.MapParameterHook == nil {
+		panic("Mapper.MapParameter() called but FakeMapper.MapParameterHook is nil")
+	}
+
 	invocation := new(MapperMapParameterInvocation)
 	_f1.MapParameterCalls = append(_f1.MapParameterCalls, invocation)
 
@@ -222,6 +226,10 @@ func (_f5 *FakeMapper) AssertMapParameterCalledOnceWith(t MapperTestingT, ident1
 }
 
 func (_f6 *FakeMapper) MapReturn() (ident1 map[string]string) {
+	if _f6.MapReturnHook == nil {
+		panic("Mapper.MapReturn() called but FakeMapper.MapReturnHook is nil")
+	}
+
 	invocation := new(MapperMapReturnInvocation)
 	_f6.MapReturnCalls = append(_f6.MapReturnCalls, invocation)
 

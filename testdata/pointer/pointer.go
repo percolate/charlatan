@@ -86,6 +86,10 @@ func (f *FakePointer) Reset() {
 }
 
 func (_f1 *FakePointer) Point(ident1 *string) (ident2 int) {
+	if _f1.PointHook == nil {
+		panic("Pointer.Point() called but FakePointer.PointHook is nil")
+	}
+
 	invocation := new(PointerPointInvocation)
 	_f1.PointCalls = append(_f1.PointCalls, invocation)
 
