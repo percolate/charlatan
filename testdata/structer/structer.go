@@ -20,6 +20,23 @@ type StructerStructInvocation struct {
 	}
 }
 
+// NewStructerStructInvocation creates a new instance of StructerStructInvocation
+func NewStructerStructInvocation(ident1 struct {
+	a string
+	b string
+}, ident2 struct {
+	c string
+	d string
+}) *StructerStructInvocation {
+	invocation := new(StructerStructInvocation)
+
+	invocation.Parameters.Ident1 = ident1
+
+	invocation.Results.Ident2 = ident2
+
+	return invocation
+}
+
 // StructerNamedStructInvocation represents a single call of FakeStructer.NamedStruct
 type StructerNamedStructInvocation struct {
 	Parameters struct {
@@ -34,6 +51,23 @@ type StructerNamedStructInvocation struct {
 			d string
 		}
 	}
+}
+
+// NewStructerNamedStructInvocation creates a new instance of StructerNamedStructInvocation
+func NewStructerNamedStructInvocation(a struct {
+	a string
+	b string
+}, z struct {
+	c string
+	d string
+}) *StructerNamedStructInvocation {
+	invocation := new(StructerNamedStructInvocation)
+
+	invocation.Parameters.A = a
+
+	invocation.Results.Z = z
+
+	return invocation
 }
 
 // StructerTestingT represents the methods of "testing".T used by charlatan Fakes.  It avoids importing the testing package.

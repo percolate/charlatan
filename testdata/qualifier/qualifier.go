@@ -15,6 +15,17 @@ type QualifierQualifyInvocation struct {
 	}
 }
 
+// NewQualifierQualifyInvocation creates a new instance of QualifierQualifyInvocation
+func NewQualifierQualifyInvocation(ident1 fmt.Scanner, ident2 fmt.Scanner) *QualifierQualifyInvocation {
+	invocation := new(QualifierQualifyInvocation)
+
+	invocation.Parameters.Ident1 = ident1
+
+	invocation.Results.Ident2 = ident2
+
+	return invocation
+}
+
 // QualifierNamedQualifyInvocation represents a single call of FakeQualifier.NamedQualify
 type QualifierNamedQualifyInvocation struct {
 	Parameters struct {
@@ -25,6 +36,19 @@ type QualifierNamedQualifyInvocation struct {
 	Results struct {
 		D fmt.Scanner
 	}
+}
+
+// NewQualifierNamedQualifyInvocation creates a new instance of QualifierNamedQualifyInvocation
+func NewQualifierNamedQualifyInvocation(a fmt.Scanner, b fmt.Scanner, c fmt.Scanner, d fmt.Scanner) *QualifierNamedQualifyInvocation {
+	invocation := new(QualifierNamedQualifyInvocation)
+
+	invocation.Parameters.A = a
+	invocation.Parameters.B = b
+	invocation.Parameters.C = c
+
+	invocation.Results.D = d
+
+	return invocation
 }
 
 // QualifierTestingT represents the methods of "testing".T used by charlatan Fakes.  It avoids importing the testing package.

@@ -14,6 +14,17 @@ type PointerPointInvocation struct {
 	}
 }
 
+// NewPointerPointInvocation creates a new instance of PointerPointInvocation
+func NewPointerPointInvocation(ident1 *string, ident2 int) *PointerPointInvocation {
+	invocation := new(PointerPointInvocation)
+
+	invocation.Parameters.Ident1 = ident1
+
+	invocation.Results.Ident2 = ident2
+
+	return invocation
+}
+
 // PointerTestingT represents the methods of "testing".T used by charlatan Fakes.  It avoids importing the testing package.
 type PointerTestingT interface {
 	Error(...interface{})

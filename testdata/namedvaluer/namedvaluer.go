@@ -17,6 +17,20 @@ type NamedvaluerManyNamedInvocation struct {
 	}
 }
 
+// NewNamedvaluerManyNamedInvocation creates a new instance of NamedvaluerManyNamedInvocation
+func NewNamedvaluerManyNamedInvocation(a string, b string, f int, g int, ret bool) *NamedvaluerManyNamedInvocation {
+	invocation := new(NamedvaluerManyNamedInvocation)
+
+	invocation.Parameters.A = a
+	invocation.Parameters.B = b
+	invocation.Parameters.F = f
+	invocation.Parameters.G = g
+
+	invocation.Results.Ret = ret
+
+	return invocation
+}
+
 // NamedvaluerNamedInvocation represents a single call of FakeNamedvaluer.Named
 type NamedvaluerNamedInvocation struct {
 	Parameters struct {
@@ -26,6 +40,18 @@ type NamedvaluerNamedInvocation struct {
 	Results struct {
 		Ret bool
 	}
+}
+
+// NewNamedvaluerNamedInvocation creates a new instance of NamedvaluerNamedInvocation
+func NewNamedvaluerNamedInvocation(a int, b string, ret bool) *NamedvaluerNamedInvocation {
+	invocation := new(NamedvaluerNamedInvocation)
+
+	invocation.Parameters.A = a
+	invocation.Parameters.B = b
+
+	invocation.Results.Ret = ret
+
+	return invocation
 }
 
 // NamedvaluerTestingT represents the methods of "testing".T used by charlatan Fakes.  It avoids importing the testing package.

@@ -27,6 +27,19 @@ type {{.Interface}}{{.Name}}Invocation struct {
 {{end}}
 	}{{end}}
 }
+
+{{if and .Parameters .Results}}
+// New{{.Interface}}{{.Name}}Invocation creates a new instance of {{.Interface}}{{.Name}}Invocation
+func New{{.Interface}}{{.Name}}Invocation({{.ParametersDeclaration}}, {{.ResultsDeclaration}}) *{{.Interface}}{{.Name}}Invocation {
+	invocation := new({{.Interface}}{{.Name}}Invocation)
+
+{{range .Parameters}} invocation.Parameters.{{.TitleCase}} = {{.Name}}
+{{end}}
+{{range .Results}}invocation.Results.{{.TitleCase}} = {{.Name}}
+{{end}}
+
+	return invocation
+}{{end}}
 {{end}}{{/* end range .Methods */}}
 
 // {{.Name}}TestingT represents the methods of "testing".T used by charlatan Fakes.  It avoids importing the testing package.

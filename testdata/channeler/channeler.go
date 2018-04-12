@@ -14,6 +14,17 @@ type ChannelerChannelInvocation struct {
 	}
 }
 
+// NewChannelerChannelInvocation creates a new instance of ChannelerChannelInvocation
+func NewChannelerChannelInvocation(ident1 chan int, ident2 chan int) *ChannelerChannelInvocation {
+	invocation := new(ChannelerChannelInvocation)
+
+	invocation.Parameters.Ident1 = ident1
+
+	invocation.Results.Ident2 = ident2
+
+	return invocation
+}
+
 // ChannelerChannelReceiveInvocation represents a single call of FakeChanneler.ChannelReceive
 type ChannelerChannelReceiveInvocation struct {
 	Parameters struct {
@@ -22,6 +33,17 @@ type ChannelerChannelReceiveInvocation struct {
 	Results struct {
 		Ident2 <-chan int
 	}
+}
+
+// NewChannelerChannelReceiveInvocation creates a new instance of ChannelerChannelReceiveInvocation
+func NewChannelerChannelReceiveInvocation(ident1 <-chan int, ident2 <-chan int) *ChannelerChannelReceiveInvocation {
+	invocation := new(ChannelerChannelReceiveInvocation)
+
+	invocation.Parameters.Ident1 = ident1
+
+	invocation.Results.Ident2 = ident2
+
+	return invocation
 }
 
 // ChannelerChannelSendInvocation represents a single call of FakeChanneler.ChannelSend
@@ -34,6 +56,17 @@ type ChannelerChannelSendInvocation struct {
 	}
 }
 
+// NewChannelerChannelSendInvocation creates a new instance of ChannelerChannelSendInvocation
+func NewChannelerChannelSendInvocation(ident1 chan<- int, ident2 chan<- int) *ChannelerChannelSendInvocation {
+	invocation := new(ChannelerChannelSendInvocation)
+
+	invocation.Parameters.Ident1 = ident1
+
+	invocation.Results.Ident2 = ident2
+
+	return invocation
+}
+
 // ChannelerChannelPointerInvocation represents a single call of FakeChanneler.ChannelPointer
 type ChannelerChannelPointerInvocation struct {
 	Parameters struct {
@@ -44,6 +77,17 @@ type ChannelerChannelPointerInvocation struct {
 	}
 }
 
+// NewChannelerChannelPointerInvocation creates a new instance of ChannelerChannelPointerInvocation
+func NewChannelerChannelPointerInvocation(ident1 *chan int, ident2 *chan int) *ChannelerChannelPointerInvocation {
+	invocation := new(ChannelerChannelPointerInvocation)
+
+	invocation.Parameters.Ident1 = ident1
+
+	invocation.Results.Ident2 = ident2
+
+	return invocation
+}
+
 // ChannelerChannelInterfaceInvocation represents a single call of FakeChanneler.ChannelInterface
 type ChannelerChannelInterfaceInvocation struct {
 	Parameters struct {
@@ -52,6 +96,17 @@ type ChannelerChannelInterfaceInvocation struct {
 	Results struct {
 		Ident2 chan interface{}
 	}
+}
+
+// NewChannelerChannelInterfaceInvocation creates a new instance of ChannelerChannelInterfaceInvocation
+func NewChannelerChannelInterfaceInvocation(ident1 chan interface{}, ident2 chan interface{}) *ChannelerChannelInterfaceInvocation {
+	invocation := new(ChannelerChannelInterfaceInvocation)
+
+	invocation.Parameters.Ident1 = ident1
+
+	invocation.Results.Ident2 = ident2
+
+	return invocation
 }
 
 // ChannelerTestingT represents the methods of "testing".T used by charlatan Fakes.  It avoids importing the testing package.

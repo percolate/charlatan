@@ -21,6 +21,17 @@ type EmbedderEmbedInvocation struct {
 	}
 }
 
+// NewEmbedderEmbedInvocation creates a new instance of EmbedderEmbedInvocation
+func NewEmbedderEmbedInvocation(ident1 string, ident2 string) *EmbedderEmbedInvocation {
+	invocation := new(EmbedderEmbedInvocation)
+
+	invocation.Parameters.Ident1 = ident1
+
+	invocation.Results.Ident2 = ident2
+
+	return invocation
+}
+
 // EmbedderOtherInvocation represents a single call of FakeEmbedder.Other
 type EmbedderOtherInvocation struct {
 	Parameters struct {
@@ -29,6 +40,17 @@ type EmbedderOtherInvocation struct {
 	Results struct {
 		Ident2 string
 	}
+}
+
+// NewEmbedderOtherInvocation creates a new instance of EmbedderOtherInvocation
+func NewEmbedderOtherInvocation(ident1 string, ident2 string) *EmbedderOtherInvocation {
+	invocation := new(EmbedderOtherInvocation)
+
+	invocation.Parameters.Ident1 = ident1
+
+	invocation.Results.Ident2 = ident2
+
+	return invocation
 }
 
 // EmbedderTestingT represents the methods of "testing".T used by charlatan Fakes.  It avoids importing the testing package.

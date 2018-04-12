@@ -16,6 +16,17 @@ type ImporterScanInvocation struct {
 	}
 }
 
+// NewImporterScanInvocation creates a new instance of ImporterScanInvocation
+func NewImporterScanInvocation(ident1 *Scanner, ident2 z.Reader) *ImporterScanInvocation {
+	invocation := new(ImporterScanInvocation)
+
+	invocation.Parameters.Ident1 = ident1
+
+	invocation.Results.Ident2 = ident2
+
+	return invocation
+}
+
 // ImporterTestingT represents the methods of "testing".T used by charlatan Fakes.  It avoids importing the testing package.
 type ImporterTestingT interface {
 	Error(...interface{})

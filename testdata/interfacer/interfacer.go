@@ -14,6 +14,17 @@ type InterfacerInterfaceInvocation struct {
 	}
 }
 
+// NewInterfacerInterfaceInvocation creates a new instance of InterfacerInterfaceInvocation
+func NewInterfacerInterfaceInvocation(ident1 interface{}, ident2 interface{}) *InterfacerInterfaceInvocation {
+	invocation := new(InterfacerInterfaceInvocation)
+
+	invocation.Parameters.Ident1 = ident1
+
+	invocation.Results.Ident2 = ident2
+
+	return invocation
+}
+
 // InterfacerNamedInterfaceInvocation represents a single call of FakeInterfacer.NamedInterface
 type InterfacerNamedInterfaceInvocation struct {
 	Parameters struct {
@@ -22,6 +33,17 @@ type InterfacerNamedInterfaceInvocation struct {
 	Results struct {
 		Z interface{}
 	}
+}
+
+// NewInterfacerNamedInterfaceInvocation creates a new instance of InterfacerNamedInterfaceInvocation
+func NewInterfacerNamedInterfaceInvocation(a interface{}, z interface{}) *InterfacerNamedInterfaceInvocation {
+	invocation := new(InterfacerNamedInterfaceInvocation)
+
+	invocation.Parameters.A = a
+
+	invocation.Results.Z = z
+
+	return invocation
 }
 
 // InterfacerTestingT represents the methods of "testing".T used by charlatan Fakes.  It avoids importing the testing package.
