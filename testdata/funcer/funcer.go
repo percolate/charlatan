@@ -240,6 +240,13 @@ func (_f6 *FakeFuncer) FuncReturn() (ident1 func(string) string) {
 	return
 }
 
+// SetFuncReturnStub configures Funcer.FuncReturn to always return the given values
+func (_f7 *FakeFuncer) SetFuncReturnStub(ident1 func(string) string) {
+	_f7.FuncReturnHook = func() func(string) string {
+		return ident1
+	}
+}
+
 // FuncReturnCalled returns true if FakeFuncer.FuncReturn was called
 func (f *FakeFuncer) FuncReturnCalled() bool {
 	return len(f.FuncReturnCalls) != 0

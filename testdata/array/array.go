@@ -282,6 +282,13 @@ func (_f6 *FakeArray) ArrayReturn() (ident1 [3]string) {
 	return
 }
 
+// SetArrayReturnStub configures Array.ArrayReturn to always return the given values
+func (_f7 *FakeArray) SetArrayReturnStub(ident1 [3]string) {
+	_f7.ArrayReturnHook = func() [3]string {
+		return ident1
+	}
+}
+
 // ArrayReturnCalled returns true if FakeArray.ArrayReturn was called
 func (f *FakeArray) ArrayReturnCalled() bool {
 	return len(f.ArrayReturnCalls) != 0
@@ -334,17 +341,17 @@ func (f *FakeArray) AssertArrayReturnCalledN(t ArrayTestingT, n int) {
 	}
 }
 
-func (_f7 *FakeArray) SliceParameter(ident1 []string) {
-	if _f7.SliceParameterHook == nil {
+func (_f8 *FakeArray) SliceParameter(ident1 []string) {
+	if _f8.SliceParameterHook == nil {
 		panic("Array.SliceParameter() called but FakeArray.SliceParameterHook is nil")
 	}
 
 	invocation := new(ArraySliceParameterInvocation)
-	_f7.SliceParameterCalls = append(_f7.SliceParameterCalls, invocation)
+	_f8.SliceParameterCalls = append(_f8.SliceParameterCalls, invocation)
 
 	invocation.Parameters.Ident1 = ident1
 
-	_f7.SliceParameterHook(ident1)
+	_f8.SliceParameterHook(ident1)
 
 	return
 }
@@ -402,8 +409,8 @@ func (f *FakeArray) AssertSliceParameterCalledN(t ArrayTestingT, n int) {
 }
 
 // SliceParameterCalledWith returns true if FakeArray.SliceParameter was called with the given values
-func (_f8 *FakeArray) SliceParameterCalledWith(ident1 []string) (found bool) {
-	for _, call := range _f8.SliceParameterCalls {
+func (_f9 *FakeArray) SliceParameterCalledWith(ident1 []string) (found bool) {
+	for _, call := range _f9.SliceParameterCalls {
 		if reflect.DeepEqual(call.Parameters.Ident1, ident1) {
 			found = true
 			break
@@ -414,10 +421,10 @@ func (_f8 *FakeArray) SliceParameterCalledWith(ident1 []string) (found bool) {
 }
 
 // AssertSliceParameterCalledWith calls t.Error if FakeArray.SliceParameter was not called with the given values
-func (_f9 *FakeArray) AssertSliceParameterCalledWith(t ArrayTestingT, ident1 []string) {
+func (_f10 *FakeArray) AssertSliceParameterCalledWith(t ArrayTestingT, ident1 []string) {
 	t.Helper()
 	var found bool
-	for _, call := range _f9.SliceParameterCalls {
+	for _, call := range _f10.SliceParameterCalls {
 		if reflect.DeepEqual(call.Parameters.Ident1, ident1) {
 			found = true
 			break
@@ -430,9 +437,9 @@ func (_f9 *FakeArray) AssertSliceParameterCalledWith(t ArrayTestingT, ident1 []s
 }
 
 // SliceParameterCalledOnceWith returns true if FakeArray.SliceParameter was called exactly once with the given values
-func (_f10 *FakeArray) SliceParameterCalledOnceWith(ident1 []string) bool {
+func (_f11 *FakeArray) SliceParameterCalledOnceWith(ident1 []string) bool {
 	var count int
-	for _, call := range _f10.SliceParameterCalls {
+	for _, call := range _f11.SliceParameterCalls {
 		if reflect.DeepEqual(call.Parameters.Ident1, ident1) {
 			count++
 		}
@@ -442,10 +449,10 @@ func (_f10 *FakeArray) SliceParameterCalledOnceWith(ident1 []string) bool {
 }
 
 // AssertSliceParameterCalledOnceWith calls t.Error if FakeArray.SliceParameter was not called exactly once with the given values
-func (_f11 *FakeArray) AssertSliceParameterCalledOnceWith(t ArrayTestingT, ident1 []string) {
+func (_f12 *FakeArray) AssertSliceParameterCalledOnceWith(t ArrayTestingT, ident1 []string) {
 	t.Helper()
 	var count int
-	for _, call := range _f11.SliceParameterCalls {
+	for _, call := range _f12.SliceParameterCalls {
 		if reflect.DeepEqual(call.Parameters.Ident1, ident1) {
 			count++
 		}
@@ -456,19 +463,26 @@ func (_f11 *FakeArray) AssertSliceParameterCalledOnceWith(t ArrayTestingT, ident
 	}
 }
 
-func (_f12 *FakeArray) SliceReturn() (ident1 []string) {
-	if _f12.SliceReturnHook == nil {
+func (_f13 *FakeArray) SliceReturn() (ident1 []string) {
+	if _f13.SliceReturnHook == nil {
 		panic("Array.SliceReturn() called but FakeArray.SliceReturnHook is nil")
 	}
 
 	invocation := new(ArraySliceReturnInvocation)
-	_f12.SliceReturnCalls = append(_f12.SliceReturnCalls, invocation)
+	_f13.SliceReturnCalls = append(_f13.SliceReturnCalls, invocation)
 
-	ident1 = _f12.SliceReturnHook()
+	ident1 = _f13.SliceReturnHook()
 
 	invocation.Results.Ident1 = ident1
 
 	return
+}
+
+// SetSliceReturnStub configures Array.SliceReturn to always return the given values
+func (_f14 *FakeArray) SetSliceReturnStub(ident1 []string) {
+	_f14.SliceReturnHook = func() []string {
+		return ident1
+	}
 }
 
 // SliceReturnCalled returns true if FakeArray.SliceReturn was called

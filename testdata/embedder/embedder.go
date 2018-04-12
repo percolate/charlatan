@@ -145,6 +145,13 @@ func (_f1 *FakeEmbedder) String() (ident5 string) {
 	return
 }
 
+// SetStringStub configures Embedder.String to always return the given values
+func (_f2 *FakeEmbedder) SetStringStub(ident5 string) {
+	_f2.StringHook = func() string {
+		return ident5
+	}
+}
+
 // StringCalled returns true if FakeEmbedder.String was called
 func (f *FakeEmbedder) StringCalled() bool {
 	return len(f.StringCalls) != 0
@@ -197,21 +204,44 @@ func (f *FakeEmbedder) AssertStringCalledN(t EmbedderTestingT, n int) {
 	}
 }
 
-func (_f2 *FakeEmbedder) Embed(ident1 string) (ident2 string) {
-	if _f2.EmbedHook == nil {
+func (_f3 *FakeEmbedder) Embed(ident1 string) (ident2 string) {
+	if _f3.EmbedHook == nil {
 		panic("Embedder.Embed() called but FakeEmbedder.EmbedHook is nil")
 	}
 
 	invocation := new(EmbedderEmbedInvocation)
-	_f2.EmbedCalls = append(_f2.EmbedCalls, invocation)
+	_f3.EmbedCalls = append(_f3.EmbedCalls, invocation)
 
 	invocation.Parameters.Ident1 = ident1
 
-	ident2 = _f2.EmbedHook(ident1)
+	ident2 = _f3.EmbedHook(ident1)
 
 	invocation.Results.Ident2 = ident2
 
 	return
+}
+
+// SetEmbedStub configures Embedder.Embed to always return the given values
+func (_f4 *FakeEmbedder) SetEmbedStub(ident2 string) {
+	_f4.EmbedHook = func(string) string {
+		return ident2
+	}
+}
+
+// SetEmbedInvocation configures Embedder.Embed to return the given results when called with the given parameters
+// If no match is found for an invocation the result(s) of the fallback function are returned
+func (_f5 *FakeEmbedder) SetEmbedInvocation(calls_f6 []*EmbedderEmbedInvocation, fallback_f7 func() string) {
+	_f5.EmbedHook = func(ident1 string) (ident2 string) {
+		for _, call := range calls_f6 {
+			if reflect.DeepEqual(call.Parameters.Ident1, ident1) {
+				ident2 = call.Results.Ident2
+
+				return
+			}
+		}
+
+		return fallback_f7()
+	}
 }
 
 // EmbedCalled returns true if FakeEmbedder.Embed was called
@@ -267,8 +297,8 @@ func (f *FakeEmbedder) AssertEmbedCalledN(t EmbedderTestingT, n int) {
 }
 
 // EmbedCalledWith returns true if FakeEmbedder.Embed was called with the given values
-func (_f3 *FakeEmbedder) EmbedCalledWith(ident1 string) (found bool) {
-	for _, call := range _f3.EmbedCalls {
+func (_f8 *FakeEmbedder) EmbedCalledWith(ident1 string) (found bool) {
+	for _, call := range _f8.EmbedCalls {
 		if reflect.DeepEqual(call.Parameters.Ident1, ident1) {
 			found = true
 			break
@@ -279,10 +309,10 @@ func (_f3 *FakeEmbedder) EmbedCalledWith(ident1 string) (found bool) {
 }
 
 // AssertEmbedCalledWith calls t.Error if FakeEmbedder.Embed was not called with the given values
-func (_f4 *FakeEmbedder) AssertEmbedCalledWith(t EmbedderTestingT, ident1 string) {
+func (_f9 *FakeEmbedder) AssertEmbedCalledWith(t EmbedderTestingT, ident1 string) {
 	t.Helper()
 	var found bool
-	for _, call := range _f4.EmbedCalls {
+	for _, call := range _f9.EmbedCalls {
 		if reflect.DeepEqual(call.Parameters.Ident1, ident1) {
 			found = true
 			break
@@ -295,9 +325,9 @@ func (_f4 *FakeEmbedder) AssertEmbedCalledWith(t EmbedderTestingT, ident1 string
 }
 
 // EmbedCalledOnceWith returns true if FakeEmbedder.Embed was called exactly once with the given values
-func (_f5 *FakeEmbedder) EmbedCalledOnceWith(ident1 string) bool {
+func (_f10 *FakeEmbedder) EmbedCalledOnceWith(ident1 string) bool {
 	var count int
-	for _, call := range _f5.EmbedCalls {
+	for _, call := range _f10.EmbedCalls {
 		if reflect.DeepEqual(call.Parameters.Ident1, ident1) {
 			count++
 		}
@@ -307,10 +337,10 @@ func (_f5 *FakeEmbedder) EmbedCalledOnceWith(ident1 string) bool {
 }
 
 // AssertEmbedCalledOnceWith calls t.Error if FakeEmbedder.Embed was not called exactly once with the given values
-func (_f6 *FakeEmbedder) AssertEmbedCalledOnceWith(t EmbedderTestingT, ident1 string) {
+func (_f11 *FakeEmbedder) AssertEmbedCalledOnceWith(t EmbedderTestingT, ident1 string) {
 	t.Helper()
 	var count int
-	for _, call := range _f6.EmbedCalls {
+	for _, call := range _f11.EmbedCalls {
 		if reflect.DeepEqual(call.Parameters.Ident1, ident1) {
 			count++
 		}
@@ -322,8 +352,8 @@ func (_f6 *FakeEmbedder) AssertEmbedCalledOnceWith(t EmbedderTestingT, ident1 st
 }
 
 // EmbedResultsForCall returns the result values for the first call to FakeEmbedder.Embed with the given values
-func (_f7 *FakeEmbedder) EmbedResultsForCall(ident1 string) (ident2 string, found bool) {
-	for _, call := range _f7.EmbedCalls {
+func (_f12 *FakeEmbedder) EmbedResultsForCall(ident1 string) (ident2 string, found bool) {
+	for _, call := range _f12.EmbedCalls {
 		if reflect.DeepEqual(call.Parameters.Ident1, ident1) {
 			ident2 = call.Results.Ident2
 			found = true
@@ -334,21 +364,44 @@ func (_f7 *FakeEmbedder) EmbedResultsForCall(ident1 string) (ident2 string, foun
 	return
 }
 
-func (_f8 *FakeEmbedder) Other(ident1 string) (ident2 string) {
-	if _f8.OtherHook == nil {
+func (_f13 *FakeEmbedder) Other(ident1 string) (ident2 string) {
+	if _f13.OtherHook == nil {
 		panic("Embedder.Other() called but FakeEmbedder.OtherHook is nil")
 	}
 
 	invocation := new(EmbedderOtherInvocation)
-	_f8.OtherCalls = append(_f8.OtherCalls, invocation)
+	_f13.OtherCalls = append(_f13.OtherCalls, invocation)
 
 	invocation.Parameters.Ident1 = ident1
 
-	ident2 = _f8.OtherHook(ident1)
+	ident2 = _f13.OtherHook(ident1)
 
 	invocation.Results.Ident2 = ident2
 
 	return
+}
+
+// SetOtherStub configures Embedder.Other to always return the given values
+func (_f14 *FakeEmbedder) SetOtherStub(ident2 string) {
+	_f14.OtherHook = func(string) string {
+		return ident2
+	}
+}
+
+// SetOtherInvocation configures Embedder.Other to return the given results when called with the given parameters
+// If no match is found for an invocation the result(s) of the fallback function are returned
+func (_f15 *FakeEmbedder) SetOtherInvocation(calls_f16 []*EmbedderOtherInvocation, fallback_f17 func() string) {
+	_f15.OtherHook = func(ident1 string) (ident2 string) {
+		for _, call := range calls_f16 {
+			if reflect.DeepEqual(call.Parameters.Ident1, ident1) {
+				ident2 = call.Results.Ident2
+
+				return
+			}
+		}
+
+		return fallback_f17()
+	}
 }
 
 // OtherCalled returns true if FakeEmbedder.Other was called
@@ -404,8 +457,8 @@ func (f *FakeEmbedder) AssertOtherCalledN(t EmbedderTestingT, n int) {
 }
 
 // OtherCalledWith returns true if FakeEmbedder.Other was called with the given values
-func (_f9 *FakeEmbedder) OtherCalledWith(ident1 string) (found bool) {
-	for _, call := range _f9.OtherCalls {
+func (_f18 *FakeEmbedder) OtherCalledWith(ident1 string) (found bool) {
+	for _, call := range _f18.OtherCalls {
 		if reflect.DeepEqual(call.Parameters.Ident1, ident1) {
 			found = true
 			break
@@ -416,10 +469,10 @@ func (_f9 *FakeEmbedder) OtherCalledWith(ident1 string) (found bool) {
 }
 
 // AssertOtherCalledWith calls t.Error if FakeEmbedder.Other was not called with the given values
-func (_f10 *FakeEmbedder) AssertOtherCalledWith(t EmbedderTestingT, ident1 string) {
+func (_f19 *FakeEmbedder) AssertOtherCalledWith(t EmbedderTestingT, ident1 string) {
 	t.Helper()
 	var found bool
-	for _, call := range _f10.OtherCalls {
+	for _, call := range _f19.OtherCalls {
 		if reflect.DeepEqual(call.Parameters.Ident1, ident1) {
 			found = true
 			break
@@ -432,9 +485,9 @@ func (_f10 *FakeEmbedder) AssertOtherCalledWith(t EmbedderTestingT, ident1 strin
 }
 
 // OtherCalledOnceWith returns true if FakeEmbedder.Other was called exactly once with the given values
-func (_f11 *FakeEmbedder) OtherCalledOnceWith(ident1 string) bool {
+func (_f20 *FakeEmbedder) OtherCalledOnceWith(ident1 string) bool {
 	var count int
-	for _, call := range _f11.OtherCalls {
+	for _, call := range _f20.OtherCalls {
 		if reflect.DeepEqual(call.Parameters.Ident1, ident1) {
 			count++
 		}
@@ -444,10 +497,10 @@ func (_f11 *FakeEmbedder) OtherCalledOnceWith(ident1 string) bool {
 }
 
 // AssertOtherCalledOnceWith calls t.Error if FakeEmbedder.Other was not called exactly once with the given values
-func (_f12 *FakeEmbedder) AssertOtherCalledOnceWith(t EmbedderTestingT, ident1 string) {
+func (_f21 *FakeEmbedder) AssertOtherCalledOnceWith(t EmbedderTestingT, ident1 string) {
 	t.Helper()
 	var count int
-	for _, call := range _f12.OtherCalls {
+	for _, call := range _f21.OtherCalls {
 		if reflect.DeepEqual(call.Parameters.Ident1, ident1) {
 			count++
 		}
@@ -459,8 +512,8 @@ func (_f12 *FakeEmbedder) AssertOtherCalledOnceWith(t EmbedderTestingT, ident1 s
 }
 
 // OtherResultsForCall returns the result values for the first call to FakeEmbedder.Other with the given values
-func (_f13 *FakeEmbedder) OtherResultsForCall(ident1 string) (ident2 string, found bool) {
-	for _, call := range _f13.OtherCalls {
+func (_f22 *FakeEmbedder) OtherResultsForCall(ident1 string) (ident2 string, found bool) {
+	for _, call := range _f22.OtherCalls {
 		if reflect.DeepEqual(call.Parameters.Ident1, ident1) {
 			ident2 = call.Results.Ident2
 			found = true

@@ -122,6 +122,29 @@ func (f *Fake{{.Name}}) Reset() {
 
 	return
 }{{end}}
+{{if .Results}}
+// Set{{.Name}}Stub configures {{.Interface}}.{{.Name}} to always return the given values
+{{with $f := gensym}}func ({{$f}} *Fake{{$m.Interface}}) Set{{$m.Name}}Stub({{$m.ResultsDeclaration}}) {
+	{{$f}}.{{$m.Name}}Hook = func({{$m.ParametersSignature}}) ({{$m.ResultsSignature}}) {
+		return {{range $i, $r := $m.Results}}{{if $i}}, {{end}}{{$r.Name}}{{end}}
+	}
+}{{end}}{{end}}{{/* end if .Results */}}
+{{if and .Parameters .Results}}
+// Set{{.Name}}Invocation configures {{.Interface}}.{{.Name}} to return the given results when called with the given parameters
+// If no match is found for an invocation the result(s) of the fallback function are returned
+{{with $f := gensym}}{{with $c := gensym}}{{with $d := gensym}}func ({{$f}} *Fake{{$m.Interface}}) Set{{$m.Name}}Invocation(calls{{$c}} []*{{$m.Interface}}{{$m.Name}}Invocation, fallback{{$d}} func() ({{$m.ResultsSignature}})) {
+	{{$f}}.{{$m.Name}}Hook = func({{$m.ParametersDeclaration}}) ({{$m.ResultsDeclaration}}) {
+		for _, call := range calls{{$c}} {
+			if {{range $i, $p := $m.Parameters}}{{if $i}} && {{end}}reflect.DeepEqual(call.Parameters.{{$p.TitleCase}}, {{$p.Name}}){{end}} {
+				{{range $m.Results}}{{.Name}} = call.Results.{{.TitleCase}}
+				{{end}}
+				return
+			}
+		}
+	
+		return fallback{{$d}}()
+	}
+}{{end}}{{end}}{{end}}{{end}}{{/* end if and .Parameters .Results */}}
 
 // {{.Name}}Called returns true if Fake{{.Interface}}.{{.Name}} was called
 func (f *Fake{{.Interface}}) {{.Name}}Called() bool {
@@ -241,7 +264,7 @@ func (f *Fake{{.Interface}}) Assert{{.Name}}CalledN(t {{.Interface}}TestingT, n 
 	}
 
 	return
-}{{end}}{{end}} {{/* end if .Results */}}
+}{{end}}{{end}}{{/* end if len $m.Results */}}
 {{end}}{{/* end if .Parameters */}}
 {{end}}{{/* end range $m := .Methods */}}
 {{end}}{{/* end range .Interfaces */}}
