@@ -4,7 +4,7 @@
 [![codecov.io](https://codecov.io/github/percolate/charlatan/coverage.svg?branch=master)](https://codecov.io/github/percolate/charlatan?branch=master)
 [![BSD](https://img.shields.io/badge/license-BSD-blue.svg)](https://github.com/percolate/charlatan/blob/master/LICENSE)
 
-Percolate's Go Interface Mocking Tool.
+Percolate's Go Interface Mocking Tool.  Please read our introductory [blog post](https://medium.com/percolate-engineering/introducing-charlatan-df9b5d3d3107).
 
 ## Installation
 
