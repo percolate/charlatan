@@ -14,6 +14,17 @@ type ChannelerChannelInvocation struct {
 	}
 }
 
+// NewChannelerChannelInvocation creates a new instance of ChannelerChannelInvocation
+func NewChannelerChannelInvocation(ident1 chan int, ident2 chan int) *ChannelerChannelInvocation {
+	invocation := new(ChannelerChannelInvocation)
+
+	invocation.Parameters.Ident1 = ident1
+
+	invocation.Results.Ident2 = ident2
+
+	return invocation
+}
+
 // ChannelerChannelReceiveInvocation represents a single call of FakeChanneler.ChannelReceive
 type ChannelerChannelReceiveInvocation struct {
 	Parameters struct {
@@ -22,6 +33,17 @@ type ChannelerChannelReceiveInvocation struct {
 	Results struct {
 		Ident2 <-chan int
 	}
+}
+
+// NewChannelerChannelReceiveInvocation creates a new instance of ChannelerChannelReceiveInvocation
+func NewChannelerChannelReceiveInvocation(ident1 <-chan int, ident2 <-chan int) *ChannelerChannelReceiveInvocation {
+	invocation := new(ChannelerChannelReceiveInvocation)
+
+	invocation.Parameters.Ident1 = ident1
+
+	invocation.Results.Ident2 = ident2
+
+	return invocation
 }
 
 // ChannelerChannelSendInvocation represents a single call of FakeChanneler.ChannelSend
@@ -34,6 +56,17 @@ type ChannelerChannelSendInvocation struct {
 	}
 }
 
+// NewChannelerChannelSendInvocation creates a new instance of ChannelerChannelSendInvocation
+func NewChannelerChannelSendInvocation(ident1 chan<- int, ident2 chan<- int) *ChannelerChannelSendInvocation {
+	invocation := new(ChannelerChannelSendInvocation)
+
+	invocation.Parameters.Ident1 = ident1
+
+	invocation.Results.Ident2 = ident2
+
+	return invocation
+}
+
 // ChannelerChannelPointerInvocation represents a single call of FakeChanneler.ChannelPointer
 type ChannelerChannelPointerInvocation struct {
 	Parameters struct {
@@ -44,6 +77,17 @@ type ChannelerChannelPointerInvocation struct {
 	}
 }
 
+// NewChannelerChannelPointerInvocation creates a new instance of ChannelerChannelPointerInvocation
+func NewChannelerChannelPointerInvocation(ident1 *chan int, ident2 *chan int) *ChannelerChannelPointerInvocation {
+	invocation := new(ChannelerChannelPointerInvocation)
+
+	invocation.Parameters.Ident1 = ident1
+
+	invocation.Results.Ident2 = ident2
+
+	return invocation
+}
+
 // ChannelerChannelInterfaceInvocation represents a single call of FakeChanneler.ChannelInterface
 type ChannelerChannelInterfaceInvocation struct {
 	Parameters struct {
@@ -52,6 +96,17 @@ type ChannelerChannelInterfaceInvocation struct {
 	Results struct {
 		Ident2 chan interface{}
 	}
+}
+
+// NewChannelerChannelInterfaceInvocation creates a new instance of ChannelerChannelInterfaceInvocation
+func NewChannelerChannelInterfaceInvocation(ident1 chan interface{}, ident2 chan interface{}) *ChannelerChannelInterfaceInvocation {
+	invocation := new(ChannelerChannelInterfaceInvocation)
+
+	invocation.Parameters.Ident1 = ident1
+
+	invocation.Results.Ident2 = ident2
+
+	return invocation
 }
 
 // ChannelerTestingT represents the methods of "testing".T used by charlatan Fakes.  It avoids importing the testing package.
@@ -198,6 +253,29 @@ func (_f1 *FakeChanneler) Channel(ident1 chan int) (ident2 chan int) {
 	return
 }
 
+// SetChannelStub configures Channeler.Channel to always return the given values
+func (_f2 *FakeChanneler) SetChannelStub(ident2 chan int) {
+	_f2.ChannelHook = func(chan int) chan int {
+		return ident2
+	}
+}
+
+// SetChannelInvocation configures Channeler.Channel to return the given results when called with the given parameters
+// If no match is found for an invocation the result(s) of the fallback function are returned
+func (_f3 *FakeChanneler) SetChannelInvocation(calls_f4 []*ChannelerChannelInvocation, fallback_f5 func() chan int) {
+	_f3.ChannelHook = func(ident1 chan int) (ident2 chan int) {
+		for _, call := range calls_f4 {
+			if reflect.DeepEqual(call.Parameters.Ident1, ident1) {
+				ident2 = call.Results.Ident2
+
+				return
+			}
+		}
+
+		return fallback_f5()
+	}
+}
+
 // ChannelCalled returns true if FakeChanneler.Channel was called
 func (f *FakeChanneler) ChannelCalled() bool {
 	return len(f.ChannelCalls) != 0
@@ -251,8 +329,8 @@ func (f *FakeChanneler) AssertChannelCalledN(t ChannelerTestingT, n int) {
 }
 
 // ChannelCalledWith returns true if FakeChanneler.Channel was called with the given values
-func (_f2 *FakeChanneler) ChannelCalledWith(ident1 chan int) (found bool) {
-	for _, call := range _f2.ChannelCalls {
+func (_f6 *FakeChanneler) ChannelCalledWith(ident1 chan int) (found bool) {
+	for _, call := range _f6.ChannelCalls {
 		if reflect.DeepEqual(call.Parameters.Ident1, ident1) {
 			found = true
 			break
@@ -263,10 +341,10 @@ func (_f2 *FakeChanneler) ChannelCalledWith(ident1 chan int) (found bool) {
 }
 
 // AssertChannelCalledWith calls t.Error if FakeChanneler.Channel was not called with the given values
-func (_f3 *FakeChanneler) AssertChannelCalledWith(t ChannelerTestingT, ident1 chan int) {
+func (_f7 *FakeChanneler) AssertChannelCalledWith(t ChannelerTestingT, ident1 chan int) {
 	t.Helper()
 	var found bool
-	for _, call := range _f3.ChannelCalls {
+	for _, call := range _f7.ChannelCalls {
 		if reflect.DeepEqual(call.Parameters.Ident1, ident1) {
 			found = true
 			break
@@ -279,9 +357,9 @@ func (_f3 *FakeChanneler) AssertChannelCalledWith(t ChannelerTestingT, ident1 ch
 }
 
 // ChannelCalledOnceWith returns true if FakeChanneler.Channel was called exactly once with the given values
-func (_f4 *FakeChanneler) ChannelCalledOnceWith(ident1 chan int) bool {
+func (_f8 *FakeChanneler) ChannelCalledOnceWith(ident1 chan int) bool {
 	var count int
-	for _, call := range _f4.ChannelCalls {
+	for _, call := range _f8.ChannelCalls {
 		if reflect.DeepEqual(call.Parameters.Ident1, ident1) {
 			count++
 		}
@@ -291,10 +369,10 @@ func (_f4 *FakeChanneler) ChannelCalledOnceWith(ident1 chan int) bool {
 }
 
 // AssertChannelCalledOnceWith calls t.Error if FakeChanneler.Channel was not called exactly once with the given values
-func (_f5 *FakeChanneler) AssertChannelCalledOnceWith(t ChannelerTestingT, ident1 chan int) {
+func (_f9 *FakeChanneler) AssertChannelCalledOnceWith(t ChannelerTestingT, ident1 chan int) {
 	t.Helper()
 	var count int
-	for _, call := range _f5.ChannelCalls {
+	for _, call := range _f9.ChannelCalls {
 		if reflect.DeepEqual(call.Parameters.Ident1, ident1) {
 			count++
 		}
@@ -306,8 +384,8 @@ func (_f5 *FakeChanneler) AssertChannelCalledOnceWith(t ChannelerTestingT, ident
 }
 
 // ChannelResultsForCall returns the result values for the first call to FakeChanneler.Channel with the given values
-func (_f6 *FakeChanneler) ChannelResultsForCall(ident1 chan int) (ident2 chan int, found bool) {
-	for _, call := range _f6.ChannelCalls {
+func (_f10 *FakeChanneler) ChannelResultsForCall(ident1 chan int) (ident2 chan int, found bool) {
+	for _, call := range _f10.ChannelCalls {
 		if reflect.DeepEqual(call.Parameters.Ident1, ident1) {
 			ident2 = call.Results.Ident2
 			found = true
@@ -318,21 +396,44 @@ func (_f6 *FakeChanneler) ChannelResultsForCall(ident1 chan int) (ident2 chan in
 	return
 }
 
-func (_f7 *FakeChanneler) ChannelReceive(ident1 <-chan int) (ident2 <-chan int) {
-	if _f7.ChannelReceiveHook == nil {
+func (_f11 *FakeChanneler) ChannelReceive(ident1 <-chan int) (ident2 <-chan int) {
+	if _f11.ChannelReceiveHook == nil {
 		panic("Channeler.ChannelReceive() called but FakeChanneler.ChannelReceiveHook is nil")
 	}
 
 	invocation := new(ChannelerChannelReceiveInvocation)
-	_f7.ChannelReceiveCalls = append(_f7.ChannelReceiveCalls, invocation)
+	_f11.ChannelReceiveCalls = append(_f11.ChannelReceiveCalls, invocation)
 
 	invocation.Parameters.Ident1 = ident1
 
-	ident2 = _f7.ChannelReceiveHook(ident1)
+	ident2 = _f11.ChannelReceiveHook(ident1)
 
 	invocation.Results.Ident2 = ident2
 
 	return
+}
+
+// SetChannelReceiveStub configures Channeler.ChannelReceive to always return the given values
+func (_f12 *FakeChanneler) SetChannelReceiveStub(ident2 <-chan int) {
+	_f12.ChannelReceiveHook = func(<-chan int) <-chan int {
+		return ident2
+	}
+}
+
+// SetChannelReceiveInvocation configures Channeler.ChannelReceive to return the given results when called with the given parameters
+// If no match is found for an invocation the result(s) of the fallback function are returned
+func (_f13 *FakeChanneler) SetChannelReceiveInvocation(calls_f14 []*ChannelerChannelReceiveInvocation, fallback_f15 func() <-chan int) {
+	_f13.ChannelReceiveHook = func(ident1 <-chan int) (ident2 <-chan int) {
+		for _, call := range calls_f14 {
+			if reflect.DeepEqual(call.Parameters.Ident1, ident1) {
+				ident2 = call.Results.Ident2
+
+				return
+			}
+		}
+
+		return fallback_f15()
+	}
 }
 
 // ChannelReceiveCalled returns true if FakeChanneler.ChannelReceive was called
@@ -388,8 +489,8 @@ func (f *FakeChanneler) AssertChannelReceiveCalledN(t ChannelerTestingT, n int) 
 }
 
 // ChannelReceiveCalledWith returns true if FakeChanneler.ChannelReceive was called with the given values
-func (_f8 *FakeChanneler) ChannelReceiveCalledWith(ident1 <-chan int) (found bool) {
-	for _, call := range _f8.ChannelReceiveCalls {
+func (_f16 *FakeChanneler) ChannelReceiveCalledWith(ident1 <-chan int) (found bool) {
+	for _, call := range _f16.ChannelReceiveCalls {
 		if reflect.DeepEqual(call.Parameters.Ident1, ident1) {
 			found = true
 			break
@@ -400,10 +501,10 @@ func (_f8 *FakeChanneler) ChannelReceiveCalledWith(ident1 <-chan int) (found boo
 }
 
 // AssertChannelReceiveCalledWith calls t.Error if FakeChanneler.ChannelReceive was not called with the given values
-func (_f9 *FakeChanneler) AssertChannelReceiveCalledWith(t ChannelerTestingT, ident1 <-chan int) {
+func (_f17 *FakeChanneler) AssertChannelReceiveCalledWith(t ChannelerTestingT, ident1 <-chan int) {
 	t.Helper()
 	var found bool
-	for _, call := range _f9.ChannelReceiveCalls {
+	for _, call := range _f17.ChannelReceiveCalls {
 		if reflect.DeepEqual(call.Parameters.Ident1, ident1) {
 			found = true
 			break
@@ -416,9 +517,9 @@ func (_f9 *FakeChanneler) AssertChannelReceiveCalledWith(t ChannelerTestingT, id
 }
 
 // ChannelReceiveCalledOnceWith returns true if FakeChanneler.ChannelReceive was called exactly once with the given values
-func (_f10 *FakeChanneler) ChannelReceiveCalledOnceWith(ident1 <-chan int) bool {
+func (_f18 *FakeChanneler) ChannelReceiveCalledOnceWith(ident1 <-chan int) bool {
 	var count int
-	for _, call := range _f10.ChannelReceiveCalls {
+	for _, call := range _f18.ChannelReceiveCalls {
 		if reflect.DeepEqual(call.Parameters.Ident1, ident1) {
 			count++
 		}
@@ -428,10 +529,10 @@ func (_f10 *FakeChanneler) ChannelReceiveCalledOnceWith(ident1 <-chan int) bool 
 }
 
 // AssertChannelReceiveCalledOnceWith calls t.Error if FakeChanneler.ChannelReceive was not called exactly once with the given values
-func (_f11 *FakeChanneler) AssertChannelReceiveCalledOnceWith(t ChannelerTestingT, ident1 <-chan int) {
+func (_f19 *FakeChanneler) AssertChannelReceiveCalledOnceWith(t ChannelerTestingT, ident1 <-chan int) {
 	t.Helper()
 	var count int
-	for _, call := range _f11.ChannelReceiveCalls {
+	for _, call := range _f19.ChannelReceiveCalls {
 		if reflect.DeepEqual(call.Parameters.Ident1, ident1) {
 			count++
 		}
@@ -443,8 +544,8 @@ func (_f11 *FakeChanneler) AssertChannelReceiveCalledOnceWith(t ChannelerTesting
 }
 
 // ChannelReceiveResultsForCall returns the result values for the first call to FakeChanneler.ChannelReceive with the given values
-func (_f12 *FakeChanneler) ChannelReceiveResultsForCall(ident1 <-chan int) (ident2 <-chan int, found bool) {
-	for _, call := range _f12.ChannelReceiveCalls {
+func (_f20 *FakeChanneler) ChannelReceiveResultsForCall(ident1 <-chan int) (ident2 <-chan int, found bool) {
+	for _, call := range _f20.ChannelReceiveCalls {
 		if reflect.DeepEqual(call.Parameters.Ident1, ident1) {
 			ident2 = call.Results.Ident2
 			found = true
@@ -455,21 +556,44 @@ func (_f12 *FakeChanneler) ChannelReceiveResultsForCall(ident1 <-chan int) (iden
 	return
 }
 
-func (_f13 *FakeChanneler) ChannelSend(ident1 chan<- int) (ident2 chan<- int) {
-	if _f13.ChannelSendHook == nil {
+func (_f21 *FakeChanneler) ChannelSend(ident1 chan<- int) (ident2 chan<- int) {
+	if _f21.ChannelSendHook == nil {
 		panic("Channeler.ChannelSend() called but FakeChanneler.ChannelSendHook is nil")
 	}
 
 	invocation := new(ChannelerChannelSendInvocation)
-	_f13.ChannelSendCalls = append(_f13.ChannelSendCalls, invocation)
+	_f21.ChannelSendCalls = append(_f21.ChannelSendCalls, invocation)
 
 	invocation.Parameters.Ident1 = ident1
 
-	ident2 = _f13.ChannelSendHook(ident1)
+	ident2 = _f21.ChannelSendHook(ident1)
 
 	invocation.Results.Ident2 = ident2
 
 	return
+}
+
+// SetChannelSendStub configures Channeler.ChannelSend to always return the given values
+func (_f22 *FakeChanneler) SetChannelSendStub(ident2 chan<- int) {
+	_f22.ChannelSendHook = func(chan<- int) chan<- int {
+		return ident2
+	}
+}
+
+// SetChannelSendInvocation configures Channeler.ChannelSend to return the given results when called with the given parameters
+// If no match is found for an invocation the result(s) of the fallback function are returned
+func (_f23 *FakeChanneler) SetChannelSendInvocation(calls_f24 []*ChannelerChannelSendInvocation, fallback_f25 func() chan<- int) {
+	_f23.ChannelSendHook = func(ident1 chan<- int) (ident2 chan<- int) {
+		for _, call := range calls_f24 {
+			if reflect.DeepEqual(call.Parameters.Ident1, ident1) {
+				ident2 = call.Results.Ident2
+
+				return
+			}
+		}
+
+		return fallback_f25()
+	}
 }
 
 // ChannelSendCalled returns true if FakeChanneler.ChannelSend was called
@@ -525,8 +649,8 @@ func (f *FakeChanneler) AssertChannelSendCalledN(t ChannelerTestingT, n int) {
 }
 
 // ChannelSendCalledWith returns true if FakeChanneler.ChannelSend was called with the given values
-func (_f14 *FakeChanneler) ChannelSendCalledWith(ident1 chan<- int) (found bool) {
-	for _, call := range _f14.ChannelSendCalls {
+func (_f26 *FakeChanneler) ChannelSendCalledWith(ident1 chan<- int) (found bool) {
+	for _, call := range _f26.ChannelSendCalls {
 		if reflect.DeepEqual(call.Parameters.Ident1, ident1) {
 			found = true
 			break
@@ -537,10 +661,10 @@ func (_f14 *FakeChanneler) ChannelSendCalledWith(ident1 chan<- int) (found bool)
 }
 
 // AssertChannelSendCalledWith calls t.Error if FakeChanneler.ChannelSend was not called with the given values
-func (_f15 *FakeChanneler) AssertChannelSendCalledWith(t ChannelerTestingT, ident1 chan<- int) {
+func (_f27 *FakeChanneler) AssertChannelSendCalledWith(t ChannelerTestingT, ident1 chan<- int) {
 	t.Helper()
 	var found bool
-	for _, call := range _f15.ChannelSendCalls {
+	for _, call := range _f27.ChannelSendCalls {
 		if reflect.DeepEqual(call.Parameters.Ident1, ident1) {
 			found = true
 			break
@@ -553,9 +677,9 @@ func (_f15 *FakeChanneler) AssertChannelSendCalledWith(t ChannelerTestingT, iden
 }
 
 // ChannelSendCalledOnceWith returns true if FakeChanneler.ChannelSend was called exactly once with the given values
-func (_f16 *FakeChanneler) ChannelSendCalledOnceWith(ident1 chan<- int) bool {
+func (_f28 *FakeChanneler) ChannelSendCalledOnceWith(ident1 chan<- int) bool {
 	var count int
-	for _, call := range _f16.ChannelSendCalls {
+	for _, call := range _f28.ChannelSendCalls {
 		if reflect.DeepEqual(call.Parameters.Ident1, ident1) {
 			count++
 		}
@@ -565,10 +689,10 @@ func (_f16 *FakeChanneler) ChannelSendCalledOnceWith(ident1 chan<- int) bool {
 }
 
 // AssertChannelSendCalledOnceWith calls t.Error if FakeChanneler.ChannelSend was not called exactly once with the given values
-func (_f17 *FakeChanneler) AssertChannelSendCalledOnceWith(t ChannelerTestingT, ident1 chan<- int) {
+func (_f29 *FakeChanneler) AssertChannelSendCalledOnceWith(t ChannelerTestingT, ident1 chan<- int) {
 	t.Helper()
 	var count int
-	for _, call := range _f17.ChannelSendCalls {
+	for _, call := range _f29.ChannelSendCalls {
 		if reflect.DeepEqual(call.Parameters.Ident1, ident1) {
 			count++
 		}
@@ -580,8 +704,8 @@ func (_f17 *FakeChanneler) AssertChannelSendCalledOnceWith(t ChannelerTestingT, 
 }
 
 // ChannelSendResultsForCall returns the result values for the first call to FakeChanneler.ChannelSend with the given values
-func (_f18 *FakeChanneler) ChannelSendResultsForCall(ident1 chan<- int) (ident2 chan<- int, found bool) {
-	for _, call := range _f18.ChannelSendCalls {
+func (_f30 *FakeChanneler) ChannelSendResultsForCall(ident1 chan<- int) (ident2 chan<- int, found bool) {
+	for _, call := range _f30.ChannelSendCalls {
 		if reflect.DeepEqual(call.Parameters.Ident1, ident1) {
 			ident2 = call.Results.Ident2
 			found = true
@@ -592,21 +716,44 @@ func (_f18 *FakeChanneler) ChannelSendResultsForCall(ident1 chan<- int) (ident2 
 	return
 }
 
-func (_f19 *FakeChanneler) ChannelPointer(ident1 *chan int) (ident2 *chan int) {
-	if _f19.ChannelPointerHook == nil {
+func (_f31 *FakeChanneler) ChannelPointer(ident1 *chan int) (ident2 *chan int) {
+	if _f31.ChannelPointerHook == nil {
 		panic("Channeler.ChannelPointer() called but FakeChanneler.ChannelPointerHook is nil")
 	}
 
 	invocation := new(ChannelerChannelPointerInvocation)
-	_f19.ChannelPointerCalls = append(_f19.ChannelPointerCalls, invocation)
+	_f31.ChannelPointerCalls = append(_f31.ChannelPointerCalls, invocation)
 
 	invocation.Parameters.Ident1 = ident1
 
-	ident2 = _f19.ChannelPointerHook(ident1)
+	ident2 = _f31.ChannelPointerHook(ident1)
 
 	invocation.Results.Ident2 = ident2
 
 	return
+}
+
+// SetChannelPointerStub configures Channeler.ChannelPointer to always return the given values
+func (_f32 *FakeChanneler) SetChannelPointerStub(ident2 *chan int) {
+	_f32.ChannelPointerHook = func(*chan int) *chan int {
+		return ident2
+	}
+}
+
+// SetChannelPointerInvocation configures Channeler.ChannelPointer to return the given results when called with the given parameters
+// If no match is found for an invocation the result(s) of the fallback function are returned
+func (_f33 *FakeChanneler) SetChannelPointerInvocation(calls_f34 []*ChannelerChannelPointerInvocation, fallback_f35 func() *chan int) {
+	_f33.ChannelPointerHook = func(ident1 *chan int) (ident2 *chan int) {
+		for _, call := range calls_f34 {
+			if reflect.DeepEqual(call.Parameters.Ident1, ident1) {
+				ident2 = call.Results.Ident2
+
+				return
+			}
+		}
+
+		return fallback_f35()
+	}
 }
 
 // ChannelPointerCalled returns true if FakeChanneler.ChannelPointer was called
@@ -662,8 +809,8 @@ func (f *FakeChanneler) AssertChannelPointerCalledN(t ChannelerTestingT, n int) 
 }
 
 // ChannelPointerCalledWith returns true if FakeChanneler.ChannelPointer was called with the given values
-func (_f20 *FakeChanneler) ChannelPointerCalledWith(ident1 *chan int) (found bool) {
-	for _, call := range _f20.ChannelPointerCalls {
+func (_f36 *FakeChanneler) ChannelPointerCalledWith(ident1 *chan int) (found bool) {
+	for _, call := range _f36.ChannelPointerCalls {
 		if reflect.DeepEqual(call.Parameters.Ident1, ident1) {
 			found = true
 			break
@@ -674,10 +821,10 @@ func (_f20 *FakeChanneler) ChannelPointerCalledWith(ident1 *chan int) (found boo
 }
 
 // AssertChannelPointerCalledWith calls t.Error if FakeChanneler.ChannelPointer was not called with the given values
-func (_f21 *FakeChanneler) AssertChannelPointerCalledWith(t ChannelerTestingT, ident1 *chan int) {
+func (_f37 *FakeChanneler) AssertChannelPointerCalledWith(t ChannelerTestingT, ident1 *chan int) {
 	t.Helper()
 	var found bool
-	for _, call := range _f21.ChannelPointerCalls {
+	for _, call := range _f37.ChannelPointerCalls {
 		if reflect.DeepEqual(call.Parameters.Ident1, ident1) {
 			found = true
 			break
@@ -690,9 +837,9 @@ func (_f21 *FakeChanneler) AssertChannelPointerCalledWith(t ChannelerTestingT, i
 }
 
 // ChannelPointerCalledOnceWith returns true if FakeChanneler.ChannelPointer was called exactly once with the given values
-func (_f22 *FakeChanneler) ChannelPointerCalledOnceWith(ident1 *chan int) bool {
+func (_f38 *FakeChanneler) ChannelPointerCalledOnceWith(ident1 *chan int) bool {
 	var count int
-	for _, call := range _f22.ChannelPointerCalls {
+	for _, call := range _f38.ChannelPointerCalls {
 		if reflect.DeepEqual(call.Parameters.Ident1, ident1) {
 			count++
 		}
@@ -702,10 +849,10 @@ func (_f22 *FakeChanneler) ChannelPointerCalledOnceWith(ident1 *chan int) bool {
 }
 
 // AssertChannelPointerCalledOnceWith calls t.Error if FakeChanneler.ChannelPointer was not called exactly once with the given values
-func (_f23 *FakeChanneler) AssertChannelPointerCalledOnceWith(t ChannelerTestingT, ident1 *chan int) {
+func (_f39 *FakeChanneler) AssertChannelPointerCalledOnceWith(t ChannelerTestingT, ident1 *chan int) {
 	t.Helper()
 	var count int
-	for _, call := range _f23.ChannelPointerCalls {
+	for _, call := range _f39.ChannelPointerCalls {
 		if reflect.DeepEqual(call.Parameters.Ident1, ident1) {
 			count++
 		}
@@ -717,8 +864,8 @@ func (_f23 *FakeChanneler) AssertChannelPointerCalledOnceWith(t ChannelerTesting
 }
 
 // ChannelPointerResultsForCall returns the result values for the first call to FakeChanneler.ChannelPointer with the given values
-func (_f24 *FakeChanneler) ChannelPointerResultsForCall(ident1 *chan int) (ident2 *chan int, found bool) {
-	for _, call := range _f24.ChannelPointerCalls {
+func (_f40 *FakeChanneler) ChannelPointerResultsForCall(ident1 *chan int) (ident2 *chan int, found bool) {
+	for _, call := range _f40.ChannelPointerCalls {
 		if reflect.DeepEqual(call.Parameters.Ident1, ident1) {
 			ident2 = call.Results.Ident2
 			found = true
@@ -729,21 +876,44 @@ func (_f24 *FakeChanneler) ChannelPointerResultsForCall(ident1 *chan int) (ident
 	return
 }
 
-func (_f25 *FakeChanneler) ChannelInterface(ident1 chan interface{}) (ident2 chan interface{}) {
-	if _f25.ChannelInterfaceHook == nil {
+func (_f41 *FakeChanneler) ChannelInterface(ident1 chan interface{}) (ident2 chan interface{}) {
+	if _f41.ChannelInterfaceHook == nil {
 		panic("Channeler.ChannelInterface() called but FakeChanneler.ChannelInterfaceHook is nil")
 	}
 
 	invocation := new(ChannelerChannelInterfaceInvocation)
-	_f25.ChannelInterfaceCalls = append(_f25.ChannelInterfaceCalls, invocation)
+	_f41.ChannelInterfaceCalls = append(_f41.ChannelInterfaceCalls, invocation)
 
 	invocation.Parameters.Ident1 = ident1
 
-	ident2 = _f25.ChannelInterfaceHook(ident1)
+	ident2 = _f41.ChannelInterfaceHook(ident1)
 
 	invocation.Results.Ident2 = ident2
 
 	return
+}
+
+// SetChannelInterfaceStub configures Channeler.ChannelInterface to always return the given values
+func (_f42 *FakeChanneler) SetChannelInterfaceStub(ident2 chan interface{}) {
+	_f42.ChannelInterfaceHook = func(chan interface{}) chan interface{} {
+		return ident2
+	}
+}
+
+// SetChannelInterfaceInvocation configures Channeler.ChannelInterface to return the given results when called with the given parameters
+// If no match is found for an invocation the result(s) of the fallback function are returned
+func (_f43 *FakeChanneler) SetChannelInterfaceInvocation(calls_f44 []*ChannelerChannelInterfaceInvocation, fallback_f45 func() chan interface{}) {
+	_f43.ChannelInterfaceHook = func(ident1 chan interface{}) (ident2 chan interface{}) {
+		for _, call := range calls_f44 {
+			if reflect.DeepEqual(call.Parameters.Ident1, ident1) {
+				ident2 = call.Results.Ident2
+
+				return
+			}
+		}
+
+		return fallback_f45()
+	}
 }
 
 // ChannelInterfaceCalled returns true if FakeChanneler.ChannelInterface was called
@@ -799,8 +969,8 @@ func (f *FakeChanneler) AssertChannelInterfaceCalledN(t ChannelerTestingT, n int
 }
 
 // ChannelInterfaceCalledWith returns true if FakeChanneler.ChannelInterface was called with the given values
-func (_f26 *FakeChanneler) ChannelInterfaceCalledWith(ident1 chan interface{}) (found bool) {
-	for _, call := range _f26.ChannelInterfaceCalls {
+func (_f46 *FakeChanneler) ChannelInterfaceCalledWith(ident1 chan interface{}) (found bool) {
+	for _, call := range _f46.ChannelInterfaceCalls {
 		if reflect.DeepEqual(call.Parameters.Ident1, ident1) {
 			found = true
 			break
@@ -811,10 +981,10 @@ func (_f26 *FakeChanneler) ChannelInterfaceCalledWith(ident1 chan interface{}) (
 }
 
 // AssertChannelInterfaceCalledWith calls t.Error if FakeChanneler.ChannelInterface was not called with the given values
-func (_f27 *FakeChanneler) AssertChannelInterfaceCalledWith(t ChannelerTestingT, ident1 chan interface{}) {
+func (_f47 *FakeChanneler) AssertChannelInterfaceCalledWith(t ChannelerTestingT, ident1 chan interface{}) {
 	t.Helper()
 	var found bool
-	for _, call := range _f27.ChannelInterfaceCalls {
+	for _, call := range _f47.ChannelInterfaceCalls {
 		if reflect.DeepEqual(call.Parameters.Ident1, ident1) {
 			found = true
 			break
@@ -827,9 +997,9 @@ func (_f27 *FakeChanneler) AssertChannelInterfaceCalledWith(t ChannelerTestingT,
 }
 
 // ChannelInterfaceCalledOnceWith returns true if FakeChanneler.ChannelInterface was called exactly once with the given values
-func (_f28 *FakeChanneler) ChannelInterfaceCalledOnceWith(ident1 chan interface{}) bool {
+func (_f48 *FakeChanneler) ChannelInterfaceCalledOnceWith(ident1 chan interface{}) bool {
 	var count int
-	for _, call := range _f28.ChannelInterfaceCalls {
+	for _, call := range _f48.ChannelInterfaceCalls {
 		if reflect.DeepEqual(call.Parameters.Ident1, ident1) {
 			count++
 		}
@@ -839,10 +1009,10 @@ func (_f28 *FakeChanneler) ChannelInterfaceCalledOnceWith(ident1 chan interface{
 }
 
 // AssertChannelInterfaceCalledOnceWith calls t.Error if FakeChanneler.ChannelInterface was not called exactly once with the given values
-func (_f29 *FakeChanneler) AssertChannelInterfaceCalledOnceWith(t ChannelerTestingT, ident1 chan interface{}) {
+func (_f49 *FakeChanneler) AssertChannelInterfaceCalledOnceWith(t ChannelerTestingT, ident1 chan interface{}) {
 	t.Helper()
 	var count int
-	for _, call := range _f29.ChannelInterfaceCalls {
+	for _, call := range _f49.ChannelInterfaceCalls {
 		if reflect.DeepEqual(call.Parameters.Ident1, ident1) {
 			count++
 		}
@@ -854,8 +1024,8 @@ func (_f29 *FakeChanneler) AssertChannelInterfaceCalledOnceWith(t ChannelerTesti
 }
 
 // ChannelInterfaceResultsForCall returns the result values for the first call to FakeChanneler.ChannelInterface with the given values
-func (_f30 *FakeChanneler) ChannelInterfaceResultsForCall(ident1 chan interface{}) (ident2 chan interface{}, found bool) {
-	for _, call := range _f30.ChannelInterfaceCalls {
+func (_f50 *FakeChanneler) ChannelInterfaceResultsForCall(ident1 chan interface{}) (ident2 chan interface{}, found bool) {
+	for _, call := range _f50.ChannelInterfaceCalls {
 		if reflect.DeepEqual(call.Parameters.Ident1, ident1) {
 			ident2 = call.Results.Ident2
 			found = true

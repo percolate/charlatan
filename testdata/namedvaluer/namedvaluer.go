@@ -17,6 +17,20 @@ type NamedvaluerManyNamedInvocation struct {
 	}
 }
 
+// NewNamedvaluerManyNamedInvocation creates a new instance of NamedvaluerManyNamedInvocation
+func NewNamedvaluerManyNamedInvocation(a string, b string, f int, g int, ret bool) *NamedvaluerManyNamedInvocation {
+	invocation := new(NamedvaluerManyNamedInvocation)
+
+	invocation.Parameters.A = a
+	invocation.Parameters.B = b
+	invocation.Parameters.F = f
+	invocation.Parameters.G = g
+
+	invocation.Results.Ret = ret
+
+	return invocation
+}
+
 // NamedvaluerNamedInvocation represents a single call of FakeNamedvaluer.Named
 type NamedvaluerNamedInvocation struct {
 	Parameters struct {
@@ -26,6 +40,18 @@ type NamedvaluerNamedInvocation struct {
 	Results struct {
 		Ret bool
 	}
+}
+
+// NewNamedvaluerNamedInvocation creates a new instance of NamedvaluerNamedInvocation
+func NewNamedvaluerNamedInvocation(a int, b string, ret bool) *NamedvaluerNamedInvocation {
+	invocation := new(NamedvaluerNamedInvocation)
+
+	invocation.Parameters.A = a
+	invocation.Parameters.B = b
+
+	invocation.Results.Ret = ret
+
+	return invocation
 }
 
 // NamedvaluerTestingT represents the methods of "testing".T used by charlatan Fakes.  It avoids importing the testing package.
@@ -133,6 +159,29 @@ func (_f1 *FakeNamedvaluer) ManyNamed(a string, b string, f int, g int) (ret boo
 	return
 }
 
+// SetManyNamedStub configures Namedvaluer.ManyNamed to always return the given values
+func (_f2 *FakeNamedvaluer) SetManyNamedStub(ret bool) {
+	_f2.ManyNamedHook = func(string, string, int, int) bool {
+		return ret
+	}
+}
+
+// SetManyNamedInvocation configures Namedvaluer.ManyNamed to return the given results when called with the given parameters
+// If no match is found for an invocation the result(s) of the fallback function are returned
+func (_f3 *FakeNamedvaluer) SetManyNamedInvocation(calls_f4 []*NamedvaluerManyNamedInvocation, fallback_f5 func() bool) {
+	_f3.ManyNamedHook = func(a string, b string, f int, g int) (ret bool) {
+		for _, call := range calls_f4 {
+			if reflect.DeepEqual(call.Parameters.A, a) && reflect.DeepEqual(call.Parameters.B, b) && reflect.DeepEqual(call.Parameters.F, f) && reflect.DeepEqual(call.Parameters.G, g) {
+				ret = call.Results.Ret
+
+				return
+			}
+		}
+
+		return fallback_f5()
+	}
+}
+
 // ManyNamedCalled returns true if FakeNamedvaluer.ManyNamed was called
 func (f *FakeNamedvaluer) ManyNamedCalled() bool {
 	return len(f.ManyNamedCalls) != 0
@@ -186,8 +235,8 @@ func (f *FakeNamedvaluer) AssertManyNamedCalledN(t NamedvaluerTestingT, n int) {
 }
 
 // ManyNamedCalledWith returns true if FakeNamedvaluer.ManyNamed was called with the given values
-func (_f2 *FakeNamedvaluer) ManyNamedCalledWith(a string, b string, f int, g int) (found bool) {
-	for _, call := range _f2.ManyNamedCalls {
+func (_f6 *FakeNamedvaluer) ManyNamedCalledWith(a string, b string, f int, g int) (found bool) {
+	for _, call := range _f6.ManyNamedCalls {
 		if reflect.DeepEqual(call.Parameters.A, a) && reflect.DeepEqual(call.Parameters.B, b) && reflect.DeepEqual(call.Parameters.F, f) && reflect.DeepEqual(call.Parameters.G, g) {
 			found = true
 			break
@@ -198,10 +247,10 @@ func (_f2 *FakeNamedvaluer) ManyNamedCalledWith(a string, b string, f int, g int
 }
 
 // AssertManyNamedCalledWith calls t.Error if FakeNamedvaluer.ManyNamed was not called with the given values
-func (_f3 *FakeNamedvaluer) AssertManyNamedCalledWith(t NamedvaluerTestingT, a string, b string, f int, g int) {
+func (_f7 *FakeNamedvaluer) AssertManyNamedCalledWith(t NamedvaluerTestingT, a string, b string, f int, g int) {
 	t.Helper()
 	var found bool
-	for _, call := range _f3.ManyNamedCalls {
+	for _, call := range _f7.ManyNamedCalls {
 		if reflect.DeepEqual(call.Parameters.A, a) && reflect.DeepEqual(call.Parameters.B, b) && reflect.DeepEqual(call.Parameters.F, f) && reflect.DeepEqual(call.Parameters.G, g) {
 			found = true
 			break
@@ -214,9 +263,9 @@ func (_f3 *FakeNamedvaluer) AssertManyNamedCalledWith(t NamedvaluerTestingT, a s
 }
 
 // ManyNamedCalledOnceWith returns true if FakeNamedvaluer.ManyNamed was called exactly once with the given values
-func (_f4 *FakeNamedvaluer) ManyNamedCalledOnceWith(a string, b string, f int, g int) bool {
+func (_f8 *FakeNamedvaluer) ManyNamedCalledOnceWith(a string, b string, f int, g int) bool {
 	var count int
-	for _, call := range _f4.ManyNamedCalls {
+	for _, call := range _f8.ManyNamedCalls {
 		if reflect.DeepEqual(call.Parameters.A, a) && reflect.DeepEqual(call.Parameters.B, b) && reflect.DeepEqual(call.Parameters.F, f) && reflect.DeepEqual(call.Parameters.G, g) {
 			count++
 		}
@@ -226,10 +275,10 @@ func (_f4 *FakeNamedvaluer) ManyNamedCalledOnceWith(a string, b string, f int, g
 }
 
 // AssertManyNamedCalledOnceWith calls t.Error if FakeNamedvaluer.ManyNamed was not called exactly once with the given values
-func (_f5 *FakeNamedvaluer) AssertManyNamedCalledOnceWith(t NamedvaluerTestingT, a string, b string, f int, g int) {
+func (_f9 *FakeNamedvaluer) AssertManyNamedCalledOnceWith(t NamedvaluerTestingT, a string, b string, f int, g int) {
 	t.Helper()
 	var count int
-	for _, call := range _f5.ManyNamedCalls {
+	for _, call := range _f9.ManyNamedCalls {
 		if reflect.DeepEqual(call.Parameters.A, a) && reflect.DeepEqual(call.Parameters.B, b) && reflect.DeepEqual(call.Parameters.F, f) && reflect.DeepEqual(call.Parameters.G, g) {
 			count++
 		}
@@ -241,8 +290,8 @@ func (_f5 *FakeNamedvaluer) AssertManyNamedCalledOnceWith(t NamedvaluerTestingT,
 }
 
 // ManyNamedResultsForCall returns the result values for the first call to FakeNamedvaluer.ManyNamed with the given values
-func (_f6 *FakeNamedvaluer) ManyNamedResultsForCall(a string, b string, f int, g int) (ret bool, found bool) {
-	for _, call := range _f6.ManyNamedCalls {
+func (_f10 *FakeNamedvaluer) ManyNamedResultsForCall(a string, b string, f int, g int) (ret bool, found bool) {
+	for _, call := range _f10.ManyNamedCalls {
 		if reflect.DeepEqual(call.Parameters.A, a) && reflect.DeepEqual(call.Parameters.B, b) && reflect.DeepEqual(call.Parameters.F, f) && reflect.DeepEqual(call.Parameters.G, g) {
 			ret = call.Results.Ret
 			found = true
@@ -253,22 +302,45 @@ func (_f6 *FakeNamedvaluer) ManyNamedResultsForCall(a string, b string, f int, g
 	return
 }
 
-func (_f7 *FakeNamedvaluer) Named(a int, b string) (ret bool) {
-	if _f7.NamedHook == nil {
+func (_f11 *FakeNamedvaluer) Named(a int, b string) (ret bool) {
+	if _f11.NamedHook == nil {
 		panic("Namedvaluer.Named() called but FakeNamedvaluer.NamedHook is nil")
 	}
 
 	invocation := new(NamedvaluerNamedInvocation)
-	_f7.NamedCalls = append(_f7.NamedCalls, invocation)
+	_f11.NamedCalls = append(_f11.NamedCalls, invocation)
 
 	invocation.Parameters.A = a
 	invocation.Parameters.B = b
 
-	ret = _f7.NamedHook(a, b)
+	ret = _f11.NamedHook(a, b)
 
 	invocation.Results.Ret = ret
 
 	return
+}
+
+// SetNamedStub configures Namedvaluer.Named to always return the given values
+func (_f12 *FakeNamedvaluer) SetNamedStub(ret bool) {
+	_f12.NamedHook = func(int, string) bool {
+		return ret
+	}
+}
+
+// SetNamedInvocation configures Namedvaluer.Named to return the given results when called with the given parameters
+// If no match is found for an invocation the result(s) of the fallback function are returned
+func (_f13 *FakeNamedvaluer) SetNamedInvocation(calls_f14 []*NamedvaluerNamedInvocation, fallback_f15 func() bool) {
+	_f13.NamedHook = func(a int, b string) (ret bool) {
+		for _, call := range calls_f14 {
+			if reflect.DeepEqual(call.Parameters.A, a) && reflect.DeepEqual(call.Parameters.B, b) {
+				ret = call.Results.Ret
+
+				return
+			}
+		}
+
+		return fallback_f15()
+	}
 }
 
 // NamedCalled returns true if FakeNamedvaluer.Named was called
@@ -324,8 +396,8 @@ func (f *FakeNamedvaluer) AssertNamedCalledN(t NamedvaluerTestingT, n int) {
 }
 
 // NamedCalledWith returns true if FakeNamedvaluer.Named was called with the given values
-func (_f8 *FakeNamedvaluer) NamedCalledWith(a int, b string) (found bool) {
-	for _, call := range _f8.NamedCalls {
+func (_f16 *FakeNamedvaluer) NamedCalledWith(a int, b string) (found bool) {
+	for _, call := range _f16.NamedCalls {
 		if reflect.DeepEqual(call.Parameters.A, a) && reflect.DeepEqual(call.Parameters.B, b) {
 			found = true
 			break
@@ -336,10 +408,10 @@ func (_f8 *FakeNamedvaluer) NamedCalledWith(a int, b string) (found bool) {
 }
 
 // AssertNamedCalledWith calls t.Error if FakeNamedvaluer.Named was not called with the given values
-func (_f9 *FakeNamedvaluer) AssertNamedCalledWith(t NamedvaluerTestingT, a int, b string) {
+func (_f17 *FakeNamedvaluer) AssertNamedCalledWith(t NamedvaluerTestingT, a int, b string) {
 	t.Helper()
 	var found bool
-	for _, call := range _f9.NamedCalls {
+	for _, call := range _f17.NamedCalls {
 		if reflect.DeepEqual(call.Parameters.A, a) && reflect.DeepEqual(call.Parameters.B, b) {
 			found = true
 			break
@@ -352,9 +424,9 @@ func (_f9 *FakeNamedvaluer) AssertNamedCalledWith(t NamedvaluerTestingT, a int, 
 }
 
 // NamedCalledOnceWith returns true if FakeNamedvaluer.Named was called exactly once with the given values
-func (_f10 *FakeNamedvaluer) NamedCalledOnceWith(a int, b string) bool {
+func (_f18 *FakeNamedvaluer) NamedCalledOnceWith(a int, b string) bool {
 	var count int
-	for _, call := range _f10.NamedCalls {
+	for _, call := range _f18.NamedCalls {
 		if reflect.DeepEqual(call.Parameters.A, a) && reflect.DeepEqual(call.Parameters.B, b) {
 			count++
 		}
@@ -364,10 +436,10 @@ func (_f10 *FakeNamedvaluer) NamedCalledOnceWith(a int, b string) bool {
 }
 
 // AssertNamedCalledOnceWith calls t.Error if FakeNamedvaluer.Named was not called exactly once with the given values
-func (_f11 *FakeNamedvaluer) AssertNamedCalledOnceWith(t NamedvaluerTestingT, a int, b string) {
+func (_f19 *FakeNamedvaluer) AssertNamedCalledOnceWith(t NamedvaluerTestingT, a int, b string) {
 	t.Helper()
 	var count int
-	for _, call := range _f11.NamedCalls {
+	for _, call := range _f19.NamedCalls {
 		if reflect.DeepEqual(call.Parameters.A, a) && reflect.DeepEqual(call.Parameters.B, b) {
 			count++
 		}
@@ -379,8 +451,8 @@ func (_f11 *FakeNamedvaluer) AssertNamedCalledOnceWith(t NamedvaluerTestingT, a 
 }
 
 // NamedResultsForCall returns the result values for the first call to FakeNamedvaluer.Named with the given values
-func (_f12 *FakeNamedvaluer) NamedResultsForCall(a int, b string) (ret bool, found bool) {
-	for _, call := range _f12.NamedCalls {
+func (_f20 *FakeNamedvaluer) NamedResultsForCall(a int, b string) (ret bool, found bool) {
+	for _, call := range _f20.NamedCalls {
 		if reflect.DeepEqual(call.Parameters.A, a) && reflect.DeepEqual(call.Parameters.B, b) {
 			ret = call.Results.Ret
 			found = true

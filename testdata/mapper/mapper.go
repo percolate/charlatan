@@ -240,6 +240,13 @@ func (_f6 *FakeMapper) MapReturn() (ident1 map[string]string) {
 	return
 }
 
+// SetMapReturnStub configures Mapper.MapReturn to always return the given values
+func (_f7 *FakeMapper) SetMapReturnStub(ident1 map[string]string) {
+	_f7.MapReturnHook = func() map[string]string {
+		return ident1
+	}
+}
+
 // MapReturnCalled returns true if FakeMapper.MapReturn was called
 func (f *FakeMapper) MapReturnCalled() bool {
 	return len(f.MapReturnCalls) != 0

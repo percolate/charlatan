@@ -14,6 +14,17 @@ type PointerPointInvocation struct {
 	}
 }
 
+// NewPointerPointInvocation creates a new instance of PointerPointInvocation
+func NewPointerPointInvocation(ident1 *string, ident2 int) *PointerPointInvocation {
+	invocation := new(PointerPointInvocation)
+
+	invocation.Parameters.Ident1 = ident1
+
+	invocation.Results.Ident2 = ident2
+
+	return invocation
+}
+
 // PointerTestingT represents the methods of "testing".T used by charlatan Fakes.  It avoids importing the testing package.
 type PointerTestingT interface {
 	Error(...interface{})
@@ -102,6 +113,29 @@ func (_f1 *FakePointer) Point(ident1 *string) (ident2 int) {
 	return
 }
 
+// SetPointStub configures Pointer.Point to always return the given values
+func (_f2 *FakePointer) SetPointStub(ident2 int) {
+	_f2.PointHook = func(*string) int {
+		return ident2
+	}
+}
+
+// SetPointInvocation configures Pointer.Point to return the given results when called with the given parameters
+// If no match is found for an invocation the result(s) of the fallback function are returned
+func (_f3 *FakePointer) SetPointInvocation(calls_f4 []*PointerPointInvocation, fallback_f5 func() int) {
+	_f3.PointHook = func(ident1 *string) (ident2 int) {
+		for _, call := range calls_f4 {
+			if reflect.DeepEqual(call.Parameters.Ident1, ident1) {
+				ident2 = call.Results.Ident2
+
+				return
+			}
+		}
+
+		return fallback_f5()
+	}
+}
+
 // PointCalled returns true if FakePointer.Point was called
 func (f *FakePointer) PointCalled() bool {
 	return len(f.PointCalls) != 0
@@ -155,8 +189,8 @@ func (f *FakePointer) AssertPointCalledN(t PointerTestingT, n int) {
 }
 
 // PointCalledWith returns true if FakePointer.Point was called with the given values
-func (_f2 *FakePointer) PointCalledWith(ident1 *string) (found bool) {
-	for _, call := range _f2.PointCalls {
+func (_f6 *FakePointer) PointCalledWith(ident1 *string) (found bool) {
+	for _, call := range _f6.PointCalls {
 		if reflect.DeepEqual(call.Parameters.Ident1, ident1) {
 			found = true
 			break
@@ -167,10 +201,10 @@ func (_f2 *FakePointer) PointCalledWith(ident1 *string) (found bool) {
 }
 
 // AssertPointCalledWith calls t.Error if FakePointer.Point was not called with the given values
-func (_f3 *FakePointer) AssertPointCalledWith(t PointerTestingT, ident1 *string) {
+func (_f7 *FakePointer) AssertPointCalledWith(t PointerTestingT, ident1 *string) {
 	t.Helper()
 	var found bool
-	for _, call := range _f3.PointCalls {
+	for _, call := range _f7.PointCalls {
 		if reflect.DeepEqual(call.Parameters.Ident1, ident1) {
 			found = true
 			break
@@ -183,9 +217,9 @@ func (_f3 *FakePointer) AssertPointCalledWith(t PointerTestingT, ident1 *string)
 }
 
 // PointCalledOnceWith returns true if FakePointer.Point was called exactly once with the given values
-func (_f4 *FakePointer) PointCalledOnceWith(ident1 *string) bool {
+func (_f8 *FakePointer) PointCalledOnceWith(ident1 *string) bool {
 	var count int
-	for _, call := range _f4.PointCalls {
+	for _, call := range _f8.PointCalls {
 		if reflect.DeepEqual(call.Parameters.Ident1, ident1) {
 			count++
 		}
@@ -195,10 +229,10 @@ func (_f4 *FakePointer) PointCalledOnceWith(ident1 *string) bool {
 }
 
 // AssertPointCalledOnceWith calls t.Error if FakePointer.Point was not called exactly once with the given values
-func (_f5 *FakePointer) AssertPointCalledOnceWith(t PointerTestingT, ident1 *string) {
+func (_f9 *FakePointer) AssertPointCalledOnceWith(t PointerTestingT, ident1 *string) {
 	t.Helper()
 	var count int
-	for _, call := range _f5.PointCalls {
+	for _, call := range _f9.PointCalls {
 		if reflect.DeepEqual(call.Parameters.Ident1, ident1) {
 			count++
 		}
@@ -210,8 +244,8 @@ func (_f5 *FakePointer) AssertPointCalledOnceWith(t PointerTestingT, ident1 *str
 }
 
 // PointResultsForCall returns the result values for the first call to FakePointer.Point with the given values
-func (_f6 *FakePointer) PointResultsForCall(ident1 *string) (ident2 int, found bool) {
-	for _, call := range _f6.PointCalls {
+func (_f10 *FakePointer) PointResultsForCall(ident1 *string) (ident2 int, found bool) {
+	for _, call := range _f10.PointCalls {
 		if reflect.DeepEqual(call.Parameters.Ident1, ident1) {
 			ident2 = call.Results.Ident2
 			found = true
