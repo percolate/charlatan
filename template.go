@@ -30,7 +30,7 @@ type {{.Interface}}{{.Name}}Invocation struct {
 
 {{if and .Parameters .Results}}
 // New{{.Interface}}{{.Name}}Invocation creates a new instance of {{.Interface}}{{.Name}}Invocation
-func New{{.Interface}}{{.Name}}Invocation({{.ParametersDeclaration}}, {{.ResultsDeclaration}}) *{{.Interface}}{{.Name}}Invocation {
+func New{{.Interface}}{{.Name}}Invocation({{range .Parameters}}{{.Name}} {{.ValueType.FieldFormat}}, {{end}}{{.ResultsDeclaration}}) *{{.Interface}}{{.Name}}Invocation {
 	invocation := new({{.Interface}}{{.Name}}Invocation)
 
 {{range .Parameters}} invocation.Parameters.{{.TitleCase}} = {{.Name}}
@@ -154,7 +154,7 @@ func (f *Fake{{.Name}}) Reset() {
 				return
 			}
 		}
-	
+
 		return fallback{{$d}}()
 	}
 }{{end}}{{end}}{{end}}{{end}}{{/* end if and .Parameters .Results */}}

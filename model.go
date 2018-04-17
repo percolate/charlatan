@@ -116,7 +116,7 @@ func extractIdentifiersFromField(field *ast.Field, imports *ImportSet) ([]*Ident
 		return []*Identifier{
 			&Identifier{
 				Name:      identSymGen.Next(),
-				valueType: identifierType,
+				ValueType: identifierType,
 			},
 		}, nil
 	}
@@ -125,7 +125,7 @@ func extractIdentifiersFromField(field *ast.Field, imports *ImportSet) ([]*Ident
 	for i, name := range field.Names {
 		identifiers[i] = &Identifier{
 			Name:      name.Name,
-			valueType: identifierType,
+			ValueType: identifierType,
 		}
 	}
 
@@ -241,10 +241,10 @@ func (i *Interface) addMethodFromType(f *types.Func, imports *ImportSet) error {
 	}
 	if sig.Variadic() {
 		last := parameters[len(parameters)-1]
-		if avt, ok := last.valueType.(*Array); ok {
-			last.valueType = &Ellipsis{subType: avt.subType}
+		if avt, ok := last.ValueType.(*Array); ok {
+			last.ValueType = &Ellipsis{subType: avt.subType}
 		} else {
-			last.valueType = &Ellipsis{subType: last.valueType}
+			last.ValueType = &Ellipsis{subType: last.ValueType}
 		}
 	}
 	method.Parameters = append(method.Parameters, parameters...)
@@ -274,7 +274,7 @@ func extractIdentifiersFromTuple(tuple *types.Tuple, imports *ImportSet) ([]*Ide
 		}
 		ident := &Identifier{
 			Name:      p.Name(),
-			valueType: identifierType,
+			ValueType: identifierType,
 		}
 		if "" == ident.Name {
 			ident.Name = identSymGen.Next()
@@ -462,7 +462,7 @@ func (m *Method) ResultsSignature() string {
 
 type Identifier struct {
 	Name            string
-	valueType       Type
+	ValueType       Type
 	titleCase       string
 	parameterFormat string
 	referenceFormat string
@@ -479,7 +479,7 @@ func (i *Identifier) TitleCase() string {
 
 func (i *Identifier) ParameterFormat() string {
 	if i.parameterFormat == "" {
-		i.parameterFormat = fmt.Sprintf("%s %s", i.Name, i.valueType.ParameterFormat())
+		i.parameterFormat = fmt.Sprintf("%s %s", i.Name, i.ValueType.ParameterFormat())
 	}
 
 	return i.parameterFormat
@@ -487,7 +487,7 @@ func (i *Identifier) ParameterFormat() string {
 
 func (i *Identifier) ReferenceFormat() string {
 	if i.referenceFormat == "" {
-		i.referenceFormat = fmt.Sprintf("%s%s", i.Name, i.valueType.ReferenceFormat())
+		i.referenceFormat = fmt.Sprintf("%s%s", i.Name, i.ValueType.ReferenceFormat())
 	}
 
 	return i.referenceFormat
@@ -495,7 +495,7 @@ func (i *Identifier) ReferenceFormat() string {
 
 func (i *Identifier) FieldFormat() string {
 	if i.fieldFormat == "" {
-		i.fieldFormat = fmt.Sprintf("%s %s", i.TitleCase(), i.valueType.FieldFormat())
+		i.fieldFormat = fmt.Sprintf("%s %s", i.TitleCase(), i.ValueType.FieldFormat())
 	}
 
 	return i.fieldFormat
@@ -503,7 +503,7 @@ func (i *Identifier) FieldFormat() string {
 
 func (i *Identifier) Signature() string {
 	if i.signature == "" {
-		i.signature = i.valueType.ParameterFormat()
+		i.signature = i.ValueType.ParameterFormat()
 	}
 
 	return i.signature
