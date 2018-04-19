@@ -15,7 +15,7 @@ package {{.PackageName}}
 {{if .NeedsReflect}}import "reflect"{{end}}
 {{range .Imports}}import {{if .Alias}}{{.Alias}} {{end}}{{.Path}}
 {{end}}
-{{range .Interfaces}}{{range .Methods}}
+{{range $i := .Interfaces}}{{range .Methods}}
 // {{.Interface}}{{.Name}}Invocation represents a single call of Fake{{.Interface}}.{{.Name}}
 type {{.Interface}}{{.Name}}Invocation struct {
 {{if .Parameters}}	Parameters struct {
@@ -90,74 +90,74 @@ func NewFake{{.Name}}DefaultPanic() *Fake{{.Name}} {
 	}
 }
 
-// NewFake{{.Name}}DefaultFatal returns an instance of Fake{{.Name}} with all hooks configured to call t.Fatal
-func NewFake{{.Name}}DefaultFatal(t {{.Name}}TestingT) *Fake{{.Name}} {
-	return &Fake{{.Name}}{
-{{range .Methods}}		{{.Name}}Hook: func({{.ParametersSignature}}) ({{.ResultsDeclaration}}) {
-			t.Fatal("Unexpected call to {{.Interface}}.{{.Name}}")
+// NewFake{{$i.Name}}DefaultFatal returns an instance of Fake{{$i.Name}} with all hooks configured to call t.Fatal
+{{with $sym := gensym}}func NewFake{{$i.Name}}DefaultFatal(t{{$sym}} {{$i.Name}}TestingT) *Fake{{$i.Name}} {
+	return &Fake{{$i.Name}}{
+{{range $i.Methods}}		{{.Name}}Hook: func({{.ParametersSignature}}) ({{.ResultsDeclaration}}) {
+			t{{$sym}}.Fatal("Unexpected call to {{.Interface}}.{{.Name}}")
 			return
 		},
 {{end}}
 	}
-}
+}{{end}}
 
-// NewFake{{.Name}}DefaultError returns an instance of Fake{{.Name}} with all hooks configured to call t.Error
-func NewFake{{.Name}}DefaultError(t {{.Name}}TestingT) *Fake{{.Name}} {
-	return &Fake{{.Name}}{
-{{range .Methods}}		{{.Name}}Hook: func({{.ParametersSignature}}) ({{.ResultsDeclaration}}) {
-			t.Error("Unexpected call to {{.Interface}}.{{.Name}}")
+// NewFake{{$i.Name}}DefaultError returns an instance of Fake{{$i.Name}} with all hooks configured to call t.Error
+{{with $sym := gensym}}func NewFake{{$i.Name}}DefaultError(t{{$sym}} {{$i.Name}}TestingT) *Fake{{$i.Name}} {
+	return &Fake{{$i.Name}}{
+{{range $i.Methods}}		{{.Name}}Hook: func({{.ParametersSignature}}) ({{.ResultsDeclaration}}) {
+			t{{$sym}}.Error("Unexpected call to {{.Interface}}.{{.Name}}")
 			return
 		},
 {{end}}
 	}
-}
+}{{end}}
 
 func (f *Fake{{.Name}}) Reset() {
 {{range .Methods}} f.{{.Name}}Calls = []*{{.Interface}}{{.Name}}Invocation{}
 {{end}}}
 
 {{range $m := .Methods}}
-{{with $f := gensym}}func ({{$f}} *Fake{{$m.Interface}}) {{$m.Name}}({{$m.ParametersDeclaration}}) ({{$m.ResultsDeclaration}}) {
-	if {{$f}}.{{$m.Name}}Hook == nil {
+{{with $sym := gensym}}func (f{{$sym}} *Fake{{$m.Interface}}) {{$m.Name}}({{$m.ParametersDeclaration}}) ({{$m.ResultsDeclaration}}) {
+	if f{{$sym}}.{{$m.Name}}Hook == nil {
 		panic("{{$m.Interface}}.{{$m.Name}}() called but Fake{{$m.Interface}}.{{$m.Name}}Hook is nil")
 	}
 
-	invocation := new({{$m.Interface}}{{$m.Name}}Invocation)
-	{{$f}}.{{$m.Name}}Calls = append({{$f}}.{{$m.Name}}Calls, invocation)
+	invocation{{$sym}} := new({{$m.Interface}}{{$m.Name}}Invocation)
+	f{{$sym}}.{{$m.Name}}Calls = append(f{{$sym}}.{{$m.Name}}Calls, invocation{{$sym}})
 
-{{if $m.Parameters}}{{range $m.Parameters}} invocation.Parameters.{{.TitleCase}} = {{.Name}}
+{{if $m.Parameters}}{{range $m.Parameters}} invocation{{$sym}}.Parameters.{{.TitleCase}} = {{.Name}}
 {{end}}{{end}}
-{{if $m.Results}} {{$m.ResultsReference}} = {{$f}}.{{$m.Name}}Hook({{$m.ParametersReference}})
-{{else}} {{$f}}.{{$m.Name}}Hook({{$m.ParametersReference}})
+{{if $m.Results}} {{$m.ResultsReference}} = f{{$sym}}.{{$m.Name}}Hook({{$m.ParametersReference}})
+{{else}} f{{$sym}}.{{$m.Name}}Hook({{$m.ParametersReference}})
 {{end}}
-{{if $m.Results}}{{range $m.Results}}invocation.Results.{{.TitleCase}} = {{.Name}}
+{{if $m.Results}}{{range $m.Results}}invocation{{$sym}}.Results.{{.TitleCase}} = {{.Name}}
 {{end}}{{end}}
 
 	return
 }{{end}}
 {{if .Results}}
 // Set{{.Name}}Stub configures {{.Interface}}.{{.Name}} to always return the given values
-{{with $f := gensym}}func ({{$f}} *Fake{{$m.Interface}}) Set{{$m.Name}}Stub({{$m.ResultsDeclaration}}) {
-	{{$f}}.{{$m.Name}}Hook = func({{$m.ParametersSignature}}) ({{$m.ResultsSignature}}) {
+{{with $sym := gensym}}func (f{{$sym}} *Fake{{$m.Interface}}) Set{{$m.Name}}Stub({{$m.ResultsDeclaration}}) {
+	f{{$sym}}.{{$m.Name}}Hook = func({{$m.ParametersSignature}}) ({{$m.ResultsSignature}}) {
 		return {{range $i, $r := $m.Results}}{{if $i}}, {{end}}{{$r.Name}}{{end}}
 	}
 }{{end}}{{end}}{{/* end if .Results */}}
 {{if and .Parameters .Results}}
 // Set{{.Name}}Invocation configures {{.Interface}}.{{.Name}} to return the given results when called with the given parameters
 // If no match is found for an invocation the result(s) of the fallback function are returned
-{{with $f := gensym}}{{with $c := gensym}}{{with $d := gensym}}func ({{$f}} *Fake{{$m.Interface}}) Set{{$m.Name}}Invocation(calls{{$c}} []*{{$m.Interface}}{{$m.Name}}Invocation, fallback{{$d}} func() ({{$m.ResultsSignature}})) {
-	{{$f}}.{{$m.Name}}Hook = func({{$m.ParametersDeclaration}}) ({{$m.ResultsDeclaration}}) {
-		for _, call := range calls{{$c}} {
-			if {{range $i, $p := $m.Parameters}}{{if $i}} && {{end}}reflect.DeepEqual(call.Parameters.{{$p.TitleCase}}, {{$p.Name}}){{end}} {
-				{{range $m.Results}}{{.Name}} = call.Results.{{.TitleCase}}
+{{with $sym := gensym}}func (f{{$sym}} *Fake{{$m.Interface}}) Set{{$m.Name}}Invocation(calls{{$sym}} []*{{$m.Interface}}{{$m.Name}}Invocation, fallback{{$sym}} func() ({{$m.ResultsSignature}})) {
+	f{{$sym}}.{{$m.Name}}Hook = func({{$m.ParametersDeclaration}}) ({{$m.ResultsDeclaration}}) {
+		for _, call{{$sym}} := range calls{{$sym}} {
+			if {{range $i, $p := $m.Parameters}}{{if $i}} && {{end}}reflect.DeepEqual(call{{$sym}}.Parameters.{{$p.TitleCase}}, {{$p.Name}}){{end}} {
+				{{range $m.Results}}{{.Name}} = call{{$sym}}.Results.{{.TitleCase}}
 				{{end}}
 				return
 			}
 		}
 
-		return fallback{{$d}}()
+		return fallback{{$sym}}()
 	}
-}{{end}}{{end}}{{end}}{{end}}{{/* end if and .Parameters .Results */}}
+}{{end}}{{end}}{{/* end if and .Parameters .Results */}}
 
 // {{.Name}}Called returns true if Fake{{.Interface}}.{{.Name}} was called
 func (f *Fake{{.Interface}}) {{.Name}}Called() bool {
@@ -212,66 +212,65 @@ func (f *Fake{{.Interface}}) Assert{{.Name}}CalledN(t {{.Interface}}TestingT, n 
 }
 
 {{if .Parameters}}// {{.Name}}CalledWith returns true if Fake{{.Interface}}.{{.Name}} was called with the given values
-{{with $f := gensym}}func ({{$f}} *Fake{{$m.Interface}}) {{$m.Name}}CalledWith({{$m.ParametersDeclaration}}) (found bool) {
-	for _, call := range {{$f}}.{{$m.Name}}Calls {
-		if {{range $i, $p := $m.Parameters}}{{if $i}} && {{end}}reflect.DeepEqual(call.Parameters.{{$p.TitleCase}}, {{$p.Name}}){{end}} {
-			found = true
-			break
+{{with $sym := gensym}}func (f{{$sym}} *Fake{{$m.Interface}}) {{$m.Name}}CalledWith({{$m.ParametersDeclaration}}) bool {
+	for _, call{{$sym}} := range f{{$sym}}.{{$m.Name}}Calls {
+		if {{range $i, $p := $m.Parameters}}{{if $i}} && {{end}}reflect.DeepEqual(call{{$sym}}.Parameters.{{$p.TitleCase}}, {{$p.Name}}){{end}} {
+			return true
 		}
 	}
 
-	return
+	return false
 }{{end}}
 
 // Assert{{.Name}}CalledWith calls t.Error if Fake{{.Interface}}.{{.Name}} was not called with the given values
-{{with $f := gensym}}func ({{$f}} *Fake{{$m.Interface}}) Assert{{$m.Name}}CalledWith(t {{$m.Interface}}TestingT, {{$m.ParametersDeclaration}}) {
+{{with $sym := gensym}}func (f{{$sym}} *Fake{{$m.Interface}}) Assert{{$m.Name}}CalledWith(t {{$m.Interface}}TestingT, {{$m.ParametersDeclaration}}) {
 	t.Helper()
-	var found bool
-	for _, call := range {{$f}}.{{$m.Name}}Calls {
-		if {{range $i, $p := $m.Parameters}}{{if $i}} && {{end}}reflect.DeepEqual(call.Parameters.{{$p.TitleCase}}, {{$p.Name}}){{end}} {
-			found = true
+	var found{{$sym}} bool
+	for _, call{{$sym}} := range f{{$sym}}.{{$m.Name}}Calls {
+		if {{range $i, $p := $m.Parameters}}{{if $i}} && {{end}}reflect.DeepEqual(call{{$sym}}.Parameters.{{$p.TitleCase}}, {{$p.Name}}){{end}} {
+			found{{$sym}} = true
 			break
 		}
 	}
 
-	if !found {
+	if !found{{$sym}} {
 		t.Error("Fake{{$m.Interface}}.{{$m.Name}} not called with expected parameters")
 	}
 }{{end}}
 
 // {{.Name}}CalledOnceWith returns true if Fake{{.Interface}}.{{.Name}} was called exactly once with the given values
-{{with $f := gensym}}func ({{$f}} *Fake{{$m.Interface}}) {{$m.Name}}CalledOnceWith({{$m.ParametersDeclaration}}) bool {
-	var count int
-	for _, call := range {{$f}}.{{$m.Name}}Calls {
-		if {{range $i, $p := $m.Parameters}}{{if $i}} && {{end}}reflect.DeepEqual(call.Parameters.{{$p.TitleCase}}, {{$p.Name}}){{end}} {
-			count++
+{{with $sym := gensym}}func (f{{$sym}} *Fake{{$m.Interface}}) {{$m.Name}}CalledOnceWith({{$m.ParametersDeclaration}}) bool {
+	var count{{$sym}} int
+	for _, call{{$sym}} := range f{{$sym}}.{{$m.Name}}Calls {
+		if {{range $i, $p := $m.Parameters}}{{if $i}} && {{end}}reflect.DeepEqual(call{{$sym}}.Parameters.{{$p.TitleCase}}, {{$p.Name}}){{end}} {
+			count{{$sym}}++
 		}
 	}
 
-	return count == 1
+	return count{{$sym}} == 1
 }{{end}}
 
 // Assert{{.Name}}CalledOnceWith calls t.Error if Fake{{.Interface}}.{{.Name}} was not called exactly once with the given values
-{{with $f := gensym}}func ({{$f}} *Fake{{$m.Interface}}) Assert{{$m.Name}}CalledOnceWith(t {{$m.Interface}}TestingT, {{$m.ParametersDeclaration}}) {
+{{with $sym := gensym}}func (f{{$sym}} *Fake{{$m.Interface}}) Assert{{$m.Name}}CalledOnceWith(t {{$m.Interface}}TestingT, {{$m.ParametersDeclaration}}) {
 	t.Helper()
-	var count int
-	for _, call := range {{$f}}.{{$m.Name}}Calls {
-		if {{range $i, $p := $m.Parameters}}{{if $i}} && {{end}}reflect.DeepEqual(call.Parameters.{{$p.TitleCase}}, {{$p.Name}}){{end}} {
-			count++
+	var count{{$sym}} int
+	for _, call{{$sym}} := range f{{$sym}}.{{$m.Name}}Calls {
+		if {{range $i, $p := $m.Parameters}}{{if $i}} && {{end}}reflect.DeepEqual(call{{$sym}}.Parameters.{{$p.TitleCase}}, {{$p.Name}}){{end}} {
+			count{{$sym}}++
 		}
 	}
 
-	if count != 1 {
-		t.Errorf("Fake{{$m.Interface}}.{{$m.Name}} called %d times with expected parameters, expected one", count)
+	if count{{$sym}} != 1 {
+		t.Errorf("Fake{{$m.Interface}}.{{$m.Name}} called %d times with expected parameters, expected one", count{{$sym}})
 	}
 }{{end}}
 {{if len $m.Results }}
 // {{.Name}}ResultsForCall returns the result values for the first call to Fake{{.Interface}}.{{.Name}} with the given values
-{{with $f := gensym}}func ({{$f}} *Fake{{$m.Interface}}) {{$m.Name}}ResultsForCall({{$m.ParametersDeclaration}}) ({{$m.ResultsDeclaration}}, found bool) {
-	for _, call := range {{$f}}.{{$m.Name}}Calls {
-		if {{range $i, $p := $m.Parameters}}{{if $i}} && {{end}}reflect.DeepEqual(call.Parameters.{{$p.TitleCase}}, {{$p.Name}}){{end}} {
-			{{range $m.Results}}{{.Name}} = call.Results.{{.TitleCase}}
-			{{end}}found = true
+{{with $sym := gensym}}func (f{{$sym}} *Fake{{$m.Interface}}) {{$m.Name}}ResultsForCall({{$m.ParametersDeclaration}}) ({{$m.ResultsDeclaration}}, found{{$sym}} bool) {
+	for _, call{{$sym}} := range f{{$sym}}.{{$m.Name}}Calls {
+		if {{range $i, $p := $m.Parameters}}{{if $i}} && {{end}}reflect.DeepEqual(call{{$sym}}.Parameters.{{$p.TitleCase}}, {{$p.Name}}){{end}} {
+			{{range $m.Results}}{{.Name}} = call{{$sym}}.Results.{{.TitleCase}}
+			{{end}}found{{$sym}} = true
 			break
 		}
 	}
@@ -284,7 +283,7 @@ func (f *Fake{{.Interface}}) Assert{{.Name}}CalledN(t {{.Interface}}TestingT, n 
 `
 
 var (
-	symGen         = SymbolGenerator{Prefix: "_f"}
+	symGen         = SymbolGenerator{Prefix: "_sym"}
 	funky          = template.FuncMap{"gensym": func() string { return symGen.Next() }}
 	charlatanTempl = template.Must(template.New("charlatan").Funcs(funky).Parse(charlatanTemplate))
 )
