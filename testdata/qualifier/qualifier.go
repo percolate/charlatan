@@ -104,28 +104,28 @@ func NewFakeQualifierDefaultPanic() *FakeQualifier {
 }
 
 // NewFakeQualifierDefaultFatal returns an instance of FakeQualifier with all hooks configured to call t.Fatal
-func NewFakeQualifierDefaultFatal(t QualifierTestingT) *FakeQualifier {
+func NewFakeQualifierDefaultFatal(t_sym1 QualifierTestingT) *FakeQualifier {
 	return &FakeQualifier{
 		QualifyHook: func(fmt.Scanner) (ident2 fmt.Scanner) {
-			t.Fatal("Unexpected call to Qualifier.Qualify")
+			t_sym1.Fatal("Unexpected call to Qualifier.Qualify")
 			return
 		},
 		NamedQualifyHook: func(fmt.Scanner, fmt.Scanner, fmt.Scanner) (d fmt.Scanner) {
-			t.Fatal("Unexpected call to Qualifier.NamedQualify")
+			t_sym1.Fatal("Unexpected call to Qualifier.NamedQualify")
 			return
 		},
 	}
 }
 
 // NewFakeQualifierDefaultError returns an instance of FakeQualifier with all hooks configured to call t.Error
-func NewFakeQualifierDefaultError(t QualifierTestingT) *FakeQualifier {
+func NewFakeQualifierDefaultError(t_sym2 QualifierTestingT) *FakeQualifier {
 	return &FakeQualifier{
 		QualifyHook: func(fmt.Scanner) (ident2 fmt.Scanner) {
-			t.Error("Unexpected call to Qualifier.Qualify")
+			t_sym2.Error("Unexpected call to Qualifier.Qualify")
 			return
 		},
 		NamedQualifyHook: func(fmt.Scanner, fmt.Scanner, fmt.Scanner) (d fmt.Scanner) {
-			t.Error("Unexpected call to Qualifier.NamedQualify")
+			t_sym2.Error("Unexpected call to Qualifier.NamedQualify")
 			return
 		},
 	}
@@ -136,43 +136,43 @@ func (f *FakeQualifier) Reset() {
 	f.NamedQualifyCalls = []*QualifierNamedQualifyInvocation{}
 }
 
-func (_f1 *FakeQualifier) Qualify(ident1 fmt.Scanner) (ident2 fmt.Scanner) {
-	if _f1.QualifyHook == nil {
+func (f_sym3 *FakeQualifier) Qualify(ident1 fmt.Scanner) (ident2 fmt.Scanner) {
+	if f_sym3.QualifyHook == nil {
 		panic("Qualifier.Qualify() called but FakeQualifier.QualifyHook is nil")
 	}
 
-	invocation := new(QualifierQualifyInvocation)
-	_f1.QualifyCalls = append(_f1.QualifyCalls, invocation)
+	invocation_sym3 := new(QualifierQualifyInvocation)
+	f_sym3.QualifyCalls = append(f_sym3.QualifyCalls, invocation_sym3)
 
-	invocation.Parameters.Ident1 = ident1
+	invocation_sym3.Parameters.Ident1 = ident1
 
-	ident2 = _f1.QualifyHook(ident1)
+	ident2 = f_sym3.QualifyHook(ident1)
 
-	invocation.Results.Ident2 = ident2
+	invocation_sym3.Results.Ident2 = ident2
 
 	return
 }
 
 // SetQualifyStub configures Qualifier.Qualify to always return the given values
-func (_f2 *FakeQualifier) SetQualifyStub(ident2 fmt.Scanner) {
-	_f2.QualifyHook = func(fmt.Scanner) fmt.Scanner {
+func (f_sym4 *FakeQualifier) SetQualifyStub(ident2 fmt.Scanner) {
+	f_sym4.QualifyHook = func(fmt.Scanner) fmt.Scanner {
 		return ident2
 	}
 }
 
 // SetQualifyInvocation configures Qualifier.Qualify to return the given results when called with the given parameters
 // If no match is found for an invocation the result(s) of the fallback function are returned
-func (_f3 *FakeQualifier) SetQualifyInvocation(calls_f4 []*QualifierQualifyInvocation, fallback_f5 func() fmt.Scanner) {
-	_f3.QualifyHook = func(ident1 fmt.Scanner) (ident2 fmt.Scanner) {
-		for _, call := range calls_f4 {
-			if reflect.DeepEqual(call.Parameters.Ident1, ident1) {
-				ident2 = call.Results.Ident2
+func (f_sym5 *FakeQualifier) SetQualifyInvocation(calls_sym5 []*QualifierQualifyInvocation, fallback_sym5 func() fmt.Scanner) {
+	f_sym5.QualifyHook = func(ident1 fmt.Scanner) (ident2 fmt.Scanner) {
+		for _, call_sym5 := range calls_sym5 {
+			if reflect.DeepEqual(call_sym5.Parameters.Ident1, ident1) {
+				ident2 = call_sym5.Results.Ident2
 
 				return
 			}
 		}
 
-		return fallback_f5()
+		return fallback_sym5()
 	}
 }
 
@@ -229,66 +229,65 @@ func (f *FakeQualifier) AssertQualifyCalledN(t QualifierTestingT, n int) {
 }
 
 // QualifyCalledWith returns true if FakeQualifier.Qualify was called with the given values
-func (_f6 *FakeQualifier) QualifyCalledWith(ident1 fmt.Scanner) (found bool) {
-	for _, call := range _f6.QualifyCalls {
-		if reflect.DeepEqual(call.Parameters.Ident1, ident1) {
-			found = true
-			break
+func (f_sym6 *FakeQualifier) QualifyCalledWith(ident1 fmt.Scanner) bool {
+	for _, call_sym6 := range f_sym6.QualifyCalls {
+		if reflect.DeepEqual(call_sym6.Parameters.Ident1, ident1) {
+			return true
 		}
 	}
 
-	return
+	return false
 }
 
 // AssertQualifyCalledWith calls t.Error if FakeQualifier.Qualify was not called with the given values
-func (_f7 *FakeQualifier) AssertQualifyCalledWith(t QualifierTestingT, ident1 fmt.Scanner) {
+func (f_sym7 *FakeQualifier) AssertQualifyCalledWith(t QualifierTestingT, ident1 fmt.Scanner) {
 	t.Helper()
-	var found bool
-	for _, call := range _f7.QualifyCalls {
-		if reflect.DeepEqual(call.Parameters.Ident1, ident1) {
-			found = true
+	var found_sym7 bool
+	for _, call_sym7 := range f_sym7.QualifyCalls {
+		if reflect.DeepEqual(call_sym7.Parameters.Ident1, ident1) {
+			found_sym7 = true
 			break
 		}
 	}
 
-	if !found {
+	if !found_sym7 {
 		t.Error("FakeQualifier.Qualify not called with expected parameters")
 	}
 }
 
 // QualifyCalledOnceWith returns true if FakeQualifier.Qualify was called exactly once with the given values
-func (_f8 *FakeQualifier) QualifyCalledOnceWith(ident1 fmt.Scanner) bool {
-	var count int
-	for _, call := range _f8.QualifyCalls {
-		if reflect.DeepEqual(call.Parameters.Ident1, ident1) {
-			count++
+func (f_sym8 *FakeQualifier) QualifyCalledOnceWith(ident1 fmt.Scanner) bool {
+	var count_sym8 int
+	for _, call_sym8 := range f_sym8.QualifyCalls {
+		if reflect.DeepEqual(call_sym8.Parameters.Ident1, ident1) {
+			count_sym8++
 		}
 	}
 
-	return count == 1
+	return count_sym8 == 1
 }
 
 // AssertQualifyCalledOnceWith calls t.Error if FakeQualifier.Qualify was not called exactly once with the given values
-func (_f9 *FakeQualifier) AssertQualifyCalledOnceWith(t QualifierTestingT, ident1 fmt.Scanner) {
+func (f_sym9 *FakeQualifier) AssertQualifyCalledOnceWith(t QualifierTestingT, ident1 fmt.Scanner) {
 	t.Helper()
-	var count int
-	for _, call := range _f9.QualifyCalls {
-		if reflect.DeepEqual(call.Parameters.Ident1, ident1) {
-			count++
+	var count_sym9 int
+	for _, call_sym9 := range f_sym9.QualifyCalls {
+		if reflect.DeepEqual(call_sym9.Parameters.Ident1, ident1) {
+			count_sym9++
 		}
 	}
 
-	if count != 1 {
-		t.Errorf("FakeQualifier.Qualify called %d times with expected parameters, expected one", count)
+	if count_sym9 != 1 {
+		t.Errorf("FakeQualifier.Qualify called %d times with expected parameters, expected one", count_sym9)
 	}
 }
 
 // QualifyResultsForCall returns the result values for the first call to FakeQualifier.Qualify with the given values
-func (_f10 *FakeQualifier) QualifyResultsForCall(ident1 fmt.Scanner) (ident2 fmt.Scanner, found bool) {
-	for _, call := range _f10.QualifyCalls {
-		if reflect.DeepEqual(call.Parameters.Ident1, ident1) {
-			ident2 = call.Results.Ident2
-			found = true
+func (f_sym10 *FakeQualifier) QualifyResultsForCall(ident1 fmt.Scanner) (ident2 fmt.Scanner, found_sym10 bool) {
+	for _, call_sym10 := range f_sym10.QualifyCalls {
+		if reflect.DeepEqual(call_sym10.Parameters.Ident1, ident1) {
+			ident2 = call_sym10.Results.Ident2
+			found_sym10 = true
 			break
 		}
 	}
@@ -296,45 +295,45 @@ func (_f10 *FakeQualifier) QualifyResultsForCall(ident1 fmt.Scanner) (ident2 fmt
 	return
 }
 
-func (_f11 *FakeQualifier) NamedQualify(a fmt.Scanner, b fmt.Scanner, c fmt.Scanner) (d fmt.Scanner) {
-	if _f11.NamedQualifyHook == nil {
+func (f_sym11 *FakeQualifier) NamedQualify(a fmt.Scanner, b fmt.Scanner, c fmt.Scanner) (d fmt.Scanner) {
+	if f_sym11.NamedQualifyHook == nil {
 		panic("Qualifier.NamedQualify() called but FakeQualifier.NamedQualifyHook is nil")
 	}
 
-	invocation := new(QualifierNamedQualifyInvocation)
-	_f11.NamedQualifyCalls = append(_f11.NamedQualifyCalls, invocation)
+	invocation_sym11 := new(QualifierNamedQualifyInvocation)
+	f_sym11.NamedQualifyCalls = append(f_sym11.NamedQualifyCalls, invocation_sym11)
 
-	invocation.Parameters.A = a
-	invocation.Parameters.B = b
-	invocation.Parameters.C = c
+	invocation_sym11.Parameters.A = a
+	invocation_sym11.Parameters.B = b
+	invocation_sym11.Parameters.C = c
 
-	d = _f11.NamedQualifyHook(a, b, c)
+	d = f_sym11.NamedQualifyHook(a, b, c)
 
-	invocation.Results.D = d
+	invocation_sym11.Results.D = d
 
 	return
 }
 
 // SetNamedQualifyStub configures Qualifier.NamedQualify to always return the given values
-func (_f12 *FakeQualifier) SetNamedQualifyStub(d fmt.Scanner) {
-	_f12.NamedQualifyHook = func(fmt.Scanner, fmt.Scanner, fmt.Scanner) fmt.Scanner {
+func (f_sym12 *FakeQualifier) SetNamedQualifyStub(d fmt.Scanner) {
+	f_sym12.NamedQualifyHook = func(fmt.Scanner, fmt.Scanner, fmt.Scanner) fmt.Scanner {
 		return d
 	}
 }
 
 // SetNamedQualifyInvocation configures Qualifier.NamedQualify to return the given results when called with the given parameters
 // If no match is found for an invocation the result(s) of the fallback function are returned
-func (_f13 *FakeQualifier) SetNamedQualifyInvocation(calls_f14 []*QualifierNamedQualifyInvocation, fallback_f15 func() fmt.Scanner) {
-	_f13.NamedQualifyHook = func(a fmt.Scanner, b fmt.Scanner, c fmt.Scanner) (d fmt.Scanner) {
-		for _, call := range calls_f14 {
-			if reflect.DeepEqual(call.Parameters.A, a) && reflect.DeepEqual(call.Parameters.B, b) && reflect.DeepEqual(call.Parameters.C, c) {
-				d = call.Results.D
+func (f_sym13 *FakeQualifier) SetNamedQualifyInvocation(calls_sym13 []*QualifierNamedQualifyInvocation, fallback_sym13 func() fmt.Scanner) {
+	f_sym13.NamedQualifyHook = func(a fmt.Scanner, b fmt.Scanner, c fmt.Scanner) (d fmt.Scanner) {
+		for _, call_sym13 := range calls_sym13 {
+			if reflect.DeepEqual(call_sym13.Parameters.A, a) && reflect.DeepEqual(call_sym13.Parameters.B, b) && reflect.DeepEqual(call_sym13.Parameters.C, c) {
+				d = call_sym13.Results.D
 
 				return
 			}
 		}
 
-		return fallback_f15()
+		return fallback_sym13()
 	}
 }
 
@@ -391,66 +390,65 @@ func (f *FakeQualifier) AssertNamedQualifyCalledN(t QualifierTestingT, n int) {
 }
 
 // NamedQualifyCalledWith returns true if FakeQualifier.NamedQualify was called with the given values
-func (_f16 *FakeQualifier) NamedQualifyCalledWith(a fmt.Scanner, b fmt.Scanner, c fmt.Scanner) (found bool) {
-	for _, call := range _f16.NamedQualifyCalls {
-		if reflect.DeepEqual(call.Parameters.A, a) && reflect.DeepEqual(call.Parameters.B, b) && reflect.DeepEqual(call.Parameters.C, c) {
-			found = true
-			break
+func (f_sym14 *FakeQualifier) NamedQualifyCalledWith(a fmt.Scanner, b fmt.Scanner, c fmt.Scanner) bool {
+	for _, call_sym14 := range f_sym14.NamedQualifyCalls {
+		if reflect.DeepEqual(call_sym14.Parameters.A, a) && reflect.DeepEqual(call_sym14.Parameters.B, b) && reflect.DeepEqual(call_sym14.Parameters.C, c) {
+			return true
 		}
 	}
 
-	return
+	return false
 }
 
 // AssertNamedQualifyCalledWith calls t.Error if FakeQualifier.NamedQualify was not called with the given values
-func (_f17 *FakeQualifier) AssertNamedQualifyCalledWith(t QualifierTestingT, a fmt.Scanner, b fmt.Scanner, c fmt.Scanner) {
+func (f_sym15 *FakeQualifier) AssertNamedQualifyCalledWith(t QualifierTestingT, a fmt.Scanner, b fmt.Scanner, c fmt.Scanner) {
 	t.Helper()
-	var found bool
-	for _, call := range _f17.NamedQualifyCalls {
-		if reflect.DeepEqual(call.Parameters.A, a) && reflect.DeepEqual(call.Parameters.B, b) && reflect.DeepEqual(call.Parameters.C, c) {
-			found = true
+	var found_sym15 bool
+	for _, call_sym15 := range f_sym15.NamedQualifyCalls {
+		if reflect.DeepEqual(call_sym15.Parameters.A, a) && reflect.DeepEqual(call_sym15.Parameters.B, b) && reflect.DeepEqual(call_sym15.Parameters.C, c) {
+			found_sym15 = true
 			break
 		}
 	}
 
-	if !found {
+	if !found_sym15 {
 		t.Error("FakeQualifier.NamedQualify not called with expected parameters")
 	}
 }
 
 // NamedQualifyCalledOnceWith returns true if FakeQualifier.NamedQualify was called exactly once with the given values
-func (_f18 *FakeQualifier) NamedQualifyCalledOnceWith(a fmt.Scanner, b fmt.Scanner, c fmt.Scanner) bool {
-	var count int
-	for _, call := range _f18.NamedQualifyCalls {
-		if reflect.DeepEqual(call.Parameters.A, a) && reflect.DeepEqual(call.Parameters.B, b) && reflect.DeepEqual(call.Parameters.C, c) {
-			count++
+func (f_sym16 *FakeQualifier) NamedQualifyCalledOnceWith(a fmt.Scanner, b fmt.Scanner, c fmt.Scanner) bool {
+	var count_sym16 int
+	for _, call_sym16 := range f_sym16.NamedQualifyCalls {
+		if reflect.DeepEqual(call_sym16.Parameters.A, a) && reflect.DeepEqual(call_sym16.Parameters.B, b) && reflect.DeepEqual(call_sym16.Parameters.C, c) {
+			count_sym16++
 		}
 	}
 
-	return count == 1
+	return count_sym16 == 1
 }
 
 // AssertNamedQualifyCalledOnceWith calls t.Error if FakeQualifier.NamedQualify was not called exactly once with the given values
-func (_f19 *FakeQualifier) AssertNamedQualifyCalledOnceWith(t QualifierTestingT, a fmt.Scanner, b fmt.Scanner, c fmt.Scanner) {
+func (f_sym17 *FakeQualifier) AssertNamedQualifyCalledOnceWith(t QualifierTestingT, a fmt.Scanner, b fmt.Scanner, c fmt.Scanner) {
 	t.Helper()
-	var count int
-	for _, call := range _f19.NamedQualifyCalls {
-		if reflect.DeepEqual(call.Parameters.A, a) && reflect.DeepEqual(call.Parameters.B, b) && reflect.DeepEqual(call.Parameters.C, c) {
-			count++
+	var count_sym17 int
+	for _, call_sym17 := range f_sym17.NamedQualifyCalls {
+		if reflect.DeepEqual(call_sym17.Parameters.A, a) && reflect.DeepEqual(call_sym17.Parameters.B, b) && reflect.DeepEqual(call_sym17.Parameters.C, c) {
+			count_sym17++
 		}
 	}
 
-	if count != 1 {
-		t.Errorf("FakeQualifier.NamedQualify called %d times with expected parameters, expected one", count)
+	if count_sym17 != 1 {
+		t.Errorf("FakeQualifier.NamedQualify called %d times with expected parameters, expected one", count_sym17)
 	}
 }
 
 // NamedQualifyResultsForCall returns the result values for the first call to FakeQualifier.NamedQualify with the given values
-func (_f20 *FakeQualifier) NamedQualifyResultsForCall(a fmt.Scanner, b fmt.Scanner, c fmt.Scanner) (d fmt.Scanner, found bool) {
-	for _, call := range _f20.NamedQualifyCalls {
-		if reflect.DeepEqual(call.Parameters.A, a) && reflect.DeepEqual(call.Parameters.B, b) && reflect.DeepEqual(call.Parameters.C, c) {
-			d = call.Results.D
-			found = true
+func (f_sym18 *FakeQualifier) NamedQualifyResultsForCall(a fmt.Scanner, b fmt.Scanner, c fmt.Scanner) (d fmt.Scanner, found_sym18 bool) {
+	for _, call_sym18 := range f_sym18.NamedQualifyCalls {
+		if reflect.DeepEqual(call_sym18.Parameters.A, a) && reflect.DeepEqual(call_sym18.Parameters.B, b) && reflect.DeepEqual(call_sym18.Parameters.C, c) {
+			d = call_sym18.Results.D
+			found_sym18 = true
 			break
 		}
 	}

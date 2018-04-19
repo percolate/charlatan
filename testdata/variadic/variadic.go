@@ -74,28 +74,28 @@ func NewFakeVariadicDefaultPanic() *FakeVariadic {
 }
 
 // NewFakeVariadicDefaultFatal returns an instance of FakeVariadic with all hooks configured to call t.Fatal
-func NewFakeVariadicDefaultFatal(t VariadicTestingT) *FakeVariadic {
+func NewFakeVariadicDefaultFatal(t_sym1 VariadicTestingT) *FakeVariadic {
 	return &FakeVariadic{
 		SingleVariadicHook: func(...string) {
-			t.Fatal("Unexpected call to Variadic.SingleVariadic")
+			t_sym1.Fatal("Unexpected call to Variadic.SingleVariadic")
 			return
 		},
 		MixedVariadicHook: func(int, int, int, ...string) {
-			t.Fatal("Unexpected call to Variadic.MixedVariadic")
+			t_sym1.Fatal("Unexpected call to Variadic.MixedVariadic")
 			return
 		},
 	}
 }
 
 // NewFakeVariadicDefaultError returns an instance of FakeVariadic with all hooks configured to call t.Error
-func NewFakeVariadicDefaultError(t VariadicTestingT) *FakeVariadic {
+func NewFakeVariadicDefaultError(t_sym2 VariadicTestingT) *FakeVariadic {
 	return &FakeVariadic{
 		SingleVariadicHook: func(...string) {
-			t.Error("Unexpected call to Variadic.SingleVariadic")
+			t_sym2.Error("Unexpected call to Variadic.SingleVariadic")
 			return
 		},
 		MixedVariadicHook: func(int, int, int, ...string) {
-			t.Error("Unexpected call to Variadic.MixedVariadic")
+			t_sym2.Error("Unexpected call to Variadic.MixedVariadic")
 			return
 		},
 	}
@@ -106,17 +106,17 @@ func (f *FakeVariadic) Reset() {
 	f.MixedVariadicCalls = []*VariadicMixedVariadicInvocation{}
 }
 
-func (_f1 *FakeVariadic) SingleVariadic(a ...string) {
-	if _f1.SingleVariadicHook == nil {
+func (f_sym3 *FakeVariadic) SingleVariadic(a ...string) {
+	if f_sym3.SingleVariadicHook == nil {
 		panic("Variadic.SingleVariadic() called but FakeVariadic.SingleVariadicHook is nil")
 	}
 
-	invocation := new(VariadicSingleVariadicInvocation)
-	_f1.SingleVariadicCalls = append(_f1.SingleVariadicCalls, invocation)
+	invocation_sym3 := new(VariadicSingleVariadicInvocation)
+	f_sym3.SingleVariadicCalls = append(f_sym3.SingleVariadicCalls, invocation_sym3)
 
-	invocation.Parameters.A = a
+	invocation_sym3.Parameters.A = a
 
-	_f1.SingleVariadicHook(a...)
+	f_sym3.SingleVariadicHook(a...)
 
 	return
 }
@@ -174,74 +174,73 @@ func (f *FakeVariadic) AssertSingleVariadicCalledN(t VariadicTestingT, n int) {
 }
 
 // SingleVariadicCalledWith returns true if FakeVariadic.SingleVariadic was called with the given values
-func (_f2 *FakeVariadic) SingleVariadicCalledWith(a ...string) (found bool) {
-	for _, call := range _f2.SingleVariadicCalls {
-		if reflect.DeepEqual(call.Parameters.A, a) {
-			found = true
-			break
+func (f_sym4 *FakeVariadic) SingleVariadicCalledWith(a ...string) bool {
+	for _, call_sym4 := range f_sym4.SingleVariadicCalls {
+		if reflect.DeepEqual(call_sym4.Parameters.A, a) {
+			return true
 		}
 	}
 
-	return
+	return false
 }
 
 // AssertSingleVariadicCalledWith calls t.Error if FakeVariadic.SingleVariadic was not called with the given values
-func (_f3 *FakeVariadic) AssertSingleVariadicCalledWith(t VariadicTestingT, a ...string) {
+func (f_sym5 *FakeVariadic) AssertSingleVariadicCalledWith(t VariadicTestingT, a ...string) {
 	t.Helper()
-	var found bool
-	for _, call := range _f3.SingleVariadicCalls {
-		if reflect.DeepEqual(call.Parameters.A, a) {
-			found = true
+	var found_sym5 bool
+	for _, call_sym5 := range f_sym5.SingleVariadicCalls {
+		if reflect.DeepEqual(call_sym5.Parameters.A, a) {
+			found_sym5 = true
 			break
 		}
 	}
 
-	if !found {
+	if !found_sym5 {
 		t.Error("FakeVariadic.SingleVariadic not called with expected parameters")
 	}
 }
 
 // SingleVariadicCalledOnceWith returns true if FakeVariadic.SingleVariadic was called exactly once with the given values
-func (_f4 *FakeVariadic) SingleVariadicCalledOnceWith(a ...string) bool {
-	var count int
-	for _, call := range _f4.SingleVariadicCalls {
-		if reflect.DeepEqual(call.Parameters.A, a) {
-			count++
+func (f_sym6 *FakeVariadic) SingleVariadicCalledOnceWith(a ...string) bool {
+	var count_sym6 int
+	for _, call_sym6 := range f_sym6.SingleVariadicCalls {
+		if reflect.DeepEqual(call_sym6.Parameters.A, a) {
+			count_sym6++
 		}
 	}
 
-	return count == 1
+	return count_sym6 == 1
 }
 
 // AssertSingleVariadicCalledOnceWith calls t.Error if FakeVariadic.SingleVariadic was not called exactly once with the given values
-func (_f5 *FakeVariadic) AssertSingleVariadicCalledOnceWith(t VariadicTestingT, a ...string) {
+func (f_sym7 *FakeVariadic) AssertSingleVariadicCalledOnceWith(t VariadicTestingT, a ...string) {
 	t.Helper()
-	var count int
-	for _, call := range _f5.SingleVariadicCalls {
-		if reflect.DeepEqual(call.Parameters.A, a) {
-			count++
+	var count_sym7 int
+	for _, call_sym7 := range f_sym7.SingleVariadicCalls {
+		if reflect.DeepEqual(call_sym7.Parameters.A, a) {
+			count_sym7++
 		}
 	}
 
-	if count != 1 {
-		t.Errorf("FakeVariadic.SingleVariadic called %d times with expected parameters, expected one", count)
+	if count_sym7 != 1 {
+		t.Errorf("FakeVariadic.SingleVariadic called %d times with expected parameters, expected one", count_sym7)
 	}
 }
 
-func (_f6 *FakeVariadic) MixedVariadic(a int, b int, c int, d ...string) {
-	if _f6.MixedVariadicHook == nil {
+func (f_sym8 *FakeVariadic) MixedVariadic(a int, b int, c int, d ...string) {
+	if f_sym8.MixedVariadicHook == nil {
 		panic("Variadic.MixedVariadic() called but FakeVariadic.MixedVariadicHook is nil")
 	}
 
-	invocation := new(VariadicMixedVariadicInvocation)
-	_f6.MixedVariadicCalls = append(_f6.MixedVariadicCalls, invocation)
+	invocation_sym8 := new(VariadicMixedVariadicInvocation)
+	f_sym8.MixedVariadicCalls = append(f_sym8.MixedVariadicCalls, invocation_sym8)
 
-	invocation.Parameters.A = a
-	invocation.Parameters.B = b
-	invocation.Parameters.C = c
-	invocation.Parameters.D = d
+	invocation_sym8.Parameters.A = a
+	invocation_sym8.Parameters.B = b
+	invocation_sym8.Parameters.C = c
+	invocation_sym8.Parameters.D = d
 
-	_f6.MixedVariadicHook(a, b, c, d...)
+	f_sym8.MixedVariadicHook(a, b, c, d...)
 
 	return
 }
@@ -299,56 +298,55 @@ func (f *FakeVariadic) AssertMixedVariadicCalledN(t VariadicTestingT, n int) {
 }
 
 // MixedVariadicCalledWith returns true if FakeVariadic.MixedVariadic was called with the given values
-func (_f7 *FakeVariadic) MixedVariadicCalledWith(a int, b int, c int, d ...string) (found bool) {
-	for _, call := range _f7.MixedVariadicCalls {
-		if reflect.DeepEqual(call.Parameters.A, a) && reflect.DeepEqual(call.Parameters.B, b) && reflect.DeepEqual(call.Parameters.C, c) && reflect.DeepEqual(call.Parameters.D, d) {
-			found = true
-			break
+func (f_sym9 *FakeVariadic) MixedVariadicCalledWith(a int, b int, c int, d ...string) bool {
+	for _, call_sym9 := range f_sym9.MixedVariadicCalls {
+		if reflect.DeepEqual(call_sym9.Parameters.A, a) && reflect.DeepEqual(call_sym9.Parameters.B, b) && reflect.DeepEqual(call_sym9.Parameters.C, c) && reflect.DeepEqual(call_sym9.Parameters.D, d) {
+			return true
 		}
 	}
 
-	return
+	return false
 }
 
 // AssertMixedVariadicCalledWith calls t.Error if FakeVariadic.MixedVariadic was not called with the given values
-func (_f8 *FakeVariadic) AssertMixedVariadicCalledWith(t VariadicTestingT, a int, b int, c int, d ...string) {
+func (f_sym10 *FakeVariadic) AssertMixedVariadicCalledWith(t VariadicTestingT, a int, b int, c int, d ...string) {
 	t.Helper()
-	var found bool
-	for _, call := range _f8.MixedVariadicCalls {
-		if reflect.DeepEqual(call.Parameters.A, a) && reflect.DeepEqual(call.Parameters.B, b) && reflect.DeepEqual(call.Parameters.C, c) && reflect.DeepEqual(call.Parameters.D, d) {
-			found = true
+	var found_sym10 bool
+	for _, call_sym10 := range f_sym10.MixedVariadicCalls {
+		if reflect.DeepEqual(call_sym10.Parameters.A, a) && reflect.DeepEqual(call_sym10.Parameters.B, b) && reflect.DeepEqual(call_sym10.Parameters.C, c) && reflect.DeepEqual(call_sym10.Parameters.D, d) {
+			found_sym10 = true
 			break
 		}
 	}
 
-	if !found {
+	if !found_sym10 {
 		t.Error("FakeVariadic.MixedVariadic not called with expected parameters")
 	}
 }
 
 // MixedVariadicCalledOnceWith returns true if FakeVariadic.MixedVariadic was called exactly once with the given values
-func (_f9 *FakeVariadic) MixedVariadicCalledOnceWith(a int, b int, c int, d ...string) bool {
-	var count int
-	for _, call := range _f9.MixedVariadicCalls {
-		if reflect.DeepEqual(call.Parameters.A, a) && reflect.DeepEqual(call.Parameters.B, b) && reflect.DeepEqual(call.Parameters.C, c) && reflect.DeepEqual(call.Parameters.D, d) {
-			count++
+func (f_sym11 *FakeVariadic) MixedVariadicCalledOnceWith(a int, b int, c int, d ...string) bool {
+	var count_sym11 int
+	for _, call_sym11 := range f_sym11.MixedVariadicCalls {
+		if reflect.DeepEqual(call_sym11.Parameters.A, a) && reflect.DeepEqual(call_sym11.Parameters.B, b) && reflect.DeepEqual(call_sym11.Parameters.C, c) && reflect.DeepEqual(call_sym11.Parameters.D, d) {
+			count_sym11++
 		}
 	}
 
-	return count == 1
+	return count_sym11 == 1
 }
 
 // AssertMixedVariadicCalledOnceWith calls t.Error if FakeVariadic.MixedVariadic was not called exactly once with the given values
-func (_f10 *FakeVariadic) AssertMixedVariadicCalledOnceWith(t VariadicTestingT, a int, b int, c int, d ...string) {
+func (f_sym12 *FakeVariadic) AssertMixedVariadicCalledOnceWith(t VariadicTestingT, a int, b int, c int, d ...string) {
 	t.Helper()
-	var count int
-	for _, call := range _f10.MixedVariadicCalls {
-		if reflect.DeepEqual(call.Parameters.A, a) && reflect.DeepEqual(call.Parameters.B, b) && reflect.DeepEqual(call.Parameters.C, c) && reflect.DeepEqual(call.Parameters.D, d) {
-			count++
+	var count_sym12 int
+	for _, call_sym12 := range f_sym12.MixedVariadicCalls {
+		if reflect.DeepEqual(call_sym12.Parameters.A, a) && reflect.DeepEqual(call_sym12.Parameters.B, b) && reflect.DeepEqual(call_sym12.Parameters.C, c) && reflect.DeepEqual(call_sym12.Parameters.D, d) {
+			count_sym12++
 		}
 	}
 
-	if count != 1 {
-		t.Errorf("FakeVariadic.MixedVariadic called %d times with expected parameters, expected one", count)
+	if count_sym12 != 1 {
+		t.Errorf("FakeVariadic.MixedVariadic called %d times with expected parameters, expected one", count_sym12)
 	}
 }

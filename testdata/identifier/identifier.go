@@ -140,14 +140,14 @@ func (f_sym3 *FakeIdentifier) TestConstructor(val int64) (t string) {
 		panic("Identifier.TestConstructor() called but FakeIdentifier.TestConstructorHook is nil")
 	}
 
-	invocation := new(IdentifierTestConstructorInvocation)
-	f_sym3.TestConstructorCalls = append(f_sym3.TestConstructorCalls, invocation)
+	invocation_sym3 := new(IdentifierTestConstructorInvocation)
+	f_sym3.TestConstructorCalls = append(f_sym3.TestConstructorCalls, invocation_sym3)
 
-	invocation.Parameters.Val = val
+	invocation_sym3.Parameters.Val = val
 
 	t = f_sym3.TestConstructorHook(val)
 
-	invocation.Results.T = t
+	invocation_sym3.Results.T = t
 
 	return
 }
@@ -228,66 +228,65 @@ func (f *FakeIdentifier) AssertTestConstructorCalledN(t IdentifierTestingT, n in
 }
 
 // TestConstructorCalledWith returns true if FakeIdentifier.TestConstructor was called with the given values
-func (f_sym6 *FakeIdentifier) TestConstructorCalledWith(val int64) (found bool) {
-	for _, call := range f_sym6.TestConstructorCalls {
-		if reflect.DeepEqual(call.Parameters.Val, val) {
-			found = true
-			break
+func (f_sym6 *FakeIdentifier) TestConstructorCalledWith(val int64) bool {
+	for _, call_sym6 := range f_sym6.TestConstructorCalls {
+		if reflect.DeepEqual(call_sym6.Parameters.Val, val) {
+			return true
 		}
 	}
 
-	return
+	return false
 }
 
 // AssertTestConstructorCalledWith calls t.Error if FakeIdentifier.TestConstructor was not called with the given values
 func (f_sym7 *FakeIdentifier) AssertTestConstructorCalledWith(t IdentifierTestingT, val int64) {
 	t.Helper()
-	var found bool
-	for _, call := range f_sym7.TestConstructorCalls {
-		if reflect.DeepEqual(call.Parameters.Val, val) {
-			found = true
+	var found_sym7 bool
+	for _, call_sym7 := range f_sym7.TestConstructorCalls {
+		if reflect.DeepEqual(call_sym7.Parameters.Val, val) {
+			found_sym7 = true
 			break
 		}
 	}
 
-	if !found {
+	if !found_sym7 {
 		t.Error("FakeIdentifier.TestConstructor not called with expected parameters")
 	}
 }
 
 // TestConstructorCalledOnceWith returns true if FakeIdentifier.TestConstructor was called exactly once with the given values
 func (f_sym8 *FakeIdentifier) TestConstructorCalledOnceWith(val int64) bool {
-	var count int
-	for _, call := range f_sym8.TestConstructorCalls {
-		if reflect.DeepEqual(call.Parameters.Val, val) {
-			count++
+	var count_sym8 int
+	for _, call_sym8 := range f_sym8.TestConstructorCalls {
+		if reflect.DeepEqual(call_sym8.Parameters.Val, val) {
+			count_sym8++
 		}
 	}
 
-	return count == 1
+	return count_sym8 == 1
 }
 
 // AssertTestConstructorCalledOnceWith calls t.Error if FakeIdentifier.TestConstructor was not called exactly once with the given values
 func (f_sym9 *FakeIdentifier) AssertTestConstructorCalledOnceWith(t IdentifierTestingT, val int64) {
 	t.Helper()
-	var count int
-	for _, call := range f_sym9.TestConstructorCalls {
-		if reflect.DeepEqual(call.Parameters.Val, val) {
-			count++
+	var count_sym9 int
+	for _, call_sym9 := range f_sym9.TestConstructorCalls {
+		if reflect.DeepEqual(call_sym9.Parameters.Val, val) {
+			count_sym9++
 		}
 	}
 
-	if count != 1 {
-		t.Errorf("FakeIdentifier.TestConstructor called %d times with expected parameters, expected one", count)
+	if count_sym9 != 1 {
+		t.Errorf("FakeIdentifier.TestConstructor called %d times with expected parameters, expected one", count_sym9)
 	}
 }
 
 // TestConstructorResultsForCall returns the result values for the first call to FakeIdentifier.TestConstructor with the given values
-func (f_sym10 *FakeIdentifier) TestConstructorResultsForCall(val int64) (t string, found bool) {
-	for _, call := range f_sym10.TestConstructorCalls {
-		if reflect.DeepEqual(call.Parameters.Val, val) {
-			t = call.Results.T
-			found = true
+func (f_sym10 *FakeIdentifier) TestConstructorResultsForCall(val int64) (t string, found_sym10 bool) {
+	for _, call_sym10 := range f_sym10.TestConstructorCalls {
+		if reflect.DeepEqual(call_sym10.Parameters.Val, val) {
+			t = call_sym10.Results.T
+			found_sym10 = true
 			break
 		}
 	}
@@ -300,16 +299,16 @@ func (f_sym11 *FakeIdentifier) InvocationSetter(val int64) (call string, calls s
 		panic("Identifier.InvocationSetter() called but FakeIdentifier.InvocationSetterHook is nil")
 	}
 
-	invocation := new(IdentifierInvocationSetterInvocation)
-	f_sym11.InvocationSetterCalls = append(f_sym11.InvocationSetterCalls, invocation)
+	invocation_sym11 := new(IdentifierInvocationSetterInvocation)
+	f_sym11.InvocationSetterCalls = append(f_sym11.InvocationSetterCalls, invocation_sym11)
 
-	invocation.Parameters.Val = val
+	invocation_sym11.Parameters.Val = val
 
 	call, calls, fallback = f_sym11.InvocationSetterHook(val)
 
-	invocation.Results.Call = call
-	invocation.Results.Calls = calls
-	invocation.Results.Fallback = fallback
+	invocation_sym11.Results.Call = call
+	invocation_sym11.Results.Calls = calls
+	invocation_sym11.Results.Fallback = fallback
 
 	return
 }
@@ -392,68 +391,67 @@ func (f *FakeIdentifier) AssertInvocationSetterCalledN(t IdentifierTestingT, n i
 }
 
 // InvocationSetterCalledWith returns true if FakeIdentifier.InvocationSetter was called with the given values
-func (f_sym14 *FakeIdentifier) InvocationSetterCalledWith(val int64) (found bool) {
-	for _, call := range f_sym14.InvocationSetterCalls {
-		if reflect.DeepEqual(call.Parameters.Val, val) {
-			found = true
-			break
+func (f_sym14 *FakeIdentifier) InvocationSetterCalledWith(val int64) bool {
+	for _, call_sym14 := range f_sym14.InvocationSetterCalls {
+		if reflect.DeepEqual(call_sym14.Parameters.Val, val) {
+			return true
 		}
 	}
 
-	return
+	return false
 }
 
 // AssertInvocationSetterCalledWith calls t.Error if FakeIdentifier.InvocationSetter was not called with the given values
 func (f_sym15 *FakeIdentifier) AssertInvocationSetterCalledWith(t IdentifierTestingT, val int64) {
 	t.Helper()
-	var found bool
-	for _, call := range f_sym15.InvocationSetterCalls {
-		if reflect.DeepEqual(call.Parameters.Val, val) {
-			found = true
+	var found_sym15 bool
+	for _, call_sym15 := range f_sym15.InvocationSetterCalls {
+		if reflect.DeepEqual(call_sym15.Parameters.Val, val) {
+			found_sym15 = true
 			break
 		}
 	}
 
-	if !found {
+	if !found_sym15 {
 		t.Error("FakeIdentifier.InvocationSetter not called with expected parameters")
 	}
 }
 
 // InvocationSetterCalledOnceWith returns true if FakeIdentifier.InvocationSetter was called exactly once with the given values
 func (f_sym16 *FakeIdentifier) InvocationSetterCalledOnceWith(val int64) bool {
-	var count int
-	for _, call := range f_sym16.InvocationSetterCalls {
-		if reflect.DeepEqual(call.Parameters.Val, val) {
-			count++
+	var count_sym16 int
+	for _, call_sym16 := range f_sym16.InvocationSetterCalls {
+		if reflect.DeepEqual(call_sym16.Parameters.Val, val) {
+			count_sym16++
 		}
 	}
 
-	return count == 1
+	return count_sym16 == 1
 }
 
 // AssertInvocationSetterCalledOnceWith calls t.Error if FakeIdentifier.InvocationSetter was not called exactly once with the given values
 func (f_sym17 *FakeIdentifier) AssertInvocationSetterCalledOnceWith(t IdentifierTestingT, val int64) {
 	t.Helper()
-	var count int
-	for _, call := range f_sym17.InvocationSetterCalls {
-		if reflect.DeepEqual(call.Parameters.Val, val) {
-			count++
+	var count_sym17 int
+	for _, call_sym17 := range f_sym17.InvocationSetterCalls {
+		if reflect.DeepEqual(call_sym17.Parameters.Val, val) {
+			count_sym17++
 		}
 	}
 
-	if count != 1 {
-		t.Errorf("FakeIdentifier.InvocationSetter called %d times with expected parameters, expected one", count)
+	if count_sym17 != 1 {
+		t.Errorf("FakeIdentifier.InvocationSetter called %d times with expected parameters, expected one", count_sym17)
 	}
 }
 
 // InvocationSetterResultsForCall returns the result values for the first call to FakeIdentifier.InvocationSetter with the given values
-func (f_sym18 *FakeIdentifier) InvocationSetterResultsForCall(val int64) (call string, calls string, fallback string, found bool) {
-	for _, call := range f_sym18.InvocationSetterCalls {
-		if reflect.DeepEqual(call.Parameters.Val, val) {
-			call = call.Results.Call
-			calls = call.Results.Calls
-			fallback = call.Results.Fallback
-			found = true
+func (f_sym18 *FakeIdentifier) InvocationSetterResultsForCall(val int64) (call string, calls string, fallback string, found_sym18 bool) {
+	for _, call_sym18 := range f_sym18.InvocationSetterCalls {
+		if reflect.DeepEqual(call_sym18.Parameters.Val, val) {
+			call = call_sym18.Results.Call
+			calls = call_sym18.Results.Calls
+			fallback = call_sym18.Results.Fallback
+			found_sym18 = true
 			break
 		}
 	}
