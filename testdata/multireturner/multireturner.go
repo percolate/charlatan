@@ -73,28 +73,28 @@ func NewFakeMultireturnerDefaultPanic() *FakeMultireturner {
 }
 
 // NewFakeMultireturnerDefaultFatal returns an instance of FakeMultireturner with all hooks configured to call t.Fatal
-func NewFakeMultireturnerDefaultFatal(t MultireturnerTestingT) *FakeMultireturner {
+func NewFakeMultireturnerDefaultFatal(t_sym1 MultireturnerTestingT) *FakeMultireturner {
 	return &FakeMultireturner{
 		MultiReturnHook: func() (ident1 string, ident2 int) {
-			t.Fatal("Unexpected call to Multireturner.MultiReturn")
+			t_sym1.Fatal("Unexpected call to Multireturner.MultiReturn")
 			return
 		},
 		NamedReturnHook: func() (a int, b int, c int, d int) {
-			t.Fatal("Unexpected call to Multireturner.NamedReturn")
+			t_sym1.Fatal("Unexpected call to Multireturner.NamedReturn")
 			return
 		},
 	}
 }
 
 // NewFakeMultireturnerDefaultError returns an instance of FakeMultireturner with all hooks configured to call t.Error
-func NewFakeMultireturnerDefaultError(t MultireturnerTestingT) *FakeMultireturner {
+func NewFakeMultireturnerDefaultError(t_sym2 MultireturnerTestingT) *FakeMultireturner {
 	return &FakeMultireturner{
 		MultiReturnHook: func() (ident1 string, ident2 int) {
-			t.Error("Unexpected call to Multireturner.MultiReturn")
+			t_sym2.Error("Unexpected call to Multireturner.MultiReturn")
 			return
 		},
 		NamedReturnHook: func() (a int, b int, c int, d int) {
-			t.Error("Unexpected call to Multireturner.NamedReturn")
+			t_sym2.Error("Unexpected call to Multireturner.NamedReturn")
 			return
 		},
 	}
@@ -105,25 +105,25 @@ func (f *FakeMultireturner) Reset() {
 	f.NamedReturnCalls = []*MultireturnerNamedReturnInvocation{}
 }
 
-func (_f1 *FakeMultireturner) MultiReturn() (ident1 string, ident2 int) {
-	if _f1.MultiReturnHook == nil {
+func (f_sym3 *FakeMultireturner) MultiReturn() (ident1 string, ident2 int) {
+	if f_sym3.MultiReturnHook == nil {
 		panic("Multireturner.MultiReturn() called but FakeMultireturner.MultiReturnHook is nil")
 	}
 
-	invocation := new(MultireturnerMultiReturnInvocation)
-	_f1.MultiReturnCalls = append(_f1.MultiReturnCalls, invocation)
+	invocation_sym3 := new(MultireturnerMultiReturnInvocation)
+	f_sym3.MultiReturnCalls = append(f_sym3.MultiReturnCalls, invocation_sym3)
 
-	ident1, ident2 = _f1.MultiReturnHook()
+	ident1, ident2 = f_sym3.MultiReturnHook()
 
-	invocation.Results.Ident1 = ident1
-	invocation.Results.Ident2 = ident2
+	invocation_sym3.Results.Ident1 = ident1
+	invocation_sym3.Results.Ident2 = ident2
 
 	return
 }
 
 // SetMultiReturnStub configures Multireturner.MultiReturn to always return the given values
-func (_f2 *FakeMultireturner) SetMultiReturnStub(ident1 string, ident2 int) {
-	_f2.MultiReturnHook = func() (string, int) {
+func (f_sym4 *FakeMultireturner) SetMultiReturnStub(ident1 string, ident2 int) {
+	f_sym4.MultiReturnHook = func() (string, int) {
 		return ident1, ident2
 	}
 }
@@ -180,27 +180,27 @@ func (f *FakeMultireturner) AssertMultiReturnCalledN(t MultireturnerTestingT, n 
 	}
 }
 
-func (_f3 *FakeMultireturner) NamedReturn() (a int, b int, c int, d int) {
-	if _f3.NamedReturnHook == nil {
+func (f_sym5 *FakeMultireturner) NamedReturn() (a int, b int, c int, d int) {
+	if f_sym5.NamedReturnHook == nil {
 		panic("Multireturner.NamedReturn() called but FakeMultireturner.NamedReturnHook is nil")
 	}
 
-	invocation := new(MultireturnerNamedReturnInvocation)
-	_f3.NamedReturnCalls = append(_f3.NamedReturnCalls, invocation)
+	invocation_sym5 := new(MultireturnerNamedReturnInvocation)
+	f_sym5.NamedReturnCalls = append(f_sym5.NamedReturnCalls, invocation_sym5)
 
-	a, b, c, d = _f3.NamedReturnHook()
+	a, b, c, d = f_sym5.NamedReturnHook()
 
-	invocation.Results.A = a
-	invocation.Results.B = b
-	invocation.Results.C = c
-	invocation.Results.D = d
+	invocation_sym5.Results.A = a
+	invocation_sym5.Results.B = b
+	invocation_sym5.Results.C = c
+	invocation_sym5.Results.D = d
 
 	return
 }
 
 // SetNamedReturnStub configures Multireturner.NamedReturn to always return the given values
-func (_f4 *FakeMultireturner) SetNamedReturnStub(a int, b int, c int, d int) {
-	_f4.NamedReturnHook = func() (int, int, int, int) {
+func (f_sym6 *FakeMultireturner) SetNamedReturnStub(a int, b int, c int, d int) {
+	f_sym6.NamedReturnHook = func() (int, int, int, int) {
 		return a, b, c, d
 	}
 }
