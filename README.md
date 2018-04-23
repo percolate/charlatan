@@ -74,7 +74,7 @@ type QueryInvocation struct {
 	}
 }
 
-type FetechInvocation struct {
+type FetchInvocation struct {
 	Parameters struct {
 		Id string
 	}
