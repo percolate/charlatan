@@ -4,7 +4,7 @@
 [![codecov.io](https://codecov.io/github/percolate/charlatan/coverage.svg?branch=master)](https://codecov.io/github/percolate/charlatan?branch=master)
 [![BSD](https://img.shields.io/badge/license-BSD-blue.svg)](https://github.com/percolate/charlatan/blob/master/LICENSE)
 
-Percolate's Go Interface Mocking Tool.  Please read our introductory [blog post](https://medium.com/percolate-engineering/introducing-charlatan-df9b5d3d3107).
+Percolate's Go Interface Mocking Tool.  Please read our [introductory blog post](https://medium.com/percolate-engineering/introducing-charlatan-df9b5d3d3107).
 
 ## Installation
 
@@ -29,7 +29,7 @@ Options:
 ```
 
 If you would like the mock implementations to live in the same package
-as the interace definition then use the simplest invocation as a
+as the interface definition then use the simplest invocation as a
 directive:
 
     //go:generate charlatan Interface
@@ -74,7 +74,7 @@ type QueryInvocation struct {
 	}
 }
 
-type FetechInvocation struct {
+type FetchInvocation struct {
 	Parameters struct {
 		Id string
 	}
@@ -125,7 +125,7 @@ func TestUsingService(t *testing.T) {
 		},
 	}
 
-	// use the `svc` instance in the code under text ...
+	// use the `svc` instance in the code under test ...
 
 	// assert state of FakeService ...
 	svc.AssertQueryCalledOnce(t)
