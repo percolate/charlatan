@@ -41,7 +41,7 @@ or from the command line:
 You can chose the output path using `-output`, which must include the
 name of the generated source file.  Any intermediate directories in the
 path that don't exist will be created.  The package used in the
-generated file's `pacakge` directive can be set using `-package`.
+generated file's `package` directive can be set using `-package`.
 
 ## Example
 
@@ -134,7 +134,7 @@ func TestUsingService(t *testing.T) {
 
 Create anonymous function implementations for only those interface
 methods that should be called in the code under test.  This will force
-a painc if any unexpected calls are made to the mock implementation.
+a panic if any unexpected calls are made to the mock implementation.
 
 The generated code has `godoc` formatted comments explaining the use
 of the mock and its methods.
