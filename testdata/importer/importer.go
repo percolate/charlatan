@@ -33,7 +33,7 @@ Use it in your tests as in this example:
 	func TestWithImporter(t *testing.T) {
 		f := &main.FakeImporter{
 			ScanHook: func(ident1 *Scanner) (ident2 z.Reader) {
-				// ensure parameters meet expections, signal errors using t, etc
+				// ensure parameters meet expectations, signal errors using t, etc
 				return
 			},
 		}

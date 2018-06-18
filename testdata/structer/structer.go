@@ -59,7 +59,7 @@ Use it in your tests as in this example:
 	c string
 	d string
 }) {
-				// ensure parameters meet expections, signal errors using t, etc
+				// ensure parameters meet expectations, signal errors using t, etc
 				return
 			},
 		}

@@ -44,7 +44,7 @@ Use it in your tests as in this example:
 	func TestWithQualifier(t *testing.T) {
 		f := &main.FakeQualifier{
 			QualifyHook: func(ident1 fmt.Scanner) (ident2 fmt.Scanner) {
-				// ensure parameters meet expections, signal errors using t, etc
+				// ensure parameters meet expectations, signal errors using t, etc
 				return
 			},
 		}

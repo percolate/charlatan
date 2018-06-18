@@ -92,7 +92,7 @@ func CheckOneGolden(t *testing.T) {
 	}
 
 	if len(got) == 0 {
-		t.Fatalf("%q resulted in an emtpy file when the contents of %q were expected", name, outputFilename)
+		t.Fatalf("%q resulted in an empty file when the contents of %q were expected", name, outputFilename)
 	}
 
 	readableOutput := string(outputFile)

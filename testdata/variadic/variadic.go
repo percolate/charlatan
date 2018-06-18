@@ -38,7 +38,7 @@ Use it in your tests as in this example:
 	func TestWithVariadic(t *testing.T) {
 		f := &main.FakeVariadic{
 			SingleVariadicHook: func(a ...string) () {
-				// ensure parameters meet expections, signal errors using t, etc
+				// ensure parameters meet expectations, signal errors using t, etc
 				return
 			},
 		}

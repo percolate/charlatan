@@ -46,7 +46,7 @@ Fake{{.Name}} is a mock implementation of {{.Name}} for testing.
 	func TestWith{{$m.Interface}}(t *testing.T) {
 		f := &{{$.PackageName}}.Fake{{$m.Interface}}{
 			{{$m.Name}}Hook: func({{$m.ParametersDeclaration}}) ({{$m.ResultsDeclaration}}) {
-				// ensure parameters meet expections, signal errors using t, etc
+				// ensure parameters meet expectations, signal errors using t, etc
 				return
 			},
 		}

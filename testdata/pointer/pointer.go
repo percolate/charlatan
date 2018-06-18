@@ -31,7 +31,7 @@ Use it in your tests as in this example:
 	func TestWithPointer(t *testing.T) {
 		f := &main.FakePointer{
 			PointHook: func(ident1 *string) (ident2 int) {
-				// ensure parameters meet expections, signal errors using t, etc
+				// ensure parameters meet expectations, signal errors using t, etc
 				return
 			},
 		}

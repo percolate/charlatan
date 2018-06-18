@@ -49,7 +49,7 @@ Use it in your tests as in this example:
 	func TestWithArray(t *testing.T) {
 		f := &main.FakeArray{
 			ArrayParameterHook: func(ident1 [3]string) () {
-				// ensure parameters meet expections, signal errors using t, etc
+				// ensure parameters meet expectations, signal errors using t, etc
 				return
 			},
 		}

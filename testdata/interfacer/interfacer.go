@@ -41,7 +41,7 @@ Use it in your tests as in this example:
 	func TestWithInterfacer(t *testing.T) {
 		f := &main.FakeInterfacer{
 			InterfaceHook: func(ident1 interface{}) (ident2 interface{}) {
-				// ensure parameters meet expections, signal errors using t, etc
+				// ensure parameters meet expectations, signal errors using t, etc
 				return
 			},
 		}

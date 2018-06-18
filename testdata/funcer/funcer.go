@@ -35,7 +35,7 @@ Use it in your tests as in this example:
 	func TestWithFuncer(t *testing.T) {
 		f := &main.FakeFuncer{
 			FuncParameterHook: func(ident1 func(string) string) () {
-				// ensure parameters meet expections, signal errors using t, etc
+				// ensure parameters meet expectations, signal errors using t, etc
 				return
 			},
 		}
