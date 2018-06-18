@@ -4,7 +4,7 @@ version: 2
 jobs:
   build:
     docker:
-      - image: circleci/golang:1.10.1-stretch
+      - image: circleci/golang:1.10-stretch
 
     working_directory: /go/src/github.com/percolate/charlatan
 
