@@ -71,28 +71,28 @@ func NewFakeMapperDefaultPanic() *FakeMapper {
 }
 
 // NewFakeMapperDefaultFatal returns an instance of FakeMapper with all hooks configured to call t.Fatal
-func NewFakeMapperDefaultFatal(t MapperTestingT) *FakeMapper {
+func NewFakeMapperDefaultFatal(t_sym1 MapperTestingT) *FakeMapper {
 	return &FakeMapper{
 		MapParameterHook: func(map[string]string) {
-			t.Fatal("Unexpected call to Mapper.MapParameter")
+			t_sym1.Fatal("Unexpected call to Mapper.MapParameter")
 			return
 		},
 		MapReturnHook: func() (ident1 map[string]string) {
-			t.Fatal("Unexpected call to Mapper.MapReturn")
+			t_sym1.Fatal("Unexpected call to Mapper.MapReturn")
 			return
 		},
 	}
 }
 
 // NewFakeMapperDefaultError returns an instance of FakeMapper with all hooks configured to call t.Error
-func NewFakeMapperDefaultError(t MapperTestingT) *FakeMapper {
+func NewFakeMapperDefaultError(t_sym2 MapperTestingT) *FakeMapper {
 	return &FakeMapper{
 		MapParameterHook: func(map[string]string) {
-			t.Error("Unexpected call to Mapper.MapParameter")
+			t_sym2.Error("Unexpected call to Mapper.MapParameter")
 			return
 		},
 		MapReturnHook: func() (ident1 map[string]string) {
-			t.Error("Unexpected call to Mapper.MapReturn")
+			t_sym2.Error("Unexpected call to Mapper.MapReturn")
 			return
 		},
 	}
@@ -103,17 +103,17 @@ func (f *FakeMapper) Reset() {
 	f.MapReturnCalls = []*MapperMapReturnInvocation{}
 }
 
-func (_f1 *FakeMapper) MapParameter(ident1 map[string]string) {
-	if _f1.MapParameterHook == nil {
+func (f_sym3 *FakeMapper) MapParameter(ident1 map[string]string) {
+	if f_sym3.MapParameterHook == nil {
 		panic("Mapper.MapParameter() called but FakeMapper.MapParameterHook is nil")
 	}
 
-	invocation := new(MapperMapParameterInvocation)
-	_f1.MapParameterCalls = append(_f1.MapParameterCalls, invocation)
+	invocation_sym3 := new(MapperMapParameterInvocation)
+	f_sym3.MapParameterCalls = append(f_sym3.MapParameterCalls, invocation_sym3)
 
-	invocation.Parameters.Ident1 = ident1
+	invocation_sym3.Parameters.Ident1 = ident1
 
-	_f1.MapParameterHook(ident1)
+	f_sym3.MapParameterHook(ident1)
 
 	return
 }
@@ -171,73 +171,79 @@ func (f *FakeMapper) AssertMapParameterCalledN(t MapperTestingT, n int) {
 }
 
 // MapParameterCalledWith returns true if FakeMapper.MapParameter was called with the given values
-func (_f2 *FakeMapper) MapParameterCalledWith(ident1 map[string]string) (found bool) {
-	for _, call := range _f2.MapParameterCalls {
-		if reflect.DeepEqual(call.Parameters.Ident1, ident1) {
-			found = true
-			break
+func (f_sym4 *FakeMapper) MapParameterCalledWith(ident1 map[string]string) bool {
+	for _, call_sym4 := range f_sym4.MapParameterCalls {
+		if reflect.DeepEqual(call_sym4.Parameters.Ident1, ident1) {
+			return true
 		}
 	}
 
-	return
+	return false
 }
 
 // AssertMapParameterCalledWith calls t.Error if FakeMapper.MapParameter was not called with the given values
-func (_f3 *FakeMapper) AssertMapParameterCalledWith(t MapperTestingT, ident1 map[string]string) {
+func (f_sym5 *FakeMapper) AssertMapParameterCalledWith(t MapperTestingT, ident1 map[string]string) {
 	t.Helper()
-	var found bool
-	for _, call := range _f3.MapParameterCalls {
-		if reflect.DeepEqual(call.Parameters.Ident1, ident1) {
-			found = true
+	var found_sym5 bool
+	for _, call_sym5 := range f_sym5.MapParameterCalls {
+		if reflect.DeepEqual(call_sym5.Parameters.Ident1, ident1) {
+			found_sym5 = true
 			break
 		}
 	}
 
-	if !found {
+	if !found_sym5 {
 		t.Error("FakeMapper.MapParameter not called with expected parameters")
 	}
 }
 
 // MapParameterCalledOnceWith returns true if FakeMapper.MapParameter was called exactly once with the given values
-func (_f4 *FakeMapper) MapParameterCalledOnceWith(ident1 map[string]string) bool {
-	var count int
-	for _, call := range _f4.MapParameterCalls {
-		if reflect.DeepEqual(call.Parameters.Ident1, ident1) {
-			count++
+func (f_sym6 *FakeMapper) MapParameterCalledOnceWith(ident1 map[string]string) bool {
+	var count_sym6 int
+	for _, call_sym6 := range f_sym6.MapParameterCalls {
+		if reflect.DeepEqual(call_sym6.Parameters.Ident1, ident1) {
+			count_sym6++
 		}
 	}
 
-	return count == 1
+	return count_sym6 == 1
 }
 
 // AssertMapParameterCalledOnceWith calls t.Error if FakeMapper.MapParameter was not called exactly once with the given values
-func (_f5 *FakeMapper) AssertMapParameterCalledOnceWith(t MapperTestingT, ident1 map[string]string) {
+func (f_sym7 *FakeMapper) AssertMapParameterCalledOnceWith(t MapperTestingT, ident1 map[string]string) {
 	t.Helper()
-	var count int
-	for _, call := range _f5.MapParameterCalls {
-		if reflect.DeepEqual(call.Parameters.Ident1, ident1) {
-			count++
+	var count_sym7 int
+	for _, call_sym7 := range f_sym7.MapParameterCalls {
+		if reflect.DeepEqual(call_sym7.Parameters.Ident1, ident1) {
+			count_sym7++
 		}
 	}
 
-	if count != 1 {
-		t.Errorf("FakeMapper.MapParameter called %d times with expected parameters, expected one", count)
+	if count_sym7 != 1 {
+		t.Errorf("FakeMapper.MapParameter called %d times with expected parameters, expected one", count_sym7)
 	}
 }
 
-func (_f6 *FakeMapper) MapReturn() (ident1 map[string]string) {
-	if _f6.MapReturnHook == nil {
+func (f_sym8 *FakeMapper) MapReturn() (ident1 map[string]string) {
+	if f_sym8.MapReturnHook == nil {
 		panic("Mapper.MapReturn() called but FakeMapper.MapReturnHook is nil")
 	}
 
-	invocation := new(MapperMapReturnInvocation)
-	_f6.MapReturnCalls = append(_f6.MapReturnCalls, invocation)
+	invocation_sym8 := new(MapperMapReturnInvocation)
+	f_sym8.MapReturnCalls = append(f_sym8.MapReturnCalls, invocation_sym8)
 
-	ident1 = _f6.MapReturnHook()
+	ident1 = f_sym8.MapReturnHook()
 
-	invocation.Results.Ident1 = ident1
+	invocation_sym8.Results.Ident1 = ident1
 
 	return
+}
+
+// SetMapReturnStub configures Mapper.MapReturn to always return the given values
+func (f_sym9 *FakeMapper) SetMapReturnStub(ident1 map[string]string) {
+	f_sym9.MapReturnHook = func() map[string]string {
+		return ident1
+	}
 }
 
 // MapReturnCalled returns true if FakeMapper.MapReturn was called

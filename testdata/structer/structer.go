@@ -20,6 +20,23 @@ type StructerStructInvocation struct {
 	}
 }
 
+// NewStructerStructInvocation creates a new instance of StructerStructInvocation
+func NewStructerStructInvocation(ident1 struct {
+	a string
+	b string
+}, ident2 struct {
+	c string
+	d string
+}) *StructerStructInvocation {
+	invocation := new(StructerStructInvocation)
+
+	invocation.Parameters.Ident1 = ident1
+
+	invocation.Results.Ident2 = ident2
+
+	return invocation
+}
+
 // StructerNamedStructInvocation represents a single call of FakeStructer.NamedStruct
 type StructerNamedStructInvocation struct {
 	Parameters struct {
@@ -34,6 +51,23 @@ type StructerNamedStructInvocation struct {
 			d string
 		}
 	}
+}
+
+// NewStructerNamedStructInvocation creates a new instance of StructerNamedStructInvocation
+func NewStructerNamedStructInvocation(a struct {
+	a string
+	b string
+}, z struct {
+	c string
+	d string
+}) *StructerNamedStructInvocation {
+	invocation := new(StructerNamedStructInvocation)
+
+	invocation.Parameters.A = a
+
+	invocation.Results.Z = z
+
+	return invocation
 }
 
 // StructerTestingT represents the methods of "testing".T used by charlatan Fakes.  It avoids importing the testing package.
@@ -119,7 +153,7 @@ func NewFakeStructerDefaultPanic() *FakeStructer {
 }
 
 // NewFakeStructerDefaultFatal returns an instance of FakeStructer with all hooks configured to call t.Fatal
-func NewFakeStructerDefaultFatal(t StructerTestingT) *FakeStructer {
+func NewFakeStructerDefaultFatal(t_sym1 StructerTestingT) *FakeStructer {
 	return &FakeStructer{
 		StructHook: func(struct {
 			a string
@@ -128,7 +162,7 @@ func NewFakeStructerDefaultFatal(t StructerTestingT) *FakeStructer {
 			c string
 			d string
 		}) {
-			t.Fatal("Unexpected call to Structer.Struct")
+			t_sym1.Fatal("Unexpected call to Structer.Struct")
 			return
 		},
 		NamedStructHook: func(struct {
@@ -138,14 +172,14 @@ func NewFakeStructerDefaultFatal(t StructerTestingT) *FakeStructer {
 			c string
 			d string
 		}) {
-			t.Fatal("Unexpected call to Structer.NamedStruct")
+			t_sym1.Fatal("Unexpected call to Structer.NamedStruct")
 			return
 		},
 	}
 }
 
 // NewFakeStructerDefaultError returns an instance of FakeStructer with all hooks configured to call t.Error
-func NewFakeStructerDefaultError(t StructerTestingT) *FakeStructer {
+func NewFakeStructerDefaultError(t_sym2 StructerTestingT) *FakeStructer {
 	return &FakeStructer{
 		StructHook: func(struct {
 			a string
@@ -154,7 +188,7 @@ func NewFakeStructerDefaultError(t StructerTestingT) *FakeStructer {
 			c string
 			d string
 		}) {
-			t.Error("Unexpected call to Structer.Struct")
+			t_sym2.Error("Unexpected call to Structer.Struct")
 			return
 		},
 		NamedStructHook: func(struct {
@@ -164,7 +198,7 @@ func NewFakeStructerDefaultError(t StructerTestingT) *FakeStructer {
 			c string
 			d string
 		}) {
-			t.Error("Unexpected call to Structer.NamedStruct")
+			t_sym2.Error("Unexpected call to Structer.NamedStruct")
 			return
 		},
 	}
@@ -175,27 +209,68 @@ func (f *FakeStructer) Reset() {
 	f.NamedStructCalls = []*StructerNamedStructInvocation{}
 }
 
-func (_f1 *FakeStructer) Struct(ident1 struct {
+func (f_sym3 *FakeStructer) Struct(ident1 struct {
 	a string
 	b string
 }) (ident2 struct {
 	c string
 	d string
 }) {
-	if _f1.StructHook == nil {
+	if f_sym3.StructHook == nil {
 		panic("Structer.Struct() called but FakeStructer.StructHook is nil")
 	}
 
-	invocation := new(StructerStructInvocation)
-	_f1.StructCalls = append(_f1.StructCalls, invocation)
+	invocation_sym3 := new(StructerStructInvocation)
+	f_sym3.StructCalls = append(f_sym3.StructCalls, invocation_sym3)
 
-	invocation.Parameters.Ident1 = ident1
+	invocation_sym3.Parameters.Ident1 = ident1
 
-	ident2 = _f1.StructHook(ident1)
+	ident2 = f_sym3.StructHook(ident1)
 
-	invocation.Results.Ident2 = ident2
+	invocation_sym3.Results.Ident2 = ident2
 
 	return
+}
+
+// SetStructStub configures Structer.Struct to always return the given values
+func (f_sym4 *FakeStructer) SetStructStub(ident2 struct {
+	c string
+	d string
+}) {
+	f_sym4.StructHook = func(struct {
+		a string
+		b string
+	}) struct {
+		c string
+		d string
+	} {
+		return ident2
+	}
+}
+
+// SetStructInvocation configures Structer.Struct to return the given results when called with the given parameters
+// If no match is found for an invocation the result(s) of the fallback function are returned
+func (f_sym5 *FakeStructer) SetStructInvocation(calls_sym5 []*StructerStructInvocation, fallback_sym5 func() struct {
+	c string
+	d string
+}) {
+	f_sym5.StructHook = func(ident1 struct {
+		a string
+		b string
+	}) (ident2 struct {
+		c string
+		d string
+	}) {
+		for _, call_sym5 := range calls_sym5 {
+			if reflect.DeepEqual(call_sym5.Parameters.Ident1, ident1) {
+				ident2 = call_sym5.Results.Ident2
+
+				return
+			}
+		}
+
+		return fallback_sym5()
+	}
 }
 
 // StructCalled returns true if FakeStructer.Struct was called
@@ -251,84 +326,83 @@ func (f *FakeStructer) AssertStructCalledN(t StructerTestingT, n int) {
 }
 
 // StructCalledWith returns true if FakeStructer.Struct was called with the given values
-func (_f2 *FakeStructer) StructCalledWith(ident1 struct {
+func (f_sym6 *FakeStructer) StructCalledWith(ident1 struct {
 	a string
 	b string
-}) (found bool) {
-	for _, call := range _f2.StructCalls {
-		if reflect.DeepEqual(call.Parameters.Ident1, ident1) {
-			found = true
-			break
+}) bool {
+	for _, call_sym6 := range f_sym6.StructCalls {
+		if reflect.DeepEqual(call_sym6.Parameters.Ident1, ident1) {
+			return true
 		}
 	}
 
-	return
+	return false
 }
 
 // AssertStructCalledWith calls t.Error if FakeStructer.Struct was not called with the given values
-func (_f3 *FakeStructer) AssertStructCalledWith(t StructerTestingT, ident1 struct {
+func (f_sym7 *FakeStructer) AssertStructCalledWith(t StructerTestingT, ident1 struct {
 	a string
 	b string
 }) {
 	t.Helper()
-	var found bool
-	for _, call := range _f3.StructCalls {
-		if reflect.DeepEqual(call.Parameters.Ident1, ident1) {
-			found = true
+	var found_sym7 bool
+	for _, call_sym7 := range f_sym7.StructCalls {
+		if reflect.DeepEqual(call_sym7.Parameters.Ident1, ident1) {
+			found_sym7 = true
 			break
 		}
 	}
 
-	if !found {
+	if !found_sym7 {
 		t.Error("FakeStructer.Struct not called with expected parameters")
 	}
 }
 
 // StructCalledOnceWith returns true if FakeStructer.Struct was called exactly once with the given values
-func (_f4 *FakeStructer) StructCalledOnceWith(ident1 struct {
+func (f_sym8 *FakeStructer) StructCalledOnceWith(ident1 struct {
 	a string
 	b string
 }) bool {
-	var count int
-	for _, call := range _f4.StructCalls {
-		if reflect.DeepEqual(call.Parameters.Ident1, ident1) {
-			count++
+	var count_sym8 int
+	for _, call_sym8 := range f_sym8.StructCalls {
+		if reflect.DeepEqual(call_sym8.Parameters.Ident1, ident1) {
+			count_sym8++
 		}
 	}
 
-	return count == 1
+	return count_sym8 == 1
 }
 
 // AssertStructCalledOnceWith calls t.Error if FakeStructer.Struct was not called exactly once with the given values
-func (_f5 *FakeStructer) AssertStructCalledOnceWith(t StructerTestingT, ident1 struct {
+func (f_sym9 *FakeStructer) AssertStructCalledOnceWith(t StructerTestingT, ident1 struct {
 	a string
 	b string
 }) {
 	t.Helper()
-	var count int
-	for _, call := range _f5.StructCalls {
-		if reflect.DeepEqual(call.Parameters.Ident1, ident1) {
-			count++
+	var count_sym9 int
+	for _, call_sym9 := range f_sym9.StructCalls {
+		if reflect.DeepEqual(call_sym9.Parameters.Ident1, ident1) {
+			count_sym9++
 		}
 	}
 
-	if count != 1 {
-		t.Errorf("FakeStructer.Struct called %d times with expected parameters, expected one", count)
+	if count_sym9 != 1 {
+		t.Errorf("FakeStructer.Struct called %d times with expected parameters, expected one", count_sym9)
 	}
 }
 
 // StructResultsForCall returns the result values for the first call to FakeStructer.Struct with the given values
-func (_f6 *FakeStructer) StructResultsForCall(ident1 struct {
+func (f_sym10 *FakeStructer) StructResultsForCall(ident1 struct {
 	a string
 	b string
 }) (ident2 struct {
 	c string
 	d string
-}, found bool) {
-	for _, call := range _f6.StructCalls {
-		if reflect.DeepEqual(call.Parameters.Ident1, ident1) {
-			ident2 = call.Results.Ident2
-			found = true
+}, found_sym10 bool) {
+	for _, call_sym10 := range f_sym10.StructCalls {
+		if reflect.DeepEqual(call_sym10.Parameters.Ident1, ident1) {
+			ident2 = call_sym10.Results.Ident2
+			found_sym10 = true
 			break
 		}
 	}
@@ -336,27 +410,68 @@ func (_f6 *FakeStructer) StructResultsForCall(ident1 struct {
 	return
 }
 
-func (_f7 *FakeStructer) NamedStruct(a struct {
+func (f_sym11 *FakeStructer) NamedStruct(a struct {
 	a string
 	b string
 }) (z struct {
 	c string
 	d string
 }) {
-	if _f7.NamedStructHook == nil {
+	if f_sym11.NamedStructHook == nil {
 		panic("Structer.NamedStruct() called but FakeStructer.NamedStructHook is nil")
 	}
 
-	invocation := new(StructerNamedStructInvocation)
-	_f7.NamedStructCalls = append(_f7.NamedStructCalls, invocation)
+	invocation_sym11 := new(StructerNamedStructInvocation)
+	f_sym11.NamedStructCalls = append(f_sym11.NamedStructCalls, invocation_sym11)
 
-	invocation.Parameters.A = a
+	invocation_sym11.Parameters.A = a
 
-	z = _f7.NamedStructHook(a)
+	z = f_sym11.NamedStructHook(a)
 
-	invocation.Results.Z = z
+	invocation_sym11.Results.Z = z
 
 	return
+}
+
+// SetNamedStructStub configures Structer.NamedStruct to always return the given values
+func (f_sym12 *FakeStructer) SetNamedStructStub(z struct {
+	c string
+	d string
+}) {
+	f_sym12.NamedStructHook = func(struct {
+		a string
+		b string
+	}) struct {
+		c string
+		d string
+	} {
+		return z
+	}
+}
+
+// SetNamedStructInvocation configures Structer.NamedStruct to return the given results when called with the given parameters
+// If no match is found for an invocation the result(s) of the fallback function are returned
+func (f_sym13 *FakeStructer) SetNamedStructInvocation(calls_sym13 []*StructerNamedStructInvocation, fallback_sym13 func() struct {
+	c string
+	d string
+}) {
+	f_sym13.NamedStructHook = func(a struct {
+		a string
+		b string
+	}) (z struct {
+		c string
+		d string
+	}) {
+		for _, call_sym13 := range calls_sym13 {
+			if reflect.DeepEqual(call_sym13.Parameters.A, a) {
+				z = call_sym13.Results.Z
+
+				return
+			}
+		}
+
+		return fallback_sym13()
+	}
 }
 
 // NamedStructCalled returns true if FakeStructer.NamedStruct was called
@@ -412,84 +527,83 @@ func (f *FakeStructer) AssertNamedStructCalledN(t StructerTestingT, n int) {
 }
 
 // NamedStructCalledWith returns true if FakeStructer.NamedStruct was called with the given values
-func (_f8 *FakeStructer) NamedStructCalledWith(a struct {
+func (f_sym14 *FakeStructer) NamedStructCalledWith(a struct {
 	a string
 	b string
-}) (found bool) {
-	for _, call := range _f8.NamedStructCalls {
-		if reflect.DeepEqual(call.Parameters.A, a) {
-			found = true
-			break
+}) bool {
+	for _, call_sym14 := range f_sym14.NamedStructCalls {
+		if reflect.DeepEqual(call_sym14.Parameters.A, a) {
+			return true
 		}
 	}
 
-	return
+	return false
 }
 
 // AssertNamedStructCalledWith calls t.Error if FakeStructer.NamedStruct was not called with the given values
-func (_f9 *FakeStructer) AssertNamedStructCalledWith(t StructerTestingT, a struct {
+func (f_sym15 *FakeStructer) AssertNamedStructCalledWith(t StructerTestingT, a struct {
 	a string
 	b string
 }) {
 	t.Helper()
-	var found bool
-	for _, call := range _f9.NamedStructCalls {
-		if reflect.DeepEqual(call.Parameters.A, a) {
-			found = true
+	var found_sym15 bool
+	for _, call_sym15 := range f_sym15.NamedStructCalls {
+		if reflect.DeepEqual(call_sym15.Parameters.A, a) {
+			found_sym15 = true
 			break
 		}
 	}
 
-	if !found {
+	if !found_sym15 {
 		t.Error("FakeStructer.NamedStruct not called with expected parameters")
 	}
 }
 
 // NamedStructCalledOnceWith returns true if FakeStructer.NamedStruct was called exactly once with the given values
-func (_f10 *FakeStructer) NamedStructCalledOnceWith(a struct {
+func (f_sym16 *FakeStructer) NamedStructCalledOnceWith(a struct {
 	a string
 	b string
 }) bool {
-	var count int
-	for _, call := range _f10.NamedStructCalls {
-		if reflect.DeepEqual(call.Parameters.A, a) {
-			count++
+	var count_sym16 int
+	for _, call_sym16 := range f_sym16.NamedStructCalls {
+		if reflect.DeepEqual(call_sym16.Parameters.A, a) {
+			count_sym16++
 		}
 	}
 
-	return count == 1
+	return count_sym16 == 1
 }
 
 // AssertNamedStructCalledOnceWith calls t.Error if FakeStructer.NamedStruct was not called exactly once with the given values
-func (_f11 *FakeStructer) AssertNamedStructCalledOnceWith(t StructerTestingT, a struct {
+func (f_sym17 *FakeStructer) AssertNamedStructCalledOnceWith(t StructerTestingT, a struct {
 	a string
 	b string
 }) {
 	t.Helper()
-	var count int
-	for _, call := range _f11.NamedStructCalls {
-		if reflect.DeepEqual(call.Parameters.A, a) {
-			count++
+	var count_sym17 int
+	for _, call_sym17 := range f_sym17.NamedStructCalls {
+		if reflect.DeepEqual(call_sym17.Parameters.A, a) {
+			count_sym17++
 		}
 	}
 
-	if count != 1 {
-		t.Errorf("FakeStructer.NamedStruct called %d times with expected parameters, expected one", count)
+	if count_sym17 != 1 {
+		t.Errorf("FakeStructer.NamedStruct called %d times with expected parameters, expected one", count_sym17)
 	}
 }
 
 // NamedStructResultsForCall returns the result values for the first call to FakeStructer.NamedStruct with the given values
-func (_f12 *FakeStructer) NamedStructResultsForCall(a struct {
+func (f_sym18 *FakeStructer) NamedStructResultsForCall(a struct {
 	a string
 	b string
 }) (z struct {
 	c string
 	d string
-}, found bool) {
-	for _, call := range _f12.NamedStructCalls {
-		if reflect.DeepEqual(call.Parameters.A, a) {
-			z = call.Results.Z
-			found = true
+}, found_sym18 bool) {
+	for _, call_sym18 := range f_sym18.NamedStructCalls {
+		if reflect.DeepEqual(call_sym18.Parameters.A, a) {
+			z = call_sym18.Results.Z
+			found_sym18 = true
 			break
 		}
 	}

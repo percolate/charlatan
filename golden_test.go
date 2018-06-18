@@ -17,6 +17,7 @@ var (
 		"Channeler",
 		"Embedder",
 		"Funcer",
+		"Identifier",
 		"Interfacer",
 		"Importer",
 		"Mapper",

@@ -71,28 +71,28 @@ func NewFakeFuncerDefaultPanic() *FakeFuncer {
 }
 
 // NewFakeFuncerDefaultFatal returns an instance of FakeFuncer with all hooks configured to call t.Fatal
-func NewFakeFuncerDefaultFatal(t FuncerTestingT) *FakeFuncer {
+func NewFakeFuncerDefaultFatal(t_sym1 FuncerTestingT) *FakeFuncer {
 	return &FakeFuncer{
 		FuncParameterHook: func(func(string) string) {
-			t.Fatal("Unexpected call to Funcer.FuncParameter")
+			t_sym1.Fatal("Unexpected call to Funcer.FuncParameter")
 			return
 		},
 		FuncReturnHook: func() (ident1 func(string) string) {
-			t.Fatal("Unexpected call to Funcer.FuncReturn")
+			t_sym1.Fatal("Unexpected call to Funcer.FuncReturn")
 			return
 		},
 	}
 }
 
 // NewFakeFuncerDefaultError returns an instance of FakeFuncer with all hooks configured to call t.Error
-func NewFakeFuncerDefaultError(t FuncerTestingT) *FakeFuncer {
+func NewFakeFuncerDefaultError(t_sym2 FuncerTestingT) *FakeFuncer {
 	return &FakeFuncer{
 		FuncParameterHook: func(func(string) string) {
-			t.Error("Unexpected call to Funcer.FuncParameter")
+			t_sym2.Error("Unexpected call to Funcer.FuncParameter")
 			return
 		},
 		FuncReturnHook: func() (ident1 func(string) string) {
-			t.Error("Unexpected call to Funcer.FuncReturn")
+			t_sym2.Error("Unexpected call to Funcer.FuncReturn")
 			return
 		},
 	}
@@ -103,17 +103,17 @@ func (f *FakeFuncer) Reset() {
 	f.FuncReturnCalls = []*FuncerFuncReturnInvocation{}
 }
 
-func (_f1 *FakeFuncer) FuncParameter(ident1 func(string) string) {
-	if _f1.FuncParameterHook == nil {
+func (f_sym3 *FakeFuncer) FuncParameter(ident1 func(string) string) {
+	if f_sym3.FuncParameterHook == nil {
 		panic("Funcer.FuncParameter() called but FakeFuncer.FuncParameterHook is nil")
 	}
 
-	invocation := new(FuncerFuncParameterInvocation)
-	_f1.FuncParameterCalls = append(_f1.FuncParameterCalls, invocation)
+	invocation_sym3 := new(FuncerFuncParameterInvocation)
+	f_sym3.FuncParameterCalls = append(f_sym3.FuncParameterCalls, invocation_sym3)
 
-	invocation.Parameters.Ident1 = ident1
+	invocation_sym3.Parameters.Ident1 = ident1
 
-	_f1.FuncParameterHook(ident1)
+	f_sym3.FuncParameterHook(ident1)
 
 	return
 }
@@ -171,73 +171,79 @@ func (f *FakeFuncer) AssertFuncParameterCalledN(t FuncerTestingT, n int) {
 }
 
 // FuncParameterCalledWith returns true if FakeFuncer.FuncParameter was called with the given values
-func (_f2 *FakeFuncer) FuncParameterCalledWith(ident1 func(string) string) (found bool) {
-	for _, call := range _f2.FuncParameterCalls {
-		if reflect.DeepEqual(call.Parameters.Ident1, ident1) {
-			found = true
-			break
+func (f_sym4 *FakeFuncer) FuncParameterCalledWith(ident1 func(string) string) bool {
+	for _, call_sym4 := range f_sym4.FuncParameterCalls {
+		if reflect.DeepEqual(call_sym4.Parameters.Ident1, ident1) {
+			return true
 		}
 	}
 
-	return
+	return false
 }
 
 // AssertFuncParameterCalledWith calls t.Error if FakeFuncer.FuncParameter was not called with the given values
-func (_f3 *FakeFuncer) AssertFuncParameterCalledWith(t FuncerTestingT, ident1 func(string) string) {
+func (f_sym5 *FakeFuncer) AssertFuncParameterCalledWith(t FuncerTestingT, ident1 func(string) string) {
 	t.Helper()
-	var found bool
-	for _, call := range _f3.FuncParameterCalls {
-		if reflect.DeepEqual(call.Parameters.Ident1, ident1) {
-			found = true
+	var found_sym5 bool
+	for _, call_sym5 := range f_sym5.FuncParameterCalls {
+		if reflect.DeepEqual(call_sym5.Parameters.Ident1, ident1) {
+			found_sym5 = true
 			break
 		}
 	}
 
-	if !found {
+	if !found_sym5 {
 		t.Error("FakeFuncer.FuncParameter not called with expected parameters")
 	}
 }
 
 // FuncParameterCalledOnceWith returns true if FakeFuncer.FuncParameter was called exactly once with the given values
-func (_f4 *FakeFuncer) FuncParameterCalledOnceWith(ident1 func(string) string) bool {
-	var count int
-	for _, call := range _f4.FuncParameterCalls {
-		if reflect.DeepEqual(call.Parameters.Ident1, ident1) {
-			count++
+func (f_sym6 *FakeFuncer) FuncParameterCalledOnceWith(ident1 func(string) string) bool {
+	var count_sym6 int
+	for _, call_sym6 := range f_sym6.FuncParameterCalls {
+		if reflect.DeepEqual(call_sym6.Parameters.Ident1, ident1) {
+			count_sym6++
 		}
 	}
 
-	return count == 1
+	return count_sym6 == 1
 }
 
 // AssertFuncParameterCalledOnceWith calls t.Error if FakeFuncer.FuncParameter was not called exactly once with the given values
-func (_f5 *FakeFuncer) AssertFuncParameterCalledOnceWith(t FuncerTestingT, ident1 func(string) string) {
+func (f_sym7 *FakeFuncer) AssertFuncParameterCalledOnceWith(t FuncerTestingT, ident1 func(string) string) {
 	t.Helper()
-	var count int
-	for _, call := range _f5.FuncParameterCalls {
-		if reflect.DeepEqual(call.Parameters.Ident1, ident1) {
-			count++
+	var count_sym7 int
+	for _, call_sym7 := range f_sym7.FuncParameterCalls {
+		if reflect.DeepEqual(call_sym7.Parameters.Ident1, ident1) {
+			count_sym7++
 		}
 	}
 
-	if count != 1 {
-		t.Errorf("FakeFuncer.FuncParameter called %d times with expected parameters, expected one", count)
+	if count_sym7 != 1 {
+		t.Errorf("FakeFuncer.FuncParameter called %d times with expected parameters, expected one", count_sym7)
 	}
 }
 
-func (_f6 *FakeFuncer) FuncReturn() (ident1 func(string) string) {
-	if _f6.FuncReturnHook == nil {
+func (f_sym8 *FakeFuncer) FuncReturn() (ident1 func(string) string) {
+	if f_sym8.FuncReturnHook == nil {
 		panic("Funcer.FuncReturn() called but FakeFuncer.FuncReturnHook is nil")
 	}
 
-	invocation := new(FuncerFuncReturnInvocation)
-	_f6.FuncReturnCalls = append(_f6.FuncReturnCalls, invocation)
+	invocation_sym8 := new(FuncerFuncReturnInvocation)
+	f_sym8.FuncReturnCalls = append(f_sym8.FuncReturnCalls, invocation_sym8)
 
-	ident1 = _f6.FuncReturnHook()
+	ident1 = f_sym8.FuncReturnHook()
 
-	invocation.Results.Ident1 = ident1
+	invocation_sym8.Results.Ident1 = ident1
 
 	return
+}
+
+// SetFuncReturnStub configures Funcer.FuncReturn to always return the given values
+func (f_sym9 *FakeFuncer) SetFuncReturnStub(ident1 func(string) string) {
+	f_sym9.FuncReturnHook = func() func(string) string {
+		return ident1
+	}
 }
 
 // FuncReturnCalled returns true if FakeFuncer.FuncReturn was called

@@ -5,7 +5,7 @@
 [![BSD](https://img.shields.io/badge/license-BSD-blue.svg)](https://github.com/percolate/charlatan/blob/master/LICENSE)
 [![Go Report Card](https://goreportcard.com/badge/github.com/percolate/charlatan)](https://goreportcard.com/report/github.com/percolate/charlatan)
 
-Percolate's Go Interface Mocking Tool.
+Percolate's Go Interface Mocking Tool.  Please read our [introductory blog post](https://medium.com/percolate-engineering/introducing-charlatan-df9b5d3d3107).
 
 ## Installation
 
@@ -30,7 +30,7 @@ Options:
 ```
 
 If you would like the mock implementations to live in the same package
-as the interace definition then use the simplest invocation as a
+as the interface definition then use the simplest invocation as a
 directive:
 
     //go:generate charlatan Interface
@@ -42,7 +42,7 @@ or from the command line:
 You can chose the output path using `-output`, which must include the
 name of the generated source file.  Any intermediate directories in the
 path that don't exist will be created.  The package used in the
-generated file's `pacakge` directive can be set using `-package`.
+generated file's `package` directive can be set using `-package`.
 
 ## Example
 
@@ -75,7 +75,7 @@ type QueryInvocation struct {
 	}
 }
 
-type FetechInvocation struct {
+type FetchInvocation struct {
 	Parameters struct {
 		Id string
 	}
@@ -126,7 +126,7 @@ func TestUsingService(t *testing.T) {
 		},
 	}
 
-	// use the `svc` instance in the code under text ...
+	// use the `svc` instance in the code under test ...
 
 	// assert state of FakeService ...
 	svc.AssertQueryCalledOnce(t)
@@ -135,7 +135,7 @@ func TestUsingService(t *testing.T) {
 
 Create anonymous function implementations for only those interface
 methods that should be called in the code under test.  This will force
-a painc if any unexpected calls are made to the mock implementation.
+a panic if any unexpected calls are made to the mock implementation.
 
 The generated code has `godoc` formatted comments explaining the use
 of the mock and its methods.

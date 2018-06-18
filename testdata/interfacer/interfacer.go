@@ -14,6 +14,17 @@ type InterfacerInterfaceInvocation struct {
 	}
 }
 
+// NewInterfacerInterfaceInvocation creates a new instance of InterfacerInterfaceInvocation
+func NewInterfacerInterfaceInvocation(ident1 interface{}, ident2 interface{}) *InterfacerInterfaceInvocation {
+	invocation := new(InterfacerInterfaceInvocation)
+
+	invocation.Parameters.Ident1 = ident1
+
+	invocation.Results.Ident2 = ident2
+
+	return invocation
+}
+
 // InterfacerNamedInterfaceInvocation represents a single call of FakeInterfacer.NamedInterface
 type InterfacerNamedInterfaceInvocation struct {
 	Parameters struct {
@@ -22,6 +33,17 @@ type InterfacerNamedInterfaceInvocation struct {
 	Results struct {
 		Z interface{}
 	}
+}
+
+// NewInterfacerNamedInterfaceInvocation creates a new instance of InterfacerNamedInterfaceInvocation
+func NewInterfacerNamedInterfaceInvocation(a interface{}, z interface{}) *InterfacerNamedInterfaceInvocation {
+	invocation := new(InterfacerNamedInterfaceInvocation)
+
+	invocation.Parameters.A = a
+
+	invocation.Results.Z = z
+
+	return invocation
 }
 
 // InterfacerTestingT represents the methods of "testing".T used by charlatan Fakes.  It avoids importing the testing package.
@@ -77,28 +99,28 @@ func NewFakeInterfacerDefaultPanic() *FakeInterfacer {
 }
 
 // NewFakeInterfacerDefaultFatal returns an instance of FakeInterfacer with all hooks configured to call t.Fatal
-func NewFakeInterfacerDefaultFatal(t InterfacerTestingT) *FakeInterfacer {
+func NewFakeInterfacerDefaultFatal(t_sym1 InterfacerTestingT) *FakeInterfacer {
 	return &FakeInterfacer{
 		InterfaceHook: func(interface{}) (ident2 interface{}) {
-			t.Fatal("Unexpected call to Interfacer.Interface")
+			t_sym1.Fatal("Unexpected call to Interfacer.Interface")
 			return
 		},
 		NamedInterfaceHook: func(interface{}) (z interface{}) {
-			t.Fatal("Unexpected call to Interfacer.NamedInterface")
+			t_sym1.Fatal("Unexpected call to Interfacer.NamedInterface")
 			return
 		},
 	}
 }
 
 // NewFakeInterfacerDefaultError returns an instance of FakeInterfacer with all hooks configured to call t.Error
-func NewFakeInterfacerDefaultError(t InterfacerTestingT) *FakeInterfacer {
+func NewFakeInterfacerDefaultError(t_sym2 InterfacerTestingT) *FakeInterfacer {
 	return &FakeInterfacer{
 		InterfaceHook: func(interface{}) (ident2 interface{}) {
-			t.Error("Unexpected call to Interfacer.Interface")
+			t_sym2.Error("Unexpected call to Interfacer.Interface")
 			return
 		},
 		NamedInterfaceHook: func(interface{}) (z interface{}) {
-			t.Error("Unexpected call to Interfacer.NamedInterface")
+			t_sym2.Error("Unexpected call to Interfacer.NamedInterface")
 			return
 		},
 	}
@@ -109,21 +131,44 @@ func (f *FakeInterfacer) Reset() {
 	f.NamedInterfaceCalls = []*InterfacerNamedInterfaceInvocation{}
 }
 
-func (_f1 *FakeInterfacer) Interface(ident1 interface{}) (ident2 interface{}) {
-	if _f1.InterfaceHook == nil {
+func (f_sym3 *FakeInterfacer) Interface(ident1 interface{}) (ident2 interface{}) {
+	if f_sym3.InterfaceHook == nil {
 		panic("Interfacer.Interface() called but FakeInterfacer.InterfaceHook is nil")
 	}
 
-	invocation := new(InterfacerInterfaceInvocation)
-	_f1.InterfaceCalls = append(_f1.InterfaceCalls, invocation)
+	invocation_sym3 := new(InterfacerInterfaceInvocation)
+	f_sym3.InterfaceCalls = append(f_sym3.InterfaceCalls, invocation_sym3)
 
-	invocation.Parameters.Ident1 = ident1
+	invocation_sym3.Parameters.Ident1 = ident1
 
-	ident2 = _f1.InterfaceHook(ident1)
+	ident2 = f_sym3.InterfaceHook(ident1)
 
-	invocation.Results.Ident2 = ident2
+	invocation_sym3.Results.Ident2 = ident2
 
 	return
+}
+
+// SetInterfaceStub configures Interfacer.Interface to always return the given values
+func (f_sym4 *FakeInterfacer) SetInterfaceStub(ident2 interface{}) {
+	f_sym4.InterfaceHook = func(interface{}) interface{} {
+		return ident2
+	}
+}
+
+// SetInterfaceInvocation configures Interfacer.Interface to return the given results when called with the given parameters
+// If no match is found for an invocation the result(s) of the fallback function are returned
+func (f_sym5 *FakeInterfacer) SetInterfaceInvocation(calls_sym5 []*InterfacerInterfaceInvocation, fallback_sym5 func() interface{}) {
+	f_sym5.InterfaceHook = func(ident1 interface{}) (ident2 interface{}) {
+		for _, call_sym5 := range calls_sym5 {
+			if reflect.DeepEqual(call_sym5.Parameters.Ident1, ident1) {
+				ident2 = call_sym5.Results.Ident2
+
+				return
+			}
+		}
+
+		return fallback_sym5()
+	}
 }
 
 // InterfaceCalled returns true if FakeInterfacer.Interface was called
@@ -179,66 +224,65 @@ func (f *FakeInterfacer) AssertInterfaceCalledN(t InterfacerTestingT, n int) {
 }
 
 // InterfaceCalledWith returns true if FakeInterfacer.Interface was called with the given values
-func (_f2 *FakeInterfacer) InterfaceCalledWith(ident1 interface{}) (found bool) {
-	for _, call := range _f2.InterfaceCalls {
-		if reflect.DeepEqual(call.Parameters.Ident1, ident1) {
-			found = true
-			break
+func (f_sym6 *FakeInterfacer) InterfaceCalledWith(ident1 interface{}) bool {
+	for _, call_sym6 := range f_sym6.InterfaceCalls {
+		if reflect.DeepEqual(call_sym6.Parameters.Ident1, ident1) {
+			return true
 		}
 	}
 
-	return
+	return false
 }
 
 // AssertInterfaceCalledWith calls t.Error if FakeInterfacer.Interface was not called with the given values
-func (_f3 *FakeInterfacer) AssertInterfaceCalledWith(t InterfacerTestingT, ident1 interface{}) {
+func (f_sym7 *FakeInterfacer) AssertInterfaceCalledWith(t InterfacerTestingT, ident1 interface{}) {
 	t.Helper()
-	var found bool
-	for _, call := range _f3.InterfaceCalls {
-		if reflect.DeepEqual(call.Parameters.Ident1, ident1) {
-			found = true
+	var found_sym7 bool
+	for _, call_sym7 := range f_sym7.InterfaceCalls {
+		if reflect.DeepEqual(call_sym7.Parameters.Ident1, ident1) {
+			found_sym7 = true
 			break
 		}
 	}
 
-	if !found {
+	if !found_sym7 {
 		t.Error("FakeInterfacer.Interface not called with expected parameters")
 	}
 }
 
 // InterfaceCalledOnceWith returns true if FakeInterfacer.Interface was called exactly once with the given values
-func (_f4 *FakeInterfacer) InterfaceCalledOnceWith(ident1 interface{}) bool {
-	var count int
-	for _, call := range _f4.InterfaceCalls {
-		if reflect.DeepEqual(call.Parameters.Ident1, ident1) {
-			count++
+func (f_sym8 *FakeInterfacer) InterfaceCalledOnceWith(ident1 interface{}) bool {
+	var count_sym8 int
+	for _, call_sym8 := range f_sym8.InterfaceCalls {
+		if reflect.DeepEqual(call_sym8.Parameters.Ident1, ident1) {
+			count_sym8++
 		}
 	}
 
-	return count == 1
+	return count_sym8 == 1
 }
 
 // AssertInterfaceCalledOnceWith calls t.Error if FakeInterfacer.Interface was not called exactly once with the given values
-func (_f5 *FakeInterfacer) AssertInterfaceCalledOnceWith(t InterfacerTestingT, ident1 interface{}) {
+func (f_sym9 *FakeInterfacer) AssertInterfaceCalledOnceWith(t InterfacerTestingT, ident1 interface{}) {
 	t.Helper()
-	var count int
-	for _, call := range _f5.InterfaceCalls {
-		if reflect.DeepEqual(call.Parameters.Ident1, ident1) {
-			count++
+	var count_sym9 int
+	for _, call_sym9 := range f_sym9.InterfaceCalls {
+		if reflect.DeepEqual(call_sym9.Parameters.Ident1, ident1) {
+			count_sym9++
 		}
 	}
 
-	if count != 1 {
-		t.Errorf("FakeInterfacer.Interface called %d times with expected parameters, expected one", count)
+	if count_sym9 != 1 {
+		t.Errorf("FakeInterfacer.Interface called %d times with expected parameters, expected one", count_sym9)
 	}
 }
 
 // InterfaceResultsForCall returns the result values for the first call to FakeInterfacer.Interface with the given values
-func (_f6 *FakeInterfacer) InterfaceResultsForCall(ident1 interface{}) (ident2 interface{}, found bool) {
-	for _, call := range _f6.InterfaceCalls {
-		if reflect.DeepEqual(call.Parameters.Ident1, ident1) {
-			ident2 = call.Results.Ident2
-			found = true
+func (f_sym10 *FakeInterfacer) InterfaceResultsForCall(ident1 interface{}) (ident2 interface{}, found_sym10 bool) {
+	for _, call_sym10 := range f_sym10.InterfaceCalls {
+		if reflect.DeepEqual(call_sym10.Parameters.Ident1, ident1) {
+			ident2 = call_sym10.Results.Ident2
+			found_sym10 = true
 			break
 		}
 	}
@@ -246,21 +290,44 @@ func (_f6 *FakeInterfacer) InterfaceResultsForCall(ident1 interface{}) (ident2 i
 	return
 }
 
-func (_f7 *FakeInterfacer) NamedInterface(a interface{}) (z interface{}) {
-	if _f7.NamedInterfaceHook == nil {
+func (f_sym11 *FakeInterfacer) NamedInterface(a interface{}) (z interface{}) {
+	if f_sym11.NamedInterfaceHook == nil {
 		panic("Interfacer.NamedInterface() called but FakeInterfacer.NamedInterfaceHook is nil")
 	}
 
-	invocation := new(InterfacerNamedInterfaceInvocation)
-	_f7.NamedInterfaceCalls = append(_f7.NamedInterfaceCalls, invocation)
+	invocation_sym11 := new(InterfacerNamedInterfaceInvocation)
+	f_sym11.NamedInterfaceCalls = append(f_sym11.NamedInterfaceCalls, invocation_sym11)
 
-	invocation.Parameters.A = a
+	invocation_sym11.Parameters.A = a
 
-	z = _f7.NamedInterfaceHook(a)
+	z = f_sym11.NamedInterfaceHook(a)
 
-	invocation.Results.Z = z
+	invocation_sym11.Results.Z = z
 
 	return
+}
+
+// SetNamedInterfaceStub configures Interfacer.NamedInterface to always return the given values
+func (f_sym12 *FakeInterfacer) SetNamedInterfaceStub(z interface{}) {
+	f_sym12.NamedInterfaceHook = func(interface{}) interface{} {
+		return z
+	}
+}
+
+// SetNamedInterfaceInvocation configures Interfacer.NamedInterface to return the given results when called with the given parameters
+// If no match is found for an invocation the result(s) of the fallback function are returned
+func (f_sym13 *FakeInterfacer) SetNamedInterfaceInvocation(calls_sym13 []*InterfacerNamedInterfaceInvocation, fallback_sym13 func() interface{}) {
+	f_sym13.NamedInterfaceHook = func(a interface{}) (z interface{}) {
+		for _, call_sym13 := range calls_sym13 {
+			if reflect.DeepEqual(call_sym13.Parameters.A, a) {
+				z = call_sym13.Results.Z
+
+				return
+			}
+		}
+
+		return fallback_sym13()
+	}
 }
 
 // NamedInterfaceCalled returns true if FakeInterfacer.NamedInterface was called
@@ -316,66 +383,65 @@ func (f *FakeInterfacer) AssertNamedInterfaceCalledN(t InterfacerTestingT, n int
 }
 
 // NamedInterfaceCalledWith returns true if FakeInterfacer.NamedInterface was called with the given values
-func (_f8 *FakeInterfacer) NamedInterfaceCalledWith(a interface{}) (found bool) {
-	for _, call := range _f8.NamedInterfaceCalls {
-		if reflect.DeepEqual(call.Parameters.A, a) {
-			found = true
-			break
+func (f_sym14 *FakeInterfacer) NamedInterfaceCalledWith(a interface{}) bool {
+	for _, call_sym14 := range f_sym14.NamedInterfaceCalls {
+		if reflect.DeepEqual(call_sym14.Parameters.A, a) {
+			return true
 		}
 	}
 
-	return
+	return false
 }
 
 // AssertNamedInterfaceCalledWith calls t.Error if FakeInterfacer.NamedInterface was not called with the given values
-func (_f9 *FakeInterfacer) AssertNamedInterfaceCalledWith(t InterfacerTestingT, a interface{}) {
+func (f_sym15 *FakeInterfacer) AssertNamedInterfaceCalledWith(t InterfacerTestingT, a interface{}) {
 	t.Helper()
-	var found bool
-	for _, call := range _f9.NamedInterfaceCalls {
-		if reflect.DeepEqual(call.Parameters.A, a) {
-			found = true
+	var found_sym15 bool
+	for _, call_sym15 := range f_sym15.NamedInterfaceCalls {
+		if reflect.DeepEqual(call_sym15.Parameters.A, a) {
+			found_sym15 = true
 			break
 		}
 	}
 
-	if !found {
+	if !found_sym15 {
 		t.Error("FakeInterfacer.NamedInterface not called with expected parameters")
 	}
 }
 
 // NamedInterfaceCalledOnceWith returns true if FakeInterfacer.NamedInterface was called exactly once with the given values
-func (_f10 *FakeInterfacer) NamedInterfaceCalledOnceWith(a interface{}) bool {
-	var count int
-	for _, call := range _f10.NamedInterfaceCalls {
-		if reflect.DeepEqual(call.Parameters.A, a) {
-			count++
+func (f_sym16 *FakeInterfacer) NamedInterfaceCalledOnceWith(a interface{}) bool {
+	var count_sym16 int
+	for _, call_sym16 := range f_sym16.NamedInterfaceCalls {
+		if reflect.DeepEqual(call_sym16.Parameters.A, a) {
+			count_sym16++
 		}
 	}
 
-	return count == 1
+	return count_sym16 == 1
 }
 
 // AssertNamedInterfaceCalledOnceWith calls t.Error if FakeInterfacer.NamedInterface was not called exactly once with the given values
-func (_f11 *FakeInterfacer) AssertNamedInterfaceCalledOnceWith(t InterfacerTestingT, a interface{}) {
+func (f_sym17 *FakeInterfacer) AssertNamedInterfaceCalledOnceWith(t InterfacerTestingT, a interface{}) {
 	t.Helper()
-	var count int
-	for _, call := range _f11.NamedInterfaceCalls {
-		if reflect.DeepEqual(call.Parameters.A, a) {
-			count++
+	var count_sym17 int
+	for _, call_sym17 := range f_sym17.NamedInterfaceCalls {
+		if reflect.DeepEqual(call_sym17.Parameters.A, a) {
+			count_sym17++
 		}
 	}
 
-	if count != 1 {
-		t.Errorf("FakeInterfacer.NamedInterface called %d times with expected parameters, expected one", count)
+	if count_sym17 != 1 {
+		t.Errorf("FakeInterfacer.NamedInterface called %d times with expected parameters, expected one", count_sym17)
 	}
 }
 
 // NamedInterfaceResultsForCall returns the result values for the first call to FakeInterfacer.NamedInterface with the given values
-func (_f12 *FakeInterfacer) NamedInterfaceResultsForCall(a interface{}) (z interface{}, found bool) {
-	for _, call := range _f12.NamedInterfaceCalls {
-		if reflect.DeepEqual(call.Parameters.A, a) {
-			z = call.Results.Z
-			found = true
+func (f_sym18 *FakeInterfacer) NamedInterfaceResultsForCall(a interface{}) (z interface{}, found_sym18 bool) {
+	for _, call_sym18 := range f_sym18.NamedInterfaceCalls {
+		if reflect.DeepEqual(call_sym18.Parameters.A, a) {
+			z = call_sym18.Results.Z
+			found_sym18 = true
 			break
 		}
 	}

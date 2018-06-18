@@ -54,20 +54,20 @@ func NewFakeVoiderDefaultPanic() *FakeVoider {
 }
 
 // NewFakeVoiderDefaultFatal returns an instance of FakeVoider with all hooks configured to call t.Fatal
-func NewFakeVoiderDefaultFatal(t VoiderTestingT) *FakeVoider {
+func NewFakeVoiderDefaultFatal(t_sym1 VoiderTestingT) *FakeVoider {
 	return &FakeVoider{
 		VoidMethodHook: func() {
-			t.Fatal("Unexpected call to Voider.VoidMethod")
+			t_sym1.Fatal("Unexpected call to Voider.VoidMethod")
 			return
 		},
 	}
 }
 
 // NewFakeVoiderDefaultError returns an instance of FakeVoider with all hooks configured to call t.Error
-func NewFakeVoiderDefaultError(t VoiderTestingT) *FakeVoider {
+func NewFakeVoiderDefaultError(t_sym2 VoiderTestingT) *FakeVoider {
 	return &FakeVoider{
 		VoidMethodHook: func() {
-			t.Error("Unexpected call to Voider.VoidMethod")
+			t_sym2.Error("Unexpected call to Voider.VoidMethod")
 			return
 		},
 	}
@@ -77,15 +77,15 @@ func (f *FakeVoider) Reset() {
 	f.VoidMethodCalls = []*VoiderVoidMethodInvocation{}
 }
 
-func (_f1 *FakeVoider) VoidMethod() {
-	if _f1.VoidMethodHook == nil {
+func (f_sym3 *FakeVoider) VoidMethod() {
+	if f_sym3.VoidMethodHook == nil {
 		panic("Voider.VoidMethod() called but FakeVoider.VoidMethodHook is nil")
 	}
 
-	invocation := new(VoiderVoidMethodInvocation)
-	_f1.VoidMethodCalls = append(_f1.VoidMethodCalls, invocation)
+	invocation_sym3 := new(VoiderVoidMethodInvocation)
+	f_sym3.VoidMethodCalls = append(f_sym3.VoidMethodCalls, invocation_sym3)
 
-	_f1.VoidMethodHook()
+	f_sym3.VoidMethodHook()
 
 	return
 }

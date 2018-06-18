@@ -16,6 +16,17 @@ type ImporterScanInvocation struct {
 	}
 }
 
+// NewImporterScanInvocation creates a new instance of ImporterScanInvocation
+func NewImporterScanInvocation(ident1 *Scanner, ident2 z.Reader) *ImporterScanInvocation {
+	invocation := new(ImporterScanInvocation)
+
+	invocation.Parameters.Ident1 = ident1
+
+	invocation.Results.Ident2 = ident2
+
+	return invocation
+}
+
 // ImporterTestingT represents the methods of "testing".T used by charlatan Fakes.  It avoids importing the testing package.
 type ImporterTestingT interface {
 	Error(...interface{})
@@ -64,20 +75,20 @@ func NewFakeImporterDefaultPanic() *FakeImporter {
 }
 
 // NewFakeImporterDefaultFatal returns an instance of FakeImporter with all hooks configured to call t.Fatal
-func NewFakeImporterDefaultFatal(t ImporterTestingT) *FakeImporter {
+func NewFakeImporterDefaultFatal(t_sym1 ImporterTestingT) *FakeImporter {
 	return &FakeImporter{
 		ScanHook: func(*Scanner) (ident2 z.Reader) {
-			t.Fatal("Unexpected call to Importer.Scan")
+			t_sym1.Fatal("Unexpected call to Importer.Scan")
 			return
 		},
 	}
 }
 
 // NewFakeImporterDefaultError returns an instance of FakeImporter with all hooks configured to call t.Error
-func NewFakeImporterDefaultError(t ImporterTestingT) *FakeImporter {
+func NewFakeImporterDefaultError(t_sym2 ImporterTestingT) *FakeImporter {
 	return &FakeImporter{
 		ScanHook: func(*Scanner) (ident2 z.Reader) {
-			t.Error("Unexpected call to Importer.Scan")
+			t_sym2.Error("Unexpected call to Importer.Scan")
 			return
 		},
 	}
@@ -87,21 +98,44 @@ func (f *FakeImporter) Reset() {
 	f.ScanCalls = []*ImporterScanInvocation{}
 }
 
-func (_f1 *FakeImporter) Scan(ident1 *Scanner) (ident2 z.Reader) {
-	if _f1.ScanHook == nil {
+func (f_sym3 *FakeImporter) Scan(ident1 *Scanner) (ident2 z.Reader) {
+	if f_sym3.ScanHook == nil {
 		panic("Importer.Scan() called but FakeImporter.ScanHook is nil")
 	}
 
-	invocation := new(ImporterScanInvocation)
-	_f1.ScanCalls = append(_f1.ScanCalls, invocation)
+	invocation_sym3 := new(ImporterScanInvocation)
+	f_sym3.ScanCalls = append(f_sym3.ScanCalls, invocation_sym3)
 
-	invocation.Parameters.Ident1 = ident1
+	invocation_sym3.Parameters.Ident1 = ident1
 
-	ident2 = _f1.ScanHook(ident1)
+	ident2 = f_sym3.ScanHook(ident1)
 
-	invocation.Results.Ident2 = ident2
+	invocation_sym3.Results.Ident2 = ident2
 
 	return
+}
+
+// SetScanStub configures Importer.Scan to always return the given values
+func (f_sym4 *FakeImporter) SetScanStub(ident2 z.Reader) {
+	f_sym4.ScanHook = func(*Scanner) z.Reader {
+		return ident2
+	}
+}
+
+// SetScanInvocation configures Importer.Scan to return the given results when called with the given parameters
+// If no match is found for an invocation the result(s) of the fallback function are returned
+func (f_sym5 *FakeImporter) SetScanInvocation(calls_sym5 []*ImporterScanInvocation, fallback_sym5 func() z.Reader) {
+	f_sym5.ScanHook = func(ident1 *Scanner) (ident2 z.Reader) {
+		for _, call_sym5 := range calls_sym5 {
+			if reflect.DeepEqual(call_sym5.Parameters.Ident1, ident1) {
+				ident2 = call_sym5.Results.Ident2
+
+				return
+			}
+		}
+
+		return fallback_sym5()
+	}
 }
 
 // ScanCalled returns true if FakeImporter.Scan was called
@@ -157,66 +191,65 @@ func (f *FakeImporter) AssertScanCalledN(t ImporterTestingT, n int) {
 }
 
 // ScanCalledWith returns true if FakeImporter.Scan was called with the given values
-func (_f2 *FakeImporter) ScanCalledWith(ident1 *Scanner) (found bool) {
-	for _, call := range _f2.ScanCalls {
-		if reflect.DeepEqual(call.Parameters.Ident1, ident1) {
-			found = true
-			break
+func (f_sym6 *FakeImporter) ScanCalledWith(ident1 *Scanner) bool {
+	for _, call_sym6 := range f_sym6.ScanCalls {
+		if reflect.DeepEqual(call_sym6.Parameters.Ident1, ident1) {
+			return true
 		}
 	}
 
-	return
+	return false
 }
 
 // AssertScanCalledWith calls t.Error if FakeImporter.Scan was not called with the given values
-func (_f3 *FakeImporter) AssertScanCalledWith(t ImporterTestingT, ident1 *Scanner) {
+func (f_sym7 *FakeImporter) AssertScanCalledWith(t ImporterTestingT, ident1 *Scanner) {
 	t.Helper()
-	var found bool
-	for _, call := range _f3.ScanCalls {
-		if reflect.DeepEqual(call.Parameters.Ident1, ident1) {
-			found = true
+	var found_sym7 bool
+	for _, call_sym7 := range f_sym7.ScanCalls {
+		if reflect.DeepEqual(call_sym7.Parameters.Ident1, ident1) {
+			found_sym7 = true
 			break
 		}
 	}
 
-	if !found {
+	if !found_sym7 {
 		t.Error("FakeImporter.Scan not called with expected parameters")
 	}
 }
 
 // ScanCalledOnceWith returns true if FakeImporter.Scan was called exactly once with the given values
-func (_f4 *FakeImporter) ScanCalledOnceWith(ident1 *Scanner) bool {
-	var count int
-	for _, call := range _f4.ScanCalls {
-		if reflect.DeepEqual(call.Parameters.Ident1, ident1) {
-			count++
+func (f_sym8 *FakeImporter) ScanCalledOnceWith(ident1 *Scanner) bool {
+	var count_sym8 int
+	for _, call_sym8 := range f_sym8.ScanCalls {
+		if reflect.DeepEqual(call_sym8.Parameters.Ident1, ident1) {
+			count_sym8++
 		}
 	}
 
-	return count == 1
+	return count_sym8 == 1
 }
 
 // AssertScanCalledOnceWith calls t.Error if FakeImporter.Scan was not called exactly once with the given values
-func (_f5 *FakeImporter) AssertScanCalledOnceWith(t ImporterTestingT, ident1 *Scanner) {
+func (f_sym9 *FakeImporter) AssertScanCalledOnceWith(t ImporterTestingT, ident1 *Scanner) {
 	t.Helper()
-	var count int
-	for _, call := range _f5.ScanCalls {
-		if reflect.DeepEqual(call.Parameters.Ident1, ident1) {
-			count++
+	var count_sym9 int
+	for _, call_sym9 := range f_sym9.ScanCalls {
+		if reflect.DeepEqual(call_sym9.Parameters.Ident1, ident1) {
+			count_sym9++
 		}
 	}
 
-	if count != 1 {
-		t.Errorf("FakeImporter.Scan called %d times with expected parameters, expected one", count)
+	if count_sym9 != 1 {
+		t.Errorf("FakeImporter.Scan called %d times with expected parameters, expected one", count_sym9)
 	}
 }
 
 // ScanResultsForCall returns the result values for the first call to FakeImporter.Scan with the given values
-func (_f6 *FakeImporter) ScanResultsForCall(ident1 *Scanner) (ident2 z.Reader, found bool) {
-	for _, call := range _f6.ScanCalls {
-		if reflect.DeepEqual(call.Parameters.Ident1, ident1) {
-			ident2 = call.Results.Ident2
-			found = true
+func (f_sym10 *FakeImporter) ScanResultsForCall(ident1 *Scanner) (ident2 z.Reader, found_sym10 bool) {
+	for _, call_sym10 := range f_sym10.ScanCalls {
+		if reflect.DeepEqual(call_sym10.Parameters.Ident1, ident1) {
+			ident2 = call_sym10.Results.Ident2
+			found_sym10 = true
 			break
 		}
 	}

@@ -1,6 +1,7 @@
 package main
 
 import (
+	"flag"
 	"fmt"
 	"go/ast"
 	"go/build"
@@ -255,9 +256,17 @@ func (g *Generator) Generate(interfaceNames []string) ([]byte, error) {
 		packageName = g.PackageOverride
 	}
 
-	argv := []string{"charlatan"}
+	var argv strings.Builder
+	argv.WriteString("charlatan")
+	flag.Visit(func(f *flag.Flag) {
+		fmt.Fprintf(&argv, " -%s=%s", f.Name, f.Value)
+	})
+	if flag.NArg() > 0 {
+		argv.WriteByte(' ')
+		argv.WriteString(strings.Join(flag.Args(), " "))
+	}
 	tmpl := charlatanTemplate{
-		CommandLine: strings.Join(append(argv, os.Args[1:]...), " "),
+		CommandLine: argv.String(),
 		PackageName: packageName,
 		Imports:     g.imports.GetRequired(),
 		Interfaces:  decls,
