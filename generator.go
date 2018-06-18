@@ -202,7 +202,7 @@ func (g *Generator) processInterface(name string, ifType *ast.InterfaceType) (*I
 			// N.B. - embedded interface from imported package
 			decl.embeds = append(decl.embeds, fmt.Sprintf("%s.%s", f.X.(*ast.Ident).String(), f.Sel.String()))
 		default:
-			return nil, fmt.Errorf("internal error: unsupported interface field: %#v\n", field.Type)
+			return nil, fmt.Errorf("internal error: unsupported interface field: %#v", field.Type)
 		}
 	}
 
@@ -256,12 +256,12 @@ func (g *Generator) Generate(interfaceNames []string) ([]byte, error) {
 	}
 
 	argv := []string{"charlatan"}
-	tmpl := Template{
+	tmpl := charlatanTemplate{
 		CommandLine: strings.Join(append(argv, os.Args[1:]...), " "),
 		PackageName: packageName,
 		Imports:     g.imports.GetRequired(),
 		Interfaces:  decls,
 	}
 
-	return tmpl.Execute()
+	return tmpl.execute()
 }

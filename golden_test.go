@@ -70,9 +70,8 @@ func CheckOneGolden(t *testing.T) {
 	name := path.Base(t.Name())
 	lname := strings.ToLower(name)
 
-	// reset gensyms
-	symGen.Reset()
-	identSymGen.Reset()
+	symGen.reset()
+	identSymGen.reset()
 
 	inputFilename := fmt.Sprintf("./testdata/%s/%s_def.go", lname, lname)
 	outputFilename := fmt.Sprintf("./testdata/%s/%s.go", lname, lname)
