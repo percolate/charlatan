@@ -114,7 +114,7 @@ func extractIdentifiersFromField(field *ast.Field, imports *ImportSet) ([]*Ident
 
 	if len(field.Names) == 0 {
 		return []*Identifier{
-			&Identifier{
+			{
 				Name:      identSymGen.Next(),
 				valueType: identifierType,
 			},
