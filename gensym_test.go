@@ -6,36 +6,36 @@ import (
 )
 
 func TestGensym(t *testing.T) {
-	g := Gensym()
+	g := gensym()
 
 	assert.Equal(t, g, "G1")
 }
 
 func TestSymbolGenerator_Next(t *testing.T) {
-	s := SymbolGenerator{
+	s := symbolGenerator{
 		Prefix: "A",
 		Suffix: "Z",
 	}
 
-	n := s.Next()
-	n2 := s.Next()
+	n := s.next()
+	n2 := s.next()
 
 	assert.Equal(t, n, "A1Z")
 	assert.Equal(t, n2, "A2Z")
 }
 
 func TestSymbolGenerator_Reset(t *testing.T) {
-	s := SymbolGenerator{
+	s := symbolGenerator{
 		Prefix: "A",
 		Suffix: "Z",
 	}
 
 	preCount := s.count
-	n := s.Next()
+	n := s.next()
 	onceCount := s.count
-	n2 := s.Next()
+	n2 := s.next()
 	twiceCount := s.count
-	s.Reset()
+	s.reset()
 
 	assert.Equal(t, n, "A1Z")
 	assert.Equal(t, n2, "A2Z")

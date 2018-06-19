@@ -70,7 +70,7 @@ Use it in your tests as in this example:
 	func TestWithEmbedder(t *testing.T) {
 		f := &main.FakeEmbedder{
 			StringHook: func() (ident5 string) {
-				// ensure parameters meet expections, signal errors using t, etc
+				// ensure parameters meet expectations, signal errors using t, etc
 				return
 			},
 		}

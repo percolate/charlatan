@@ -71,7 +71,7 @@ Use it in your tests as in this example:
 	func TestWithNamedvaluer(t *testing.T) {
 		f := &main.FakeNamedvaluer{
 			ManyNamedHook: func(a string, b string, f int, g int) (ret bool) {
-				// ensure parameters meet expections, signal errors using t, etc
+				// ensure parameters meet expectations, signal errors using t, etc
 				return
 			},
 		}

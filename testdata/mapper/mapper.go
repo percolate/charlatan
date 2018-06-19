@@ -35,7 +35,7 @@ Use it in your tests as in this example:
 	func TestWithMapper(t *testing.T) {
 		f := &main.FakeMapper{
 			MapParameterHook: func(ident1 map[string]string) () {
-				// ensure parameters meet expections, signal errors using t, etc
+				// ensure parameters meet expectations, signal errors using t, etc
 				return
 			},
 		}

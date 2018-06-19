@@ -10,27 +10,27 @@ const (
 )
 
 var (
-	defaultSymbolGenerator = SymbolGenerator{Prefix: defaultPrefix}
+	defaultSymbolGenerator = symbolGenerator{Prefix: defaultPrefix}
 	defaultMutex           sync.Mutex
 )
 
-func Gensym() string {
+func gensym() string {
 	defaultMutex.Lock()
 	defer defaultMutex.Unlock()
-	return defaultSymbolGenerator.Next()
+	return defaultSymbolGenerator.next()
 }
 
-type SymbolGenerator struct {
+type symbolGenerator struct {
 	Prefix string
 	Suffix string
 	count  uint64
 }
 
-func (s *SymbolGenerator) Next() string {
+func (s *symbolGenerator) next() string {
 	s.count++
 	return fmt.Sprintf("%s%d%s", s.Prefix, s.count, s.Suffix)
 }
 
-func (s *SymbolGenerator) Reset() {
+func (s *symbolGenerator) reset() {
 	s.count = 0
 }

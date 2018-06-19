@@ -126,7 +126,7 @@ Use it in your tests as in this example:
 	func TestWithChanneler(t *testing.T) {
 		f := &main.FakeChanneler{
 			ChannelHook: func(ident1 chan int) (ident2 chan int) {
-				// ensure parameters meet expections, signal errors using t, etc
+				// ensure parameters meet expectations, signal errors using t, etc
 				return
 			},
 		}

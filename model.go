@@ -12,7 +12,7 @@ import (
 )
 
 var (
-	identSymGen = SymbolGenerator{Prefix: "ident"}
+	identSymGen = symbolGenerator{Prefix: "ident"}
 )
 
 // Import represents a declared import
@@ -28,6 +28,7 @@ type ImportSet struct {
 	imports []*Import
 }
 
+// Add inserts the given value into the set if it doesn't already exist
 func (r *ImportSet) Add(value *Import) {
 	if r.imports == nil {
 		r.imports = []*Import{value}
@@ -36,9 +37,10 @@ func (r *ImportSet) Add(value *Import) {
 	}
 }
 
-func (r *ImportSet) Contains(ri *Import) bool {
+// Contains returns true if the given value is in the set
+func (r *ImportSet) Contains(value *Import) bool {
 	for _, i := range r.imports {
-		if i.Name == ri.Name && i.Path == ri.Path {
+		if i.Name == value.Name && i.Path == value.Path {
 			return true
 		}
 	}
@@ -46,6 +48,7 @@ func (r *ImportSet) Contains(ri *Import) bool {
 	return false
 }
 
+// GetRequired returns all imports referenced by the target interface
 func (r *ImportSet) GetRequired() []*Import {
 	result := make([]*Import, 0, len(r.imports))
 	for _, imp := range r.imports {
@@ -56,6 +59,7 @@ func (r *ImportSet) GetRequired() []*Import {
 	return result
 }
 
+// RequireByName marks an import symbol as required
 func (r *ImportSet) RequireByName(s string) {
 	for i, imp := range r.imports {
 		if imp.Name == s || imp.Alias == s {
@@ -82,7 +86,7 @@ func (i *Interface) addMethodFromField(field *ast.Field, imports *ImportSet) err
 		Name:      field.Names[0].Name,
 	}
 
-	identSymGen.Reset()
+	identSymGen.reset()
 	// `Params.List` can be 0-length, but `Results` can be nil
 	for _, parameter := range functionType.Params.List {
 		identifiers, err := extractIdentifiersFromField(parameter, imports)
@@ -114,8 +118,8 @@ func extractIdentifiersFromField(field *ast.Field, imports *ImportSet) ([]*Ident
 
 	if len(field.Names) == 0 {
 		return []*Identifier{
-			&Identifier{
-				Name:      identSymGen.Next(),
+			{
+				Name:      identSymGen.next(),
 				ValueType: identifierType,
 			},
 		}, nil
@@ -277,7 +281,7 @@ func extractIdentifiersFromTuple(tuple *types.Tuple, imports *ImportSet) ([]*Ide
 			ValueType: identifierType,
 		}
 		if "" == ident.Name {
-			ident.Name = identSymGen.Next()
+			ident.Name = identSymGen.next()
 		}
 		idents[i] = ident
 	}
@@ -370,6 +374,7 @@ type Method struct {
 	resultsSignature      string
 }
 
+// ParametersDeclaration returns the formal declaration syntax for the method's parameters
 func (m *Method) ParametersDeclaration() string {
 	if len(m.Parameters) == 0 {
 		return ""
@@ -385,6 +390,7 @@ func (m *Method) ParametersDeclaration() string {
 	return m.parametersDeclaration
 }
 
+// ResultsDeclaration returns the formal declaration syntax for the method's results
 func (m *Method) ResultsDeclaration() string {
 	if len(m.Results) == 0 {
 		return ""
@@ -400,6 +406,7 @@ func (m *Method) ResultsDeclaration() string {
 	return m.resultsDeclaration
 }
 
+// ParametersReference returns the sytax to reference the method's parameters
 func (m *Method) ParametersReference() string {
 	if len(m.Parameters) == 0 {
 		return ""
@@ -415,6 +422,7 @@ func (m *Method) ParametersReference() string {
 	return m.parametersCall
 }
 
+// ResultsReference returns the syntax to reference teh method's results
 func (m *Method) ResultsReference() string {
 	if len(m.Results) == 0 {
 		return ""
@@ -430,6 +438,7 @@ func (m *Method) ResultsReference() string {
 	return m.resultsCall
 }
 
+// ParametersSignature returns the type declaration syntax for the methods parameters
 func (m *Method) ParametersSignature() string {
 	if len(m.Parameters) == 0 {
 		return ""
@@ -445,6 +454,7 @@ func (m *Method) ParametersSignature() string {
 	return m.parametersSignature
 }
 
+// ResultsSignature returns the type declaration syntax for the methods results
 func (m *Method) ResultsSignature() string {
 	if len(m.Results) == 0 {
 		return ""
@@ -460,6 +470,7 @@ func (m *Method) ResultsSignature() string {
 	return m.resultsSignature
 }
 
+// Identifier is a declared identifier
 type Identifier struct {
 	Name            string
 	ValueType       Type
@@ -470,6 +481,7 @@ type Identifier struct {
 	signature       string
 }
 
+// TitleCase returns the identifier's name in title case
 func (i *Identifier) TitleCase() string {
 	if i.titleCase == "" {
 		i.titleCase = strings.Title(i.Name)
@@ -477,6 +489,7 @@ func (i *Identifier) TitleCase() string {
 	return i.titleCase
 }
 
+// ParameterFormat returns the syntax to use the identifier as a parameter
 func (i *Identifier) ParameterFormat() string {
 	if i.parameterFormat == "" {
 		i.parameterFormat = fmt.Sprintf("%s %s", i.Name, i.ValueType.ParameterFormat())
@@ -485,6 +498,7 @@ func (i *Identifier) ParameterFormat() string {
 	return i.parameterFormat
 }
 
+// ReferenceFormat returns the syntax to refer to the identifier
 func (i *Identifier) ReferenceFormat() string {
 	if i.referenceFormat == "" {
 		i.referenceFormat = fmt.Sprintf("%s%s", i.Name, i.ValueType.ReferenceFormat())
@@ -493,6 +507,7 @@ func (i *Identifier) ReferenceFormat() string {
 	return i.referenceFormat
 }
 
+// FieldFormat returns the syntax to use the identifier as a field
 func (i *Identifier) FieldFormat() string {
 	if i.fieldFormat == "" {
 		i.fieldFormat = fmt.Sprintf("%s %s", i.TitleCase(), i.ValueType.FieldFormat())
@@ -501,6 +516,7 @@ func (i *Identifier) FieldFormat() string {
 	return i.fieldFormat
 }
 
+// Signature returns the syntax type signature syntax for the identifier
 func (i *Identifier) Signature() string {
 	if i.signature == "" {
 		i.signature = i.ValueType.ParameterFormat()
@@ -509,12 +525,17 @@ func (i *Identifier) Signature() string {
 	return i.signature
 }
 
+// Type is the interface for all built-in types
 type Type interface {
+	// ParameterFormat returns syntax for a parameter declaration
 	ParameterFormat() string
+	// ReferenceFormat returns the syntax for a reference
 	ReferenceFormat() string
+	// FieldFormat returns the syntax for a field declaration
 	FieldFormat() string
 }
 
+// Array is the built-in array type
 type Array struct {
 	subType         Type
 	scale           string
@@ -522,6 +543,7 @@ type Array struct {
 	fieldFormat     string
 }
 
+// ParameterFormat returns syntax for a parameter declaration
 func (t *Array) ParameterFormat() string {
 	if t.parameterFormat != "" {
 		return t.parameterFormat
@@ -532,10 +554,12 @@ func (t *Array) ParameterFormat() string {
 	return t.parameterFormat
 }
 
+// ReferenceFormat returns the syntax for a reference
 func (t *Array) ReferenceFormat() string {
 	return ""
 }
 
+// FieldFormat returns the syntax for a field declaration
 func (t *Array) FieldFormat() string {
 	if t.fieldFormat != "" {
 		return t.fieldFormat
@@ -546,6 +570,7 @@ func (t *Array) FieldFormat() string {
 	return t.fieldFormat
 }
 
+// Map is the built-in map type
 type Map struct {
 	keyType         Type
 	subType         Type
@@ -553,6 +578,7 @@ type Map struct {
 	fieldFormat     string
 }
 
+// ParameterFormat returns syntax for a parameter declaration
 func (t *Map) ParameterFormat() string {
 	if t.parameterFormat != "" {
 		return t.parameterFormat
@@ -563,10 +589,12 @@ func (t *Map) ParameterFormat() string {
 	return t.parameterFormat
 }
 
+// ReferenceFormat returns the syntax for a reference
 func (t *Map) ReferenceFormat() string {
 	return ""
 }
 
+// FieldFormat returns the syntax for a field declaration
 func (t *Map) FieldFormat() string {
 	if t.fieldFormat != "" {
 		return t.fieldFormat
@@ -577,12 +605,14 @@ func (t *Map) FieldFormat() string {
 	return t.fieldFormat
 }
 
+// Ellipsis is the built-in vararg type
 type Ellipsis struct {
 	subType         Type
 	parameterFormat string
 	fieldFormat     string
 }
 
+// ParameterFormat returns syntax for a parameter declaration
 func (t *Ellipsis) ParameterFormat() string {
 	if t.parameterFormat != "" {
 		return t.parameterFormat
@@ -593,10 +623,12 @@ func (t *Ellipsis) ParameterFormat() string {
 	return t.parameterFormat
 }
 
+// ReferenceFormat returns the syntax for a reference
 func (t *Ellipsis) ReferenceFormat() string {
 	return "..."
 }
 
+// FieldFormat returns the syntax for a field declaration
 func (t *Ellipsis) FieldFormat() string {
 	if t.fieldFormat != "" {
 		return t.fieldFormat
@@ -607,12 +639,14 @@ func (t *Ellipsis) FieldFormat() string {
 	return t.fieldFormat
 }
 
+// Channel is the built-in bidirectional channel
 type Channel struct {
 	subType         Type
 	parameterFormat string
 	fieldFormat     string
 }
 
+// ParameterFormat returns syntax for a parameter declaration
 func (t *Channel) ParameterFormat() string {
 	if t.parameterFormat != "" {
 		return t.parameterFormat
@@ -623,10 +657,12 @@ func (t *Channel) ParameterFormat() string {
 	return t.parameterFormat
 }
 
+// ReferenceFormat returns the syntax for a reference
 func (t *Channel) ReferenceFormat() string {
 	return ""
 }
 
+// FieldFormat returns the syntax for a field declaration
 func (t *Channel) FieldFormat() string {
 	if t.fieldFormat != "" {
 		return t.fieldFormat
@@ -637,12 +673,14 @@ func (t *Channel) FieldFormat() string {
 	return t.fieldFormat
 }
 
+// ReceiveChannel is the built-in receive-only channel
 type ReceiveChannel struct {
 	subType         Type
 	parameterFormat string
 	fieldFormat     string
 }
 
+// ParameterFormat returns syntax for a parameter declaration
 func (t *ReceiveChannel) ParameterFormat() string {
 	if t.parameterFormat != "" {
 		return t.parameterFormat
@@ -653,10 +691,12 @@ func (t *ReceiveChannel) ParameterFormat() string {
 	return t.parameterFormat
 }
 
+// ReferenceFormat returns the syntax for a reference
 func (t *ReceiveChannel) ReferenceFormat() string {
 	return ""
 }
 
+// FieldFormat returns the syntax for a field declaration
 func (t *ReceiveChannel) FieldFormat() string {
 	if t.fieldFormat != "" {
 		return t.fieldFormat
@@ -667,12 +707,14 @@ func (t *ReceiveChannel) FieldFormat() string {
 	return t.fieldFormat
 }
 
+// SendChannel is the built-in send-only channel
 type SendChannel struct {
 	subType         Type
 	parameterFormat string
 	fieldFormat     string
 }
 
+// ParameterFormat returns syntax for a parameter declaration
 func (t *SendChannel) ParameterFormat() string {
 	if t.parameterFormat != "" {
 		return t.parameterFormat
@@ -683,10 +725,12 @@ func (t *SendChannel) ParameterFormat() string {
 	return t.parameterFormat
 }
 
+// ReferenceFormat returns the syntax for a reference
 func (t *SendChannel) ReferenceFormat() string {
 	return ""
 }
 
+// FieldFormat returns the syntax for a field declaration
 func (t *SendChannel) FieldFormat() string {
 	if t.fieldFormat != "" {
 		return t.fieldFormat
@@ -697,12 +741,14 @@ func (t *SendChannel) FieldFormat() string {
 	return t.fieldFormat
 }
 
+// Pointer is the built-in pointer type
 type Pointer struct {
 	subType         Type
 	parameterFormat string
 	fieldFormat     string
 }
 
+// ParameterFormat returns syntax for a parameter declaration
 func (t *Pointer) ParameterFormat() string {
 	if t.parameterFormat != "" {
 		return t.parameterFormat
@@ -713,10 +759,12 @@ func (t *Pointer) ParameterFormat() string {
 	return t.parameterFormat
 }
 
+// ReferenceFormat returns the syntax for a reference
 func (t *Pointer) ReferenceFormat() string {
 	return t.subType.ReferenceFormat()
 }
 
+// FieldFormat returns the syntax for a field declaration
 func (t *Pointer) FieldFormat() string {
 	if t.fieldFormat != "" {
 		return t.fieldFormat
@@ -727,6 +775,7 @@ func (t *Pointer) FieldFormat() string {
 	return t.fieldFormat
 }
 
+// BasicType represents all built-in simple types
 type BasicType struct {
 	Name            string
 	Qualifier       string
@@ -734,6 +783,7 @@ type BasicType struct {
 	fieldFormat     string
 }
 
+// ParameterFormat returns syntax for a parameter declaration
 func (t *BasicType) ParameterFormat() string {
 	if t.parameterFormat != "" {
 		return t.parameterFormat
@@ -748,10 +798,12 @@ func (t *BasicType) ParameterFormat() string {
 	return t.parameterFormat
 }
 
+// ReferenceFormat returns the syntax for a reference
 func (t *BasicType) ReferenceFormat() string {
 	return ""
 }
 
+// FieldFormat returns the syntax for a field declaration
 func (t *BasicType) FieldFormat() string {
 	if t.fieldFormat != "" {
 		return t.fieldFormat

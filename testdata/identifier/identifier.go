@@ -67,7 +67,7 @@ Use it in your tests as in this example:
 	func TestWithIdentifier(t *testing.T) {
 		f := &main.FakeIdentifier{
 			TestConstructorHook: func(val int64) (t string) {
-				// ensure parameters meet expections, signal errors using t, etc
+				// ensure parameters meet expectations, signal errors using t, etc
 				return
 			},
 		}
