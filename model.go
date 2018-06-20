@@ -422,7 +422,7 @@ func (m *Method) ParametersReference() string {
 	return m.parametersCall
 }
 
-// ResultsReference returns the syntax to reference teh method's results
+// ResultsReference returns the syntax to reference the method's results
 func (m *Method) ResultsReference() string {
 	if len(m.Results) == 0 {
 		return ""
