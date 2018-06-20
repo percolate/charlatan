@@ -21,13 +21,13 @@ jobs:
 
   mdl:
     docker:
-      - image: prclt/cci-mdl:1.0.0
+      - image: rsrchboy/mdl
     steps:
       - checkout
       - run:
           name: Validate Markdown
           command: |
-            mdl -r ~MD010 $(find . -path ./vendor -prune -o -type f -name '*.md' -print)
+            mdl -r "~MD010" $(find . -path ./vendor -prune -o -type f -name '*.md' -print)
 
   release:
     docker:
