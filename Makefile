@@ -37,7 +37,7 @@ vet:
 	go vet ./...
 
 charlatan:
-	go build
+	go build -mod=vendor ./...
 
 # Get the capitalized interface name from the filename and pass it to charlatan
 %.go: %_def.go
