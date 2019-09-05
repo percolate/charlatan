@@ -31,13 +31,11 @@ jobs:
 
   release:
     docker:
-      - image: 667005031541.dkr.ecr.us-west-1.amazonaws.com/circleci/cci-release:1.0.3
+      - image: 667005031541.dkr.ecr.us-west-1.amazonaws.com/circleci/cci-release:2.1.0
     steps:
       - checkout
       - deploy:
           name: Deploy to GitHub Releases
-          environment:
-            GITHUB_TOKEN: ${GITHUB_OAUTH_TOKEN}
           command: |
             ci-make-release $(cat VERSION.txt)
 
