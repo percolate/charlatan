@@ -15,15 +15,6 @@ import (
 	"strings"
 )
 
-// Generator holds the state of the analysis
-type Generator struct {
-	// PackageOverride can be set to control the package for the output file.  The default is the same package as the input interface(s).
-	PackageOverride string
-	packageName     string
-	imports         *ImportSet
-	interfaces      map[string]*Interface
-}
-
 // LoadPackageDir parses a package in the given directory.
 func LoadPackageDir(directory string) (*Generator, error) {
 	pkg, err := build.Default.ImportDir(directory, 0)
@@ -82,6 +73,15 @@ func parsePackage(directory string, filenames []string) (*Generator, error) {
 	generator.packageName = pkg.Name()
 
 	return generator, nil
+}
+
+// Generator holds the state of the analysis
+type Generator struct {
+	// PackageOverride can be set to control the package for the output file.  The default is the same package as the input interface(s).
+	PackageOverride string
+	packageName     string
+	imports         *ImportSet
+	interfaces      map[string]*Interface
 }
 
 func (g *Generator) processImports(file *ast.File, importer types.Importer) error {
@@ -192,6 +192,9 @@ func (g *Generator) processInterface(name string, ifType *ast.InterfaceType) (*I
 
 	for _, field := range ifType.Methods.List {
 		switch f := field.Type.(type) {
+		case *ast.BinaryExpr:
+			// N.B. - type expression
+			continue
 		case *ast.FuncType:
 			if err := decl.addMethodFromField(field, g.imports); err != nil {
 				return nil, err
@@ -203,7 +206,7 @@ func (g *Generator) processInterface(name string, ifType *ast.InterfaceType) (*I
 			// N.B. - embedded interface from imported package
 			decl.embeds = append(decl.embeds, fmt.Sprintf("%s.%s", f.X.(*ast.Ident).String(), f.Sel.String()))
 		default:
-			return nil, fmt.Errorf("internal error: unsupported interface field: %#v", field.Type)
+			return nil, fmt.Errorf("internal error: unsupported interface field: %t, %#v", f, field.Type)
 		}
 	}
 
